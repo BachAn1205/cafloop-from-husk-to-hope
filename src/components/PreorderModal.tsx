@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Heart, Plus, Minus, CheckCircle, Sparkles, Bike, Coffee } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { useLanguage } from '../utils/LanguageContext';
 
 interface PreorderModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const { t } = useLanguage();
 
   const pricePerUnit = 150000;
   const totalPrice = quantity * pricePerUnit;
@@ -67,7 +69,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-[#E3EDD3] text-[#335C33] hover:bg-[#d6e3c2] transition-colors"
+            className="absolute top-4 right-4 p-2 rounded-full bg-[#E3EDD3] text-[#335C33] hover:bg-[#d6e3c2] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -78,40 +80,40 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                 <CheckCircle className="w-10 h-10" />
               </div>
               <h3 className="text-xl font-bold text-[#335C33] font-serif mb-2">
-                Cảm Ơn Tấm Lòng Của Bạn!
+                {t('modalSuccessTitle')}
               </h3>
               <p className="text-xs text-[#2C2E2B]/80 leading-relaxed mb-5">
-                Thông tin ủng hộ {quantity} Hộp Trà Cascara CAFLOOP đã được ghi nhận. Đội ngũ điều phối dự án sẽ liên hệ bạn sớm để gửi trao hộp trà gây quỹ.
+                {t('modalSuccessDesc', { quantity })}
               </p>
               
               <div className="bg-[#E3EDD3] rounded-2xl p-4 mb-5 text-left text-xs">
                 <div className="flex items-center gap-2 font-bold text-[#335C33] mb-1">
                   <Bike className="w-4 h-4" />
-                  <span>Tác Động Trực Tiếp Của Bạn</span>
+                  <span>{t('modalSuccessDirectImpact')}</span>
                 </div>
                 <p className="text-[#8C5A35]">
-                  Đóng góp của bạn tương đương hỗ trợ {quantity * 25}% chi phí một chiếc xe đạp mới cho học sinh vùng cao.
+                  {t('modalSuccessImpactDesc', { percent: quantity * 25 })}
                 </p>
               </div>
 
               <button
                 onClick={handleReset}
-                className="w-full py-3 rounded-xl bg-[#335C33] text-[#F6F6EE] font-semibold text-xs hover:bg-[#284828] transition-colors"
+                className="w-full py-3 rounded-xl bg-[#335C33] text-[#F6F6EE] font-semibold text-xs hover:bg-[#284828] transition-colors cursor-pointer"
               >
-                Hoàn tất & Quay lại trang
+                {t('modalSuccessBtnDone')}
               </button>
             </div>
           ) : (
             <div>
               <div className="flex items-center gap-2 text-[#8C5A35] text-xs font-semibold uppercase tracking-wider mb-1">
                 <Sparkles className="w-3.5 h-3.5" />
-                Gây Quỹ Giáo Dục 2026
+                {t('modalFundraiseYear')}
               </div>
               <h3 className="text-xl font-bold text-[#335C33] font-serif mb-1">
-                Nhận Trà Cascara Gây Quỹ
+                {t('modalPreorderTitle')}
               </h3>
               <p className="text-xs text-[#8C5A35] mb-4">
-                100% lợi nhuận chuyển đổi thành xe đạp và trang thiết bị học tập.
+                {t('modalPreorderSub')}
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -122,8 +124,8 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                       <Coffee className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-[#335C33]">Hộp Trà Cascara (100g)</p>
-                      <p className="text-[11px] text-[#8C5A35]">150.000đ / hộp</p>
+                      <p className="text-xs font-bold text-[#335C33]">{t('modalItemName')}</p>
+                      <p className="text-[11px] text-[#8C5A35]">{t('modalItemPrice')}</p>
                     </div>
                   </div>
 
@@ -131,7 +133,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                     <button
                       type="button"
                       onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      className="p-1 text-[#335C33] hover:bg-[#E3EDD3] rounded"
+                      className="p-1 text-[#335C33] hover:bg-[#E3EDD3] rounded cursor-pointer"
                     >
                       <Minus className="w-3.5 h-3.5" />
                     </button>
@@ -139,7 +141,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                     <button
                       type="button"
                       onClick={() => setQuantity((q) => q + 1)}
-                      className="p-1 text-[#335C33] hover:bg-[#E3EDD3] rounded"
+                      className="p-1 text-[#335C33] hover:bg-[#E3EDD3] rounded cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
                     </button>
@@ -150,42 +152,42 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                 <div className="space-y-2.5">
                   <div>
                     <label className="block text-xs font-semibold text-[#335C33] mb-1">
-                      Họ và tên của bạn
+                      {t('modalFieldName')}
                     </label>
                     <input
                       type="text"
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="VD: Nguyễn Văn A"
+                      placeholder={t('modalFieldNamePlaceholder')}
                       className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-[#F6F6EE] border border-[#335C33]/25 focus:outline-none focus:border-[#335C33] focus:ring-1 focus:ring-[#335C33]"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-semibold text-[#335C33] mb-1">
-                      Số điện thoại nhận hàng
+                      {t('modalFieldPhone')}
                     </label>
                     <input
-                      type="tel"
+                      type="text"
                       required
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      placeholder="VD: 0912 345 678"
+                      placeholder={t('modalFieldPhonePlaceholder')}
                       className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-[#F6F6EE] border border-[#335C33]/25 focus:outline-none focus:border-[#335C33] focus:ring-1 focus:ring-[#335C33]"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-semibold text-[#335C33] mb-1">
-                      Địa chỉ nhận trà
+                      {t('modalFieldAddress')}
                     </label>
                     <input
                       type="text"
                       required
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
-                      placeholder="Địa chỉ giao hàng nhận trà gây quỹ"
+                      placeholder={t('modalFieldAddressPlaceholder')}
                       className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-[#F6F6EE] border border-[#335C33]/25 focus:outline-none focus:border-[#335C33] focus:ring-1 focus:ring-[#335C33]"
                     />
                   </div>
@@ -194,24 +196,26 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                 {/* Total impact & price summary */}
                 <div className="pt-2 flex items-center justify-between border-t border-[#335C33]/15">
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-[#8C5A35]">Tổng tiền ủng hộ</p>
+                    <p className="text-[10px] uppercase font-bold text-[#8C5A35]">{t('modalSummaryLabel')}</p>
                     <p className="text-base font-extrabold text-[#335C33]">
                       {totalPrice.toLocaleString('vi-VN')} đ
                     </p>
                   </div>
                   <span className="text-[10px] text-[#335C33] bg-[#E3EDD3] px-2 py-1 rounded-md font-semibold">
-                    Freeship toàn quốc
+                    {t('modalFreeship')}
                   </span>
                 </div>
 
                 {/* Submit button */}
-                <button
+                <motion.button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl bg-[#335C33] text-[#F6F6EE] font-bold text-xs flex items-center justify-center gap-2 hover:bg-[#284828] active:scale-[0.98] transition-all shadow-md"
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full py-3.5 rounded-xl bg-[#335C33] text-[#F6F6EE] font-bold text-xs flex items-center justify-center gap-2 hover:bg-[#284828] transition-[background-color] duration-200 shadow-md cursor-pointer border border-transparent"
                 >
                   <Heart className="w-4 h-4 fill-current text-[#E3EDD3]" />
-                  <span>Xác Nhận Ủng Hộ & Nhận Trà</span>
-                </button>
+                  <span>{t('modalBtnConfirm')}</span>
+                </motion.button>
               </form>
             </div>
           )}

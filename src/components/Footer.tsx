@@ -1,9 +1,12 @@
 import { motion } from 'motion/react';
 import { Leaf, Heart, School, ArrowUp } from 'lucide-react';
+import { useLanguage } from '../utils/LanguageContext';
 
 const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
 export function Footer() {
+  const { t } = useLanguage();
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -28,34 +31,34 @@ export function Footer() {
         </div>
 
         <p className="text-xs text-[#2C2E2B]/75 leading-relaxed max-w-sm mx-auto mb-4">
-          Dự án kinh tế tuần hoàn tái chế vỏ quả cà phê chín mọng thành trà Cascara thượng hạng, gây quỹ học bổng và trang thiết bị cho các điểm trường vùng cao Tây Nguyên.
+          {t('footerDesc')}
         </p>
 
         {/* School beneficiary badge */}
         <div className="inline-flex items-center gap-2 bg-[#F6F6EE] border border-[#335C33]/15 px-3.5 py-2 rounded-xl text-xs text-[#335C33] font-medium mb-6 shadow-xs">
           <School className="w-4 h-4 text-[#8C5A35] flex-shrink-0" />
-          <span>Đối tác thụ hưởng: Trường TH Nguyễn Thị Minh Khai</span>
+          <span>{t('footerPartner')}</span>
         </div>
 
         {/* Scroll back up */}
         <div className="mb-6">
           <motion.button
             onClick={scrollToTop}
-            aria-label="Cuộn lên đầu trang"
+            aria-label={t('footerToTop')}
             whileHover={{ y: -2 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="inline-flex items-center gap-1.5 text-xs text-[#8C5A35] hover:text-[#335C33] font-medium transition-colors cursor-pointer"
           >
-            <span>Lên đầu trang</span>
+            <span>{t('footerToTop')}</span>
             <ArrowUp className="w-3.5 h-3.5" />
           </motion.button>
         </div>
 
         {/* Copyright */}
         <div className="pt-4 border-t border-[#335C33]/10 text-[10px] text-[#2C2E2B]/60 flex flex-col gap-1">
-          <p>© 2026 CAFLOOP - Dự Án Kinh Tế Tuần Hoàn & Quỹ Giáo Dục Vùng Cao</p>
+          <p>{t('footerCopyright')}</p>
           <div className="flex items-center justify-center gap-1 text-[#8C5A35]">
-            <span>Vì một tương lai xanh và ngời sáng tri thức</span>
+            <span>{t('footerSlogan')}</span>
             <Heart className="w-3 h-3 text-[#335C33] fill-current" />
           </div>
         </div>

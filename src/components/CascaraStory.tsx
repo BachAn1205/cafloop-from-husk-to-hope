@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { Coffee, Heart, Check, ShieldCheck, Flame, Droplets } from 'lucide-react';
+import { useLanguage } from '../utils/LanguageContext';
 
 const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
@@ -8,10 +9,12 @@ interface CascaraStoryProps {
 }
 
 export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
+  const { t } = useLanguage();
+
   const trustBadges = [
-    { icon: Check, label: 'Nông Nghiệp Sạch', color: 'text-[#335C33]' },
-    { icon: ShieldCheck, label: 'Không Phụ Gia', color: 'text-[#8C5A35]' },
-    { icon: Heart, label: 'Minh Bạch 100%', color: 'text-[#335C33]' },
+    { icon: Check, label: t('storyBadgeClean'), color: 'text-[#335C33]' },
+    { icon: ShieldCheck, label: t('storyBadgeAdditive'), color: 'text-[#8C5A35]' },
+    { icon: Heart, label: t('storyBadgeTransparent'), color: 'text-[#335C33]' },
   ];
 
   return (
@@ -28,13 +31,13 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
         >
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E3EDD3] text-[#335C33] text-xs font-semibold uppercase tracking-wider mb-2.5">
             <Coffee className="w-3.5 h-3.5 text-[#8C5A35]" />
-            Hương Vị Đại Ngàn
+            {t('storyBadge')}
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-[#335C33] font-serif tracking-tight">
-            Trà Cascara CAFLOOP
+            {t('storyTitle')}
           </h2>
           <p className="text-xs sm:text-sm text-[#8C5A35] mt-1.5 font-medium">
-            Mỗi giọt trà ngọt thanh mang theo niềm hy vọng đến trường
+            {t('storySub')}
           </p>
         </motion.div>
 
@@ -58,13 +61,13 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
             </div>
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C5A35] bg-[#E3EDD3] px-2 py-0.5 rounded-md">
-                Phiên Bản Gây Quỹ Giới Hạn
+                {t('storyCardBadge')}
               </span>
               <h3 className="text-base font-bold text-[#335C33] mt-1 leading-snug">
-                Hộp Trà Cascara 100g Thượng Hạng
+                {t('storyCardTitle')}
               </h3>
               <p className="text-xs text-[#2C2E2B]/75 mt-0.5">
-                Vị ngọt mận chín, hoa hồng dại & mật ong rừng
+                {t('storyCardDesc')}
               </p>
             </div>
           </div>
@@ -72,9 +75,9 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
           {/* Flavor & Health Highlights */}
           <div className="space-y-2.5 pt-3 border-t border-[#335C33]/10">
             {[
-              { icon: Droplets, text: <><strong>Giàu Polyphenol:</strong> Chống oxy hóa cao gấp 8 lần nước ép việt quất tự nhiên.</>, color: 'text-[#8C5A35]' },
-              { icon: Flame, text: <><strong>Lượng Caffein Dịu Nhẹ:</strong> Tỉnh táo tự nhiên, êm dịu dạ dày và giấc ngủ.</>, color: 'text-[#335C33]' },
-              { icon: ShieldCheck, text: <><strong>100% Lợi Nhuận Gây Quỹ:</strong> Mỗi hộp trà tài trợ 1 tuần học tập & bánh mì cho học sinh.</>, color: 'text-[#335C33]' },
+              { icon: Droplets, text: <><strong>{t('storyHighlight1Title')}</strong>{t('storyHighlight1Desc')}</>, color: 'text-[#8C5A35]' },
+              { icon: Flame, text: <><strong>{t('storyHighlight2Title')}</strong>{t('storyHighlight2Desc')}</>, color: 'text-[#335C33]' },
+              { icon: ShieldCheck, text: <><strong>{t('storyHighlight3Title')}</strong>{t('storyHighlight3Desc')}</>, color: 'text-[#335C33]' },
             ].map(({ icon: Icon, text, color }, i) => (
               <div key={i} className="flex items-start gap-2 text-xs text-[#2C2E2B]/85">
                 <Icon className={`w-4 h-4 ${color} flex-shrink-0 mt-0.5`} />
@@ -89,10 +92,10 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="w-full mt-4 py-3 px-4 rounded-xl bg-[#335C33] text-[#F6F6EE] font-semibold text-xs flex items-center justify-center gap-2 hover:bg-[#284828] transition-[background-color] duration-200 shadow-xs cursor-pointer"
+            className="w-full mt-4 py-3 px-4 rounded-xl bg-[#335C33] text-[#F6F6EE] font-semibold text-xs flex items-center justify-center gap-2 hover:bg-[#284828] transition-[background-color] duration-200 shadow-xs cursor-pointer border border-transparent"
           >
             <Heart className="w-4 h-4 text-[#E3EDD3] fill-[#E3EDD3]" />
-            <span>Ủng Hộ & Nhận Hộp Trà Gây Quỹ (150.000đ)</span>
+            <span>{t('storyBtnDonate')}</span>
           </motion.button>
         </motion.div>
 

@@ -9,11 +9,13 @@ import { Footer } from './components/Footer';
 import { PreorderModal } from './components/PreorderModal';
 import { Share2, Coffee, Volume2, VolumeX } from 'lucide-react';
 import { trungAudio } from './utils/audio';
+import { useLanguage } from './utils/LanguageContext';
 
 export default function App() {
   const [isOrderOpen, setIsOrderOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showFloatingBar, setShowFloatingBar] = useState(false);
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     const unsub = trungAudio.subscribe((playing) => {
@@ -82,7 +84,7 @@ export default function App() {
         {/* Floating Quick Action Sticky Bar on Scroll */}
         {showFloatingBar && (
           <aside
-            aria-label="Thanh tác vụ nhanh"
+            aria-label={language === 'vi' ? 'Thanh tác vụ nhanh' : 'Quick Actions'}
             className="fixed bottom-3 inset-x-0 z-40 flex justify-center px-4 pointer-events-none transition-all duration-300"
           >
             <div className="w-full max-w-[440px] bg-[#335C33]/95 backdrop-blur-md rounded-2xl p-2 px-3 shadow-xl border border-[#E3EDD3]/20 flex items-center justify-between pointer-events-auto text-[#F6F6EE]">
@@ -90,18 +92,18 @@ export default function App() {
               {/* Sound toggle quick */}
               <button
                 onClick={() => trungAudio.toggle()}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-medium transition-colors"
-                title="Bật/tắt thanh âm Tây Nguyên"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-medium transition-colors cursor-pointer"
+                title={t('navAudioToggle')}
               >
                 {isPlaying ? (
                   <>
                     <Volume2 className="w-3.5 h-3.5 text-[#E3EDD3] animate-pulse" />
-                    <span className="text-[11px] text-[#E3EDD3]">T'rưng ON</span>
+                    <span className="text-[11px] text-[#E3EDD3]">{t('floatingAudioOn')}</span>
                   </>
                 ) : (
                   <>
                     <VolumeX className="w-3.5 h-3.5 text-[#E3EDD3]/70" />
-                    <span className="text-[11px] text-[#E3EDD3]/90">T'rưng</span>
+                    <span className="text-[11px] text-[#E3EDD3]/90">{t('floatingAudioOff')}</span>
                   </>
                 )}
               </button>
@@ -110,18 +112,18 @@ export default function App() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleShareClick}
-                  className="p-2 rounded-xl bg-[#1877F2] text-white hover:bg-[#166fe5] transition-colors"
-                  title="Chia sẻ lên Facebook"
+                  className="p-2 rounded-xl bg-[#1877F2] text-white hover:bg-[#166fe5] transition-colors cursor-pointer"
+                  title={language === 'vi' ? 'Chia sẻ lên Facebook' : 'Share on Facebook'}
                 >
                   <Share2 className="w-4 h-4" />
                 </button>
 
                 <button
                   onClick={() => setIsOrderOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#E3EDD3] text-[#335C33] font-bold text-xs hover:bg-[#d5e3c1] transition-colors shadow-xs"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#E3EDD3] text-[#335C33] font-bold text-xs hover:bg-[#d5e3c1] transition-colors shadow-xs cursor-pointer"
                 >
                   <Coffee className="w-3.5 h-3.5" />
-                  <span>Ủng hộ trà</span>
+                  <span>{t('floatingSupport')}</span>
                 </button>
               </div>
 

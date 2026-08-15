@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Music, TreePine, ArrowDown, HeartHandshake, Coffee, Leaf } from 'lucide-react';
 import { trungAudio } from '../utils/audio';
+import { useLanguage } from '../utils/LanguageContext';
 import heroBg from '../../assets/image/h.jpg';
 
-// Natural cubic-bezier for organic, physical-feeling entries
 const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
 interface HeroSectionProps {
@@ -14,6 +14,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const unsub = trungAudio.subscribe((playing) => {
@@ -54,7 +55,7 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
         >
           <Leaf className="w-3.5 h-3.5 text-[#335C33]" />
           <span className="text-xs font-bold text-[#335C33] tracking-wide uppercase">
-            CAFLOOP • FROM HUSK TO HOPE
+            {t('heroBadge')}
           </span>
         </motion.div>
 
@@ -66,8 +67,8 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
           transition={{ duration: 0.6, delay: 0.08, ease: EASE_NATURAL }}
           className="text-3xl sm:text-4xl font-extrabold text-[#335C33] leading-[1.2] tracking-tight font-serif mb-4"
         >
-          Từ Vỏ Cà Phê Đến <br />
-          Tương Lai Ngời Sáng
+          {t('heroTitleLine1')} <br />
+          {t('heroTitleLine2')}
         </motion.h1>
 
         {/* Subtext */}
@@ -78,7 +79,7 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
           transition={{ duration: 0.6, delay: 0.16, ease: EASE_NATURAL }}
           className="text-base text-[#2C2E2B]/85 font-normal leading-relaxed mb-7 max-w-md"
         >
-          Thưởng thức Trà Cascara CAFLOOP - Cùng chung tay góp quỹ giáo dục cho học sinh vùng cao.
+          {t('heroSubtext')}
         </motion.p>
 
         {/* T'RƯNG MUSIC PLAYER */}
@@ -94,7 +95,7 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
               <motion.button
                 id="btn-trung-music-player"
                 onClick={handleToggleMusic}
-                aria-label="Lắng nghe thanh âm Đại Ngàn (Đàn T'rưng Tây Nguyên)"
+                aria-label={t('heroMusicTitle')}
                 whileTap={{ scale: 0.93 }}
                 transition={{ duration: 0.1 }}
                 className="w-14 h-14 rounded-full bg-[#E3EDD3] border border-[#335C33]/20 flex items-center justify-center shadow-md cursor-pointer transition-[background-color] duration-200 text-[#335C33] hover:bg-[#d9e7c5]"
@@ -115,17 +116,17 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
               role="button"
               tabIndex={0}
               onKeyDown={(e) => e.key === 'Enter' && handleToggleMusic()}
-              aria-label="Lắng nghe thanh âm Đại Ngàn"
+              aria-label={t('heroMusicTitle')}
             >
               <h2 className="text-[15px] font-bold text-[#335C33] leading-tight">
-                Lắng nghe thanh âm Đại Ngàn
+                {t('heroMusicTitle')}
               </h2>
               <div className="flex items-center gap-1.5 mt-1 text-[#8C5A35]">
                 <svg className="w-4 h-4 text-[#8C5A35]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h12M4 18h8" />
                 </svg>
                 <span className="text-xs font-semibold">
-                  {isPlaying ? 'Chạm để dừng phát nhạc' : "Nhấn để phát tiếng T'rưng"}
+                  {isPlaying ? t('heroMusicOn') : t('heroMusicOff')}
                 </span>
               </div>
             </div>
@@ -148,7 +149,7 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
             className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-[#335C33] text-[#F6F6EE] font-semibold text-sm shadow-md hover:bg-[#284828] transition-[background-color] duration-200 cursor-pointer"
           >
             <Coffee className="w-4 h-4 text-[#E3EDD3]" />
-            <span>Trải nghiệm Trà Cascara</span>
+            <span>{t('heroBtnOrder')}</span>
           </motion.button>
 
           <motion.button
@@ -160,7 +161,7 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
             className="w-full flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-white text-[#335C33] border border-[#335C33]/25 font-semibold text-xs hover:bg-[#E3EDD3]/50 transition-[background-color] duration-200 cursor-pointer"
           >
             <HeartHandshake className="w-4 h-4 text-[#8C5A35]" />
-            <span>Xem hành trình gieo mầm</span>
+            <span>{t('heroBtnLearn')}</span>
           </motion.button>
         </motion.div>
 
@@ -170,12 +171,12 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
       <div className="relative z-10 pb-4 flex justify-center">
         <motion.button
           onClick={onExploreClick}
-          aria-label="Cuộn xuống để xem dữ liệu"
+          aria-label={t('heroScrollDown')}
           whileHover={{ y: 3 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
           className="flex flex-col items-center gap-1 text-[#8C5A35] hover:text-[#335C33] transition-colors cursor-pointer"
         >
-          <span className="text-[11px] font-medium tracking-wider uppercase">Tác động xanh</span>
+          <span className="text-[11px] font-medium tracking-wider uppercase">{t('heroScrollDown')}</span>
           <ArrowDown className="w-4 h-4 animate-bounce" />
         </motion.button>
       </div>

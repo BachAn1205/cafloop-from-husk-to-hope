@@ -2,12 +2,14 @@ import { useRef } from 'react';
 import { motion, useInView } from 'motion/react';
 import { Bike, Tv, Heart, MapPin, CheckCircle2, School, Sparkles, Award } from 'lucide-react';
 import { AnimatedCounter } from './AnimatedCounter';
+import { useLanguage } from '../utils/LanguageContext';
 
 const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
 export function ImpactSection() {
   const progressRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(progressRef, { once: true, margin: '-40px' });
+  const { t } = useLanguage();
 
   return (
     <section id="impact-section" className="py-12 px-5 bg-[#F6F6EE] relative border-t border-[#335C33]/10">
@@ -23,14 +25,14 @@ export function ImpactSection() {
         >
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E3EDD3] text-[#335C33] text-xs font-semibold uppercase tracking-wider mb-2.5">
             <Heart className="w-3.5 h-3.5 text-[#8C5A35] fill-[#8C5A35]/20" />
-            Tác Động Xã Hội
+            {t('impactBadge')}
           </div>
           <h2 id="impact-section-title" className="text-2xl sm:text-3xl font-extrabold text-[#335C33] font-serif tracking-tight">
-            Hành Trình Gieo Mầm
+            {t('impactTitle')}
           </h2>
           <div className="flex items-center justify-center gap-1.5 text-xs text-[#8C5A35] mt-1.5 font-medium">
             <MapPin className="w-3.5 h-3.5 text-[#8C5A35]" />
-            <span>Trường Tiểu học Nguyễn Thị Minh Khai • Tây Nguyên</span>
+            <span>{t('impactSchool')}</span>
           </div>
         </motion.div>
 
@@ -59,12 +61,12 @@ export function ImpactSection() {
                 <School className="w-4 h-4 text-[#E3EDD3]" />
               </div>
               <div>
-                <p className="text-xs font-bold leading-tight">Điểm Trường Vùng Cao</p>
-                <p className="text-[10px] text-[#E3EDD3] leading-tight">Vượt 8-12km đồi dốc mỗi ngày</p>
+                <p className="text-xs font-bold leading-tight">{t('impactImgBadgeTitle')}</p>
+                <p className="text-[10px] text-[#E3EDD3] leading-tight">{t('impactImgBadgeDesc')}</p>
               </div>
             </div>
             <span className="text-[10px] font-semibold bg-[#8C5A35]/90 px-2.5 py-1 rounded-full backdrop-blur-xs">
-              Mùa Tựu Trường
+              {t('impactImgBadgeSeason')}
             </span>
           </div>
         </motion.div>
@@ -78,7 +80,7 @@ export function ImpactSection() {
           className="bg-[#E3EDD3]/90 rounded-2xl p-5 border border-[#335C33]/15 shadow-xs mb-6"
         >
           <p id="impact-copy-text" className="text-sm sm:text-base text-[#335C33] font-medium leading-relaxed text-center">
-            &ldquo;Toàn bộ lợi nhuận từ phiên bản giới hạn sẽ được chuyển hóa thành phương tiện đến trường và tri thức.&rdquo;
+            {t('impactQuote')}
           </p>
         </motion.div>
 
@@ -97,14 +99,14 @@ export function ImpactSection() {
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C5A35] flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-[#8C5A35]" />
-                Tiến Độ Gây Quỹ Hiện Tại
+                {t('impactFundProgress')}
               </span>
               <span className="text-xs font-bold text-[#335C33] bg-[#E3EDD3] px-2 py-0.5 rounded-full">
-                Giai đoạn 1
+                {t('impactPhase')}
               </span>
             </div>
             <h3 id="target-label" className="text-sm sm:text-base font-bold text-[#335C33] leading-snug">
-              Mục tiêu: 77 xe đạp & 02 Smart TV (Trường TH Nguyễn Thị Minh Khai)
+              {t('impactTargetTitle')}
             </h3>
           </div>
 
@@ -124,11 +126,11 @@ export function ImpactSection() {
             <span className="text-[#335C33] flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-[#335C33]" />
               <span id="progress-percentage-label" className="font-bold text-sm">
-                Đã hoàn thành {isInView ? <AnimatedCounter to={35} duration={1.5} /> : 0}%
+                {t('impactCompleted')} {isInView ? <AnimatedCounter to={35} duration={1.5} /> : 0}%
               </span>
             </span>
             <span className="text-[#8C5A35] text-[11px]">
-              Còn 65% để hoàn tất mục tiêu
+              {t('impactRemaining')}
             </span>
           </div>
 
@@ -139,8 +141,8 @@ export function ImpactSection() {
                 <Bike className="w-4 h-4 text-[#E3EDD3]" />
               </div>
               <div className="min-w-0">
-                <p className="text-[11px] font-bold text-[#335C33] truncate">27 / 77 Xe Đạp</p>
-                <p className="text-[9px] text-[#8C5A35]">Đã sẵn sàng bàn giao</p>
+                <p className="text-[11px] font-bold text-[#335C33] truncate">{t('impactBikesTitle')}</p>
+                <p className="text-[9px] text-[#8C5A35]">{t('impactBikesDesc')}</p>
               </div>
             </div>
 
@@ -149,8 +151,8 @@ export function ImpactSection() {
                 <Tv className="w-4 h-4 text-[#E3EDD3]" />
               </div>
               <div className="min-w-0">
-                <p className="text-[11px] font-bold text-[#335C33] truncate">01 / 02 Smart TV</p>
-                <p className="text-[9px] text-[#8C5A35]">Cho phòng học số</p>
+                <p className="text-[11px] font-bold text-[#335C33] truncate">{t('impactTVsTitle')}</p>
+                <p className="text-[9px] text-[#8C5A35]">{t('impactTVsDesc')}</p>
               </div>
             </div>
           </div>
@@ -166,7 +168,7 @@ export function ImpactSection() {
           className="mt-4 flex items-center justify-center gap-2 text-[11px] text-[#8C5A35] text-center"
         >
           <Award className="w-3.5 h-3.5 text-[#335C33]" />
-          <span>Minh bạch 100% tài chính và tiến độ trao quà trực tiếp tại điểm trường</span>
+          <span>{t('impactTransparency')}</span>
         </motion.div>
 
       </div>

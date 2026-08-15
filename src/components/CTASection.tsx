@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Share2, Copy, Check, Heart } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { useLanguage } from '../utils/LanguageContext';
 
 const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
@@ -12,9 +13,10 @@ interface CTASectionProps {
 export function CTASection({ onOpenOrder }: CTASectionProps) {
   const [copied, setCopied] = useState(false);
   const [sharedCount, setSharedCount] = useState(384);
+  const { t } = useLanguage();
 
   const campaignUrl = typeof window !== 'undefined' ? window.location.href : 'https://cafloop.org';
-  const shareQuote = 'Cùng CAFLOOP biến vỏ cà phê thành trà Cascara gây quỹ 77 xe đạp & 2 Smart TV cho học sinh vùng cao!';
+  const shareQuote = t('ctaDesc');
 
   const triggerConfetti = () => {
     try {
@@ -40,7 +42,7 @@ export function CTASection({ onOpenOrder }: CTASectionProps) {
     if (navigator.share) {
       navigator
         .share({
-          title: 'CAFLOOP - Từ Vỏ Cà Phê Đến Tương Lai Ngời Sáng',
+          title: 'CAFLOOP - ' + t('heroTitleLine2'),
           text: shareQuote,
           url: campaignUrl,
         })
@@ -74,11 +76,11 @@ export function CTASection({ onOpenOrder }: CTASectionProps) {
         >
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#E3EDD3] text-[#335C33] text-xs font-semibold uppercase tracking-wider mb-2.5">
             <Share2 className="w-3.5 h-3.5 text-[#335C33]" />
-            Cùng Chung Đôi Tay
+            {t('ctaBadge')}
           </div>
 
           <h2 id="cta-section-title" className="text-2xl sm:text-3xl font-extrabold text-[#335C33] font-serif tracking-tight">
-            Lan Tỏa Tác Động
+            {t('ctaTitle')}
           </h2>
         </motion.div>
 
@@ -91,7 +93,7 @@ export function CTASection({ onOpenOrder }: CTASectionProps) {
           transition={{ duration: 0.5, delay: 0.08, ease: EASE_NATURAL }}
           className="text-sm sm:text-base text-[#2C2E2B]/85 font-medium leading-relaxed mb-6 px-2"
         >
-          Một lượt chia sẻ của bạn là một bước rút ngắn hành trình đến trường của các em nhỏ.
+          {t('ctaDesc')}
         </motion.p>
 
         {/* Primary Facebook Share Button */}
@@ -108,7 +110,7 @@ export function CTASection({ onOpenOrder }: CTASectionProps) {
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="w-full py-4 px-6 rounded-2xl bg-[#1877F2] text-white font-bold text-base shadow-md hover:bg-[#166fe5] transition-[background-color] duration-200 flex items-center justify-center gap-3 cursor-pointer"
+            className="w-full py-4 px-6 rounded-2xl bg-[#1877F2] text-white font-bold text-base shadow-md hover:bg-[#166fe5] transition-[background-color] duration-200 flex items-center justify-center gap-3 cursor-pointer border border-transparent"
           >
             {/* Facebook Icon */}
             <div className="w-7 h-7 rounded-full bg-white text-[#1877F2] flex items-center justify-center flex-shrink-0 shadow-xs">
@@ -116,7 +118,7 @@ export function CTASection({ onOpenOrder }: CTASectionProps) {
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
             </div>
-            <span>Chia sẻ chiến dịch lên Facebook</span>
+            <span>{t('ctaBtnShare')}</span>
           </motion.button>
         </motion.div>
 
@@ -140,12 +142,12 @@ export function CTASection({ onOpenOrder }: CTASectionProps) {
             {copied ? (
               <>
                 <Check className="w-3.5 h-3.5 text-[#335C33]" />
-                <span>Đã sao chép link!</span>
+                <span>{t('ctaBtnCopied')}</span>
               </>
             ) : (
               <>
                 <Copy className="w-3.5 h-3.5 text-[#8C5A35]" />
-                <span>Sao chép liên kết</span>
+                <span>{t('ctaBtnCopy')}</span>
               </>
             )}
           </motion.button>
@@ -160,7 +162,7 @@ export function CTASection({ onOpenOrder }: CTASectionProps) {
             className="py-2.5 px-3 rounded-xl bg-[#335C33] text-[#F6F6EE] font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-[#284828] transition-[background-color] duration-200 cursor-pointer"
           >
             <Heart className="w-3.5 h-3.5 text-[#E3EDD3]" />
-            <span>Góp quỹ trực tiếp</span>
+            <span>{t('ctaBtnDonate')}</span>
           </motion.button>
         </motion.div>
 
@@ -173,7 +175,11 @@ export function CTASection({ onOpenOrder }: CTASectionProps) {
           className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E3EDD3]/70 text-[#335C33] text-[11px] font-medium"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-[#335C33] animate-pulse flex-shrink-0" />
-          <span>Đã có <strong>{sharedCount.toLocaleString('vi-VN')}</strong> lượt chia sẻ vì trẻ em vùng cao</span>
+          <span>
+            {t('ctaCounterPrefix')}
+            <strong>{sharedCount.toLocaleString('vi-VN')}</strong>
+            {t('ctaCounterSuffix')}
+          </span>
         </motion.div>
 
       </div>
