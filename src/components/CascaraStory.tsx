@@ -1,21 +1,29 @@
 import { motion } from 'motion/react';
-import { Coffee, Heart, Check, Sparkles, ShieldCheck, Flame, Droplets } from 'lucide-react';
+import { Coffee, Heart, Check, ShieldCheck, Flame, Droplets } from 'lucide-react';
+
+const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
 interface CascaraStoryProps {
   onOpenOrder: () => void;
 }
 
 export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
+  const trustBadges = [
+    { icon: Check, label: 'Nông Nghiệp Sạch', color: 'text-[#335C33]' },
+    { icon: ShieldCheck, label: 'Không Phụ Gia', color: 'text-[#8C5A35]' },
+    { icon: Heart, label: 'Minh Bạch 100%', color: 'text-[#335C33]' },
+  ];
+
   return (
     <section className="py-12 px-5 bg-[#E3EDD3]/40 border-t border-[#335C33]/10 relative">
       <div className="max-w-[480px] mx-auto">
-        
+
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 25 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
+          transition={{ duration: 0.5, ease: EASE_NATURAL }}
           className="text-center mb-6"
         >
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E3EDD3] text-[#335C33] text-xs font-semibold uppercase tracking-wider mb-2.5">
@@ -32,10 +40,10 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
 
         {/* Product highlight Card */}
         <motion.div
-          initial={{ opacity: 0, y: 25 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={{ duration: 0.5, delay: 0.08, ease: EASE_NATURAL }}
           className="bg-[#F6F6EE] rounded-2xl p-5 border border-[#335C33]/15 shadow-sm mb-5"
         >
           <div className="flex items-center gap-4 mb-4">
@@ -44,6 +52,7 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
                 src="https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=300&q=80"
                 alt="Trà Cascara từ vỏ cà phê hữu cơ thơm dịu"
                 referrerPolicy="no-referrer"
+                loading="lazy"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -62,44 +71,46 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
 
           {/* Flavor & Health Highlights */}
           <div className="space-y-2.5 pt-3 border-t border-[#335C33]/10">
-            <div className="flex items-start gap-2 text-xs text-[#2C2E2B]/85">
-              <Droplets className="w-4 h-4 text-[#8C5A35] flex-shrink-0 mt-0.5" />
-              <span><strong>Giàu Polyphenol:</strong> Chống oxy hóa cao gấp 8 lần nước ép việt quất tự nhiên.</span>
-            </div>
-            <div className="flex items-start gap-2 text-xs text-[#2C2E2B]/85">
-              <Flame className="w-4 h-4 text-[#335C33] flex-shrink-0 mt-0.5" />
-              <span><strong>Lượng Caffein Dịu Nhẹ:</strong> Tỉnh táo tự nhiên, êm dịu dạ dày và giấc ngủ.</span>
-            </div>
-            <div className="flex items-start gap-2 text-xs text-[#2C2E2B]/85">
-              <ShieldCheck className="w-4 h-4 text-[#335C33] flex-shrink-0 mt-0.5" />
-              <span><strong>100% Lợi Nhuận Gây Quỹ:</strong> Mỗi hộp trà tài trợ 1 tuần học tập & bánh mì cho học sinh.</span>
-            </div>
+            {[
+              { icon: Droplets, text: <><strong>Giàu Polyphenol:</strong> Chống oxy hóa cao gấp 8 lần nước ép việt quất tự nhiên.</>, color: 'text-[#8C5A35]' },
+              { icon: Flame, text: <><strong>Lượng Caffein Dịu Nhẹ:</strong> Tỉnh táo tự nhiên, êm dịu dạ dày và giấc ngủ.</>, color: 'text-[#335C33]' },
+              { icon: ShieldCheck, text: <><strong>100% Lợi Nhuận Gây Quỹ:</strong> Mỗi hộp trà tài trợ 1 tuần học tập & bánh mì cho học sinh.</>, color: 'text-[#335C33]' },
+            ].map(({ icon: Icon, text, color }, i) => (
+              <div key={i} className="flex items-start gap-2 text-xs text-[#2C2E2B]/85">
+                <Icon className={`w-4 h-4 ${color} flex-shrink-0 mt-0.5`} />
+                <span>{text}</span>
+              </div>
+            ))}
           </div>
 
           {/* CTA inside product card */}
-          <button
+          <motion.button
             onClick={onOpenOrder}
-            className="w-full mt-4 py-3 px-4 rounded-xl bg-[#335C33] text-[#F6F6EE] font-semibold text-xs flex items-center justify-center gap-2 hover:bg-[#284828] active:scale-[0.98] transition-all shadow-xs"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+            className="w-full mt-4 py-3 px-4 rounded-xl bg-[#335C33] text-[#F6F6EE] font-semibold text-xs flex items-center justify-center gap-2 hover:bg-[#284828] transition-[background-color] duration-200 shadow-xs cursor-pointer"
           >
             <Heart className="w-4 h-4 text-[#E3EDD3] fill-[#E3EDD3]" />
             <span>Ủng Hộ & Nhận Hộp Trà Gây Quỹ (150.000đ)</span>
-          </button>
+          </motion.button>
         </motion.div>
 
-        {/* Small Trust Badges */}
+        {/* Trust Badges — staggered entrance */}
         <div className="grid grid-cols-3 gap-2 text-center text-[11px] font-medium text-[#335C33]">
-          <div className="bg-[#E3EDD3]/70 rounded-xl p-2 flex flex-col items-center">
-            <Check className="w-4 h-4 text-[#335C33] mb-0.5" />
-            <span>Nông Nghiệp Sạch</span>
-          </div>
-          <div className="bg-[#E3EDD3]/70 rounded-xl p-2 flex flex-col items-center">
-            <Sparkles className="w-4 h-4 text-[#8C5A35] mb-0.5" />
-            <span>Không Phụ Gia</span>
-          </div>
-          <div className="bg-[#E3EDD3]/70 rounded-xl p-2 flex flex-col items-center">
-            <Heart className="w-4 h-4 text-[#335C33] mb-0.5" />
-            <span>Minh Bạch 100%</span>
-          </div>
+          {trustBadges.map(({ icon: Icon, label, color }, i) => (
+            <motion.div
+              key={label}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.12 + i * 0.06, ease: EASE_NATURAL }}
+              className="bg-[#E3EDD3]/70 rounded-xl p-2 flex flex-col items-center"
+            >
+              <Icon className={`w-4 h-4 ${color} mb-0.5`} />
+              <span>{label}</span>
+            </motion.div>
+          ))}
         </div>
 
       </div>

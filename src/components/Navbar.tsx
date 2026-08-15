@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Leaf, Volume2, VolumeX, Sparkles } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Leaf, Volume2, VolumeX } from 'lucide-react';
 import { trungAudio } from '../utils/audio';
 
 export function Navbar() {
@@ -16,6 +17,9 @@ export function Navbar() {
     trungAudio.toggle();
   };
 
+  // Waveform bar heights — varied to feel organic, not mechanical
+  const waveHeights = [0.5, 1, 0.65, 0.85, 0.45, 0.9, 0.6];
+
   return (
     <header className="sticky top-0 z-40 w-full bg-[#F6F6EE]/90 backdrop-blur-md border-b border-[#335C33]/10 transition-all">
       <div className="max-w-[480px] mx-auto px-4 py-3 flex items-center justify-between">
@@ -26,7 +30,7 @@ export function Navbar() {
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold tracking-tight text-[#335C33] text-base leading-none">CAFLOOP</span>
+              <span className="font-bold tracking-tight text-[#335C33] text-base leading-none" style={{ fontFamily: 'var(--font-heading)' }}>CAFLOOP</span>
               <span className="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded bg-[#E3EDD3] text-[#335C33]">
                 Tuần Hoàn
               </span>
@@ -38,11 +42,13 @@ export function Navbar() {
         </div>
 
         {/* Audio Quick Toggle */}
-        <button
+        <motion.button
           onClick={toggleSound}
           id="btn-nav-audio-toggle"
           aria-label="Bật/Tắt âm thanh Đàn T'rưng"
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 ${
+          whileTap={{ scale: 0.94 }}
+          transition={{ duration: 0.12 }}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-[background-color,box-shadow] duration-200 cursor-pointer ${
             isPlaying
               ? 'bg-[#335C33] text-[#F6F6EE] shadow-sm ring-2 ring-[#335C33]/20'
               : 'bg-[#E3EDD3] text-[#335C33] hover:bg-[#d5e3c1]'
@@ -50,24 +56,35 @@ export function Navbar() {
         >
           {isPlaying ? (
             <>
-              <Volume2 className="w-3.5 h-3.5 animate-pulse text-[#E3EDD3]" />
+              <Volume2 className="w-3.5 h-3.5 text-[#E3EDD3]" />
               <span className="text-[11px] font-semibold">T'rưng đang vang</span>
-              <span className="flex gap-0.5 items-end h-2.5 ml-0.5">
-                <span className="w-0.5 h-full bg-[#E3EDD3] rounded-full animate-bounce [animation-delay:0ms]"></span>
-                <span className="w-0.5 h-2/3 bg-[#E3EDD3] rounded-full animate-bounce [animation-delay:150ms]"></span>
-                <span className="w-0.5 h-5/6 bg-[#E3EDD3] rounded-full animate-bounce [animation-delay:300ms]"></span>
+              {/* Organic waveform — motion-animated, not CSS bounce */}
+              <span className="flex gap-px items-end h-3 ml-0.5" aria-hidden="true">
+                {waveHeights.map((h, i) => (
+                  <motion.span
+                    key={i}
+                    className="w-0.5 bg-[#E3EDD3] rounded-full"
+                    animate={{ scaleY: [h, 1, h * 0.6, 1, h] }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 0.9 + i * 0.08,
+                      ease: 'easeInOut',
+                      delay: i * 0.06,
+                    }}
+                    style={{ height: '12px', transformOrigin: 'bottom' }}
+                  />
+                ))}
               </span>
             </>
           ) : (
             <>
               <VolumeX className="w-3.5 h-3.5 text-[#8C5A35]" />
-              <span className="text-[11px] text-[#8C5A35] flex items-center gap-1">
-                <Sparkles className="w-2.5 h-2.5 text-[#8C5A35]" />
+              <span className="text-[11px] text-[#8C5A35]">
                 Âm thanh Tây Nguyên
               </span>
             </>
           )}
-        </button>
+        </motion.button>
       </div>
     </header>
   );

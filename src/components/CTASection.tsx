@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Share2, Copy, Check, Heart, Sparkles } from 'lucide-react';
+import { Share2, Copy, Check, Heart } from 'lucide-react';
 import confetti from 'canvas-confetti';
+
+const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
 interface CTASectionProps {
   onOpenOrder: () => void;
@@ -35,7 +37,6 @@ export function CTASection({ onOpenOrder }: CTASectionProps) {
       campaignUrl
     )}&quote=${encodeURIComponent(shareQuote)}`;
 
-    // Try web share first on mobile if supported, or open FB popup
     if (navigator.share) {
       navigator
         .share({
@@ -65,10 +66,10 @@ export function CTASection({ onOpenOrder }: CTASectionProps) {
 
         {/* Section Tag */}
         <motion.div
-          initial={{ opacity: 0, y: 25 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
+          transition={{ duration: 0.5, ease: EASE_NATURAL }}
           className="mb-4"
         >
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#E3EDD3] text-[#335C33] text-xs font-semibold uppercase tracking-wider mb-2.5">
@@ -76,7 +77,6 @@ export function CTASection({ onOpenOrder }: CTASectionProps) {
             Cùng Chung Đôi Tay
           </div>
 
-          {/* Section Title H2 */}
           <h2 id="cta-section-title" className="text-2xl sm:text-3xl font-extrabold text-[#335C33] font-serif tracking-tight">
             Lan Tỏa Tác Động
           </h2>
@@ -85,51 +85,57 @@ export function CTASection({ onOpenOrder }: CTASectionProps) {
         {/* Section Copy */}
         <motion.p
           id="cta-copy-text"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={{ duration: 0.5, delay: 0.08, ease: EASE_NATURAL }}
           className="text-sm sm:text-base text-[#2C2E2B]/85 font-medium leading-relaxed mb-6 px-2"
         >
           Một lượt chia sẻ của bạn là một bước rút ngắn hành trình đến trường của các em nhỏ.
         </motion.p>
 
-        {/* Primary Large Facebook Share Button */}
+        {/* Primary Facebook Share Button */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.5, delay: 0.14, ease: EASE_NATURAL }}
           className="mb-4"
         >
-          <button
+          <motion.button
             id="btn-facebook-share"
             onClick={handleFacebookShare}
-            className="w-full py-4 px-6 rounded-2xl bg-[#1877F2] text-white font-bold text-base shadow-md hover:bg-[#166fe5] active:scale-[0.98] transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+            className="w-full py-4 px-6 rounded-2xl bg-[#1877F2] text-white font-bold text-base shadow-md hover:bg-[#166fe5] transition-[background-color] duration-200 flex items-center justify-center gap-3 cursor-pointer"
           >
-            {/* Facebook Custom Icon */}
+            {/* Facebook Icon */}
             <div className="w-7 h-7 rounded-full bg-white text-[#1877F2] flex items-center justify-center flex-shrink-0 shadow-xs">
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
             </div>
             <span>Chia sẻ chiến dịch lên Facebook</span>
-          </button>
+          </motion.button>
         </motion.div>
 
-        {/* Secondary Actions: Copy link and Direct Pre-order */}
+        {/* Secondary Actions */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          transition={{ duration: 0.4, delay: 0.2, ease: EASE_NATURAL }}
           className="grid grid-cols-2 gap-2.5 mb-6"
         >
           {/* Copy Link Button */}
-          <button
+          <motion.button
             onClick={handleCopyLink}
             id="btn-copy-campaign-link"
-            className="py-2.5 px-3 rounded-xl bg-[#E3EDD3] text-[#335C33] font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-[#d6e3c2] active:scale-[0.98] transition-all border border-[#335C33]/15"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.96 }}
+            transition={{ duration: 0.12 }}
+            className="py-2.5 px-3 rounded-xl bg-[#E3EDD3] text-[#335C33] font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-[#d6e3c2] transition-[background-color] duration-200 border border-[#335C33]/15 cursor-pointer"
           >
             {copied ? (
               <>
@@ -142,17 +148,20 @@ export function CTASection({ onOpenOrder }: CTASectionProps) {
                 <span>Sao chép liên kết</span>
               </>
             )}
-          </button>
+          </motion.button>
 
           {/* Direct Order Button */}
-          <button
+          <motion.button
             onClick={onOpenOrder}
             id="btn-cta-order-pack"
-            className="py-2.5 px-3 rounded-xl bg-[#335C33] text-[#F6F6EE] font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-[#284828] active:scale-[0.98] transition-all"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.96 }}
+            transition={{ duration: 0.12 }}
+            className="py-2.5 px-3 rounded-xl bg-[#335C33] text-[#F6F6EE] font-semibold text-xs flex items-center justify-center gap-1.5 hover:bg-[#284828] transition-[background-color] duration-200 cursor-pointer"
           >
             <Heart className="w-3.5 h-3.5 text-[#E3EDD3]" />
             <span>Góp quỹ trực tiếp</span>
-          </button>
+          </motion.button>
         </motion.div>
 
         {/* Live Community Counter */}
@@ -160,10 +169,10 @@ export function CTASection({ onOpenOrder }: CTASectionProps) {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.28, ease: EASE_NATURAL }}
           className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E3EDD3]/70 text-[#335C33] text-[11px] font-medium"
         >
-          <Sparkles className="w-3.5 h-3.5 text-[#8C5A35]" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#335C33] animate-pulse flex-shrink-0" />
           <span>Đã có <strong>{sharedCount.toLocaleString('vi-VN')}</strong> lượt chia sẻ vì trẻ em vùng cao</span>
         </motion.div>
 

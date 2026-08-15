@@ -2,6 +2,9 @@ import { motion } from 'motion/react';
 import { Recycle, Leaf, TrendingUp, Sparkles, RefreshCw, Sun, Sprout } from 'lucide-react';
 import { AnimatedCounter } from './AnimatedCounter';
 
+// Natural cubic-bezier — decelerates quickly then settles (feels physical)
+const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
+
 export function ESGSection() {
   return (
     <section id="esg-section" className="py-12 px-5 bg-[#F6F6EE] relative">
@@ -9,10 +12,10 @@ export function ESGSection() {
         
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 25 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
+          transition={{ duration: 0.5, ease: EASE_NATURAL }}
           className="text-center mb-7"
         >
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E3EDD3] text-[#335C33] text-xs font-semibold uppercase tracking-wider mb-2.5">
@@ -23,7 +26,7 @@ export function ESGSection() {
             Tác Động Xanh
           </h2>
           <p className="text-xs sm:text-sm text-[#8C5A35] mt-1.5 font-medium">
-            Chuyển hóa phế phẩm nông nghiệp thành tài nguyên bền vững
+            Mỗi ly trà là một vòng tuần hoàn được khép lại.
           </p>
         </motion.div>
 
@@ -33,14 +36,15 @@ export function ESGSection() {
           {/* Card 1: Vỏ cà phê tái chế */}
           <motion.div
             id="card-esg-recycled-husk"
-            initial={{ opacity: 0, y: 28 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-30px' }}
-            transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
-            className="bg-[#E3EDD3] rounded-2xl p-4 shadow-sm border border-[#335C33]/10 flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group"
+            transition={{ duration: 0.5, delay: 0.06, ease: EASE_NATURAL }}
+            whileHover={{ y: -2 }}
+            className="bg-[#E3EDD3] rounded-2xl p-4 shadow-sm border border-[#335C33]/10 flex flex-col justify-between transition-[box-shadow,transform] duration-200 hover:shadow-md relative overflow-hidden group cursor-default"
           >
             {/* Background subtle leaf motif */}
-            <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-[#335C33]/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform" />
+            <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-[#335C33]/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform duration-500" />
 
             <div className="flex items-center justify-between mb-3">
               <div className="w-10 h-10 rounded-xl bg-[#335C33] text-[#F6F6EE] flex items-center justify-center shadow-xs">
@@ -70,14 +74,15 @@ export function ESGSection() {
           {/* Card 2: CO2 giảm tải */}
           <motion.div
             id="card-esg-co2-reduction"
-            initial={{ opacity: 0, y: 28 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-30px' }}
-            transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
-            className="bg-[#E3EDD3] rounded-2xl p-4 shadow-sm border border-[#335C33]/10 flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group"
+            transition={{ duration: 0.5, delay: 0.12, ease: EASE_NATURAL }}
+            whileHover={{ y: -2 }}
+            className="bg-[#E3EDD3] rounded-2xl p-4 shadow-sm border border-[#335C33]/10 flex flex-col justify-between transition-[box-shadow,transform] duration-200 hover:shadow-md relative overflow-hidden group cursor-default"
           >
             {/* Background subtle leaf motif */}
-            <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-[#8C5A35]/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform" />
+            <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-[#8C5A35]/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform duration-500" />
 
             <div className="flex items-center justify-between mb-3">
               <div className="w-10 h-10 rounded-xl bg-[#8C5A35] text-[#F6F6EE] flex items-center justify-center shadow-xs">
@@ -108,10 +113,10 @@ export function ESGSection() {
 
         {/* Circular Economy Flow Mini Infographic */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.18, ease: EASE_NATURAL }}
           className="bg-[#F6F6EE] border border-[#335C33]/15 rounded-2xl p-4 shadow-xs"
         >
           <div className="flex items-center justify-between mb-3">
@@ -123,21 +128,24 @@ export function ESGSection() {
           </div>
 
           <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="bg-[#E3EDD3]/60 rounded-xl p-2.5 flex flex-col items-center">
-              <Sprout className="w-5 h-5 text-[#335C33] mb-1" />
-              <span className="text-[11px] font-bold text-[#335C33] leading-tight">1. Thu hoạch</span>
-              <span className="text-[10px] text-[#2C2E2B]/70 mt-0.5">Vỏ quả mọng đỏ</span>
-            </div>
-            <div className="bg-[#E3EDD3]/60 rounded-xl p-2.5 flex flex-col items-center">
-              <Sun className="w-5 h-5 text-[#8C5A35] mb-1" />
-              <span className="text-[11px] font-bold text-[#335C33] leading-tight">2. Phơi nắng</span>
-              <span className="text-[10px] text-[#2C2E2B]/70 mt-0.5">Trà Cascara thơm</span>
-            </div>
-            <div className="bg-[#E3EDD3]/60 rounded-xl p-2.5 flex flex-col items-center">
-              <TrendingUp className="w-5 h-5 text-[#335C33] mb-1" />
-              <span className="text-[11px] font-bold text-[#335C33] leading-tight">3. Học bổng</span>
-              <span className="text-[10px] text-[#2C2E2B]/70 mt-0.5">Xe đạp & Smart TV</span>
-            </div>
+            {[
+              { icon: <Sprout className="w-5 h-5 text-[#335C33] mb-1" />, step: '1. Thu hoạch', sub: 'Vỏ quả mọng đỏ', delay: 0.22 },
+              { icon: <Sun className="w-5 h-5 text-[#8C5A35] mb-1" />, step: '2. Phơi nắng', sub: 'Trà Cascara thơm', delay: 0.27 },
+              { icon: <TrendingUp className="w-5 h-5 text-[#335C33] mb-1" />, step: '3. Học bổng', sub: 'Xe đạp & Smart TV', delay: 0.32 },
+            ].map(({ icon, step, sub, delay }) => (
+              <motion.div
+                key={step}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay, ease: EASE_NATURAL }}
+                className="bg-[#E3EDD3]/60 rounded-xl p-2.5 flex flex-col items-center"
+              >
+                {icon}
+                <span className="text-[11px] font-bold text-[#335C33] leading-tight">{step}</span>
+                <span className="text-[10px] text-[#2C2E2B]/70 mt-0.5">{sub}</span>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
 

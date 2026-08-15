@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Music, TreePine, Wind, ArrowDown, Sparkles, HeartHandshake, Coffee } from 'lucide-react';
+import { Music, TreePine, ArrowDown, HeartHandshake, Coffee, Leaf } from 'lucide-react';
 import { trungAudio } from '../utils/audio';
+import heroBg from '../../assets/image/h.jpg';
+
+// Natural cubic-bezier for organic, physical-feeling entries
+const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
 interface HeroSectionProps {
   onExploreClick: () => void;
@@ -24,138 +28,105 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
 
   return (
     <section className="relative min-h-[92vh] sm:min-h-screen flex flex-col justify-between overflow-hidden bg-[#F6F6EE]">
-      {/* Background Image with Organic Warm Overlay */}
+      {/* Background Image with smooth cream gradient to next section */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.unsplash.com/photo-1511497584788-87676104235f?auto=format&fit=crop&w=1200&q=80"
+          src={heroBg}
           alt="Đồi cà phê và nông trường Tây Nguyên Việt Nam"
-          referrerPolicy="no-referrer"
-          className="w-full h-full object-cover object-center scale-105 filter saturate-[0.85] contrast-[0.95]"
+          className="w-full h-full object-cover object-center scale-105"
+          loading="eager"
         />
-        {/* Multilayered organic gradients for high readability & warmth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#F6F6EE]/95 via-[#F6F6EE]/85 to-[#F6F6EE]" />
-        <div className="absolute inset-0 bg-[#335C33]/15 mix-blend-multiply" />
-        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-[#E3EDD3]/60 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-10 -left-20 w-60 h-60 rounded-full bg-[#8C5A35]/15 blur-2xl pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#F6F6EE]/20 via-[#F6F6EE]/40 via-[#F6F6EE]/75 to-[#F6F6EE]" />
+        <div className="absolute inset-0 bg-[#335C33]/5 mix-blend-multiply" />
+        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-[#E3EDD3]/40 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 -left-20 w-60 h-60 rounded-full bg-[#8C5A35]/10 blur-2xl pointer-events-none" />
       </div>
 
-      {/* Hero Content Container (Centered Mobile-First) */}
+      {/* Hero Content Container */}
       <div className="relative z-10 flex-1 flex flex-col justify-center px-5 pt-8 pb-4">
-        
+
         {/* Tag / Badge */}
         <motion.div
-          initial={{ opacity: 0, y: 18 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
+          transition={{ duration: 0.5, ease: EASE_NATURAL }}
           className="flex items-center gap-2 self-start mb-4 px-3.5 py-1.5 rounded-full bg-[#E3EDD3]/90 border border-[#335C33]/20 shadow-xs"
         >
-          <span className="w-2 h-2 rounded-full bg-[#335C33] animate-ping" />
-          <span className="text-xs font-semibold text-[#335C33] tracking-wide">
-            Kinh Tế Tuần Hoàn • Từ Tây Nguyên
+          <Leaf className="w-3.5 h-3.5 text-[#335C33]" />
+          <span className="text-xs font-bold text-[#335C33] tracking-wide uppercase">
+            CAFLOOP • FROM HUSK TO HOPE
           </span>
         </motion.div>
 
-        {/* Main Headline H1 */}
+        {/* Main Headline H1 — Lora via font-serif class */}
         <motion.h1
           id="hero-main-heading"
-          initial={{ opacity: 0, y: 22 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1, ease: 'easeOut' }}
+          transition={{ duration: 0.6, delay: 0.08, ease: EASE_NATURAL }}
           className="text-3xl sm:text-4xl font-extrabold text-[#335C33] leading-[1.2] tracking-tight font-serif mb-4"
         >
-          Từ Vỏ Cà Phê <br />
-          <span className="text-[#8C5A35] font-sans font-bold">Đến Tương Lai Ngời Sáng</span>
+          Từ Vỏ Cà Phê Đến <br />
+          Tương Lai Ngời Sáng
         </motion.h1>
 
         {/* Subtext */}
         <motion.p
           id="hero-subtext"
-          initial={{ opacity: 0, y: 22 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
+          transition={{ duration: 0.6, delay: 0.16, ease: EASE_NATURAL }}
           className="text-base text-[#2C2E2B]/85 font-normal leading-relaxed mb-7 max-w-md"
         >
           Thưởng thức Trà Cascara CAFLOOP - Cùng chung tay góp quỹ giáo dục cho học sinh vùng cao.
         </motion.p>
 
-        {/* T'RƯNG MUSIC PLAYER - Stylized Tribal Inspired Button */}
+        {/* T'RƯNG MUSIC PLAYER */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.24, ease: EASE_NATURAL }}
           className="mb-8"
         >
-          <div className="bg-[#E3EDD3]/90 backdrop-blur-md rounded-2xl p-3.5 border border-[#335C33]/15 shadow-sm transition-all hover:shadow-md">
-            <div className="flex items-center gap-3.5">
-              {/* Stylized Tribal Circular Button with continuous pulse */}
-              <button
+          <div className="flex items-center gap-3.5">
+            {/* Concentric circle ring wrapper */}
+            <div className="relative p-1.5 rounded-full border border-[#335C33]/15 flex items-center justify-center flex-shrink-0">
+              <motion.button
                 id="btn-trung-music-player"
                 onClick={handleToggleMusic}
                 aria-label="Lắng nghe thanh âm Đại Ngàn (Đàn T'rưng Tây Nguyên)"
-                className="relative group flex-shrink-0 focus:outline-none"
+                whileTap={{ scale: 0.93 }}
+                transition={{ duration: 0.1 }}
+                className="w-14 h-14 rounded-full bg-[#E3EDD3] border border-[#335C33]/20 flex items-center justify-center shadow-md cursor-pointer transition-[background-color] duration-200 text-[#335C33] hover:bg-[#d9e7c5]"
               >
-                {/* Continuous gentle pulse rings */}
-                <span className="absolute -inset-1.5 rounded-full bg-[#8C5A35]/25 animate-ping opacity-75" />
-                <span className="absolute -inset-2.5 rounded-full bg-[#335C33]/15 animate-pulse" />
-                
-                {/* Tribal Circular Badge */}
-                <div className={`relative w-14 h-14 rounded-full flex items-center justify-center border-2 border-dashed transition-transform duration-300 shadow-md active:scale-95 ${
-                  isPlaying 
-                    ? 'bg-[#335C33] border-[#E3EDD3] text-[#F6F6EE] rotate-12' 
-                    : 'bg-[#F6F6EE] border-[#8C5A35] text-[#8C5A35] hover:scale-105'
-                }`}>
-                  {/* Outer subtle tribal decorative notches */}
-                  <div className="absolute inset-1 rounded-full border border-[#8C5A35]/30 pointer-events-none" />
-                  
-                  {/* Icons combination (Music + TreePine + Wind) */}
-                  <div className="relative flex items-center justify-center">
-                    {isPlaying ? (
-                      <div className="flex flex-col items-center">
-                        <Music className="w-5 h-5 text-[#E3EDD3] animate-bounce" />
-                        <span className="text-[9px] font-bold tracking-tighter text-[#E3EDD3] -mt-0.5">T'RƯNG</span>
-                      </div>
-                    ) : (
-                      <div className="relative flex items-center justify-center">
-                        <TreePine className="w-5 h-5 text-[#8C5A35]" />
-                        <Music className="w-3.5 h-3.5 text-[#335C33] absolute -top-1.5 -right-1.5" />
-                        <Wind className="w-3 h-3 text-[#8C5A35]/70 absolute -bottom-1 -left-1" />
-                      </div>
-                    )}
+                <div className="flex flex-col items-center justify-center">
+                  <TreePine className="w-5 h-5 text-[#335C33]" />
+                  <div className="flex gap-0.5 mt-0.5">
+                    <Music className="w-3.5 h-3.5 text-[#335C33]" />
                   </div>
                 </div>
-              </button>
+              </motion.button>
+            </div>
 
-              {/* Text info next to the button */}
-              <div className="flex-1 min-w-0" onClick={handleToggleMusic} role="button" tabIndex={0}>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-bold text-[#335C33] leading-tight">
-                    Lắng nghe thanh âm Đại Ngàn
-                  </span>
-                  <Sparkles className="w-3.5 h-3.5 text-[#8C5A35] flex-shrink-0 animate-pulse" />
-                </div>
-                <p className="text-xs text-[#8C5A35] font-medium leading-normal mt-0.5">
-                  {isPlaying 
-                    ? 'Đang phát giai điệu Đàn T\'rưng Tây Nguyên...' 
-                    : 'Chạm để hòa mình vào tiếng đàn tre & gió ngàn'}
-                </p>
-                {/* Audio visualizer bar when active */}
-                {isPlaying && (
-                  <div className="flex items-center gap-1 mt-1.5">
-                    {[40, 75, 50, 90, 60, 100, 70, 45, 80].map((h, i) => (
-                      <motion.span
-                        key={i}
-                        className="w-1 bg-[#335C33] rounded-full"
-                        animate={{ height: ['4px', `${h * 0.16}px`, '4px'] }}
-                        transition={{
-                          repeat: Infinity,
-                          duration: 0.6 + (i % 4) * 0.15,
-                          ease: 'easeInOut',
-                        }}
-                      />
-                    ))}
-                    <span className="text-[10px] text-[#335C33] font-semibold ml-2">Đang ngân vang</span>
-                  </div>
-                )}
+            {/* Text info */}
+            <div
+              className="flex-1 min-w-0 cursor-pointer"
+              onClick={handleToggleMusic}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && handleToggleMusic()}
+              aria-label="Lắng nghe thanh âm Đại Ngàn"
+            >
+              <h2 className="text-[15px] font-bold text-[#335C33] leading-tight">
+                Lắng nghe thanh âm Đại Ngàn
+              </h2>
+              <div className="flex items-center gap-1.5 mt-1 text-[#8C5A35]">
+                <svg className="w-4 h-4 text-[#8C5A35]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h12M4 18h8" />
+                </svg>
+                <span className="text-xs font-semibold">
+                  {isPlaying ? 'Chạm để dừng phát nhạc' : "Nhấn để phát tiếng T'rưng"}
+                </span>
               </div>
             </div>
           </div>
@@ -163,42 +134,50 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
 
         {/* Primary Action Buttons */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.32, ease: EASE_NATURAL }}
           className="flex flex-col sm:flex-row gap-3"
         >
-          <button
+          <motion.button
             id="btn-hero-order"
             onClick={onOpenOrder}
-            className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-[#335C33] text-[#F6F6EE] font-semibold text-sm shadow-md hover:bg-[#284828] active:scale-[0.98] transition-all"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+            className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-[#335C33] text-[#F6F6EE] font-semibold text-sm shadow-md hover:bg-[#284828] transition-[background-color] duration-200 cursor-pointer"
           >
             <Coffee className="w-4 h-4 text-[#E3EDD3]" />
             <span>Trải nghiệm Trà Cascara</span>
-          </button>
-          
-          <button
+          </motion.button>
+
+          <motion.button
             id="btn-hero-learn-more"
             onClick={onExploreClick}
-            className="w-full flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-[#F6F6EE] text-[#335C33] border border-[#335C33]/25 font-semibold text-xs hover:bg-[#E3EDD3]/50 active:scale-[0.98] transition-all"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.15 }}
+            className="w-full flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-white text-[#335C33] border border-[#335C33]/25 font-semibold text-xs hover:bg-[#E3EDD3]/50 transition-[background-color] duration-200 cursor-pointer"
           >
             <HeartHandshake className="w-4 h-4 text-[#8C5A35]" />
             <span>Xem hành trình gieo mầm</span>
-          </button>
+          </motion.button>
         </motion.div>
 
       </div>
 
       {/* Scroll Down Indicator */}
       <div className="relative z-10 pb-4 flex justify-center">
-        <button
+        <motion.button
           onClick={onExploreClick}
           aria-label="Cuộn xuống để xem dữ liệu"
-          className="flex flex-col items-center gap-1 text-[#8C5A35] hover:text-[#335C33] transition-colors"
+          whileHover={{ y: 3 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className="flex flex-col items-center gap-1 text-[#8C5A35] hover:text-[#335C33] transition-colors cursor-pointer"
         >
           <span className="text-[11px] font-medium tracking-wider uppercase">Tác động xanh</span>
           <ArrowDown className="w-4 h-4 animate-bounce" />
-        </button>
+        </motion.button>
       </div>
     </section>
   );

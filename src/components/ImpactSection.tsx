@@ -3,6 +3,8 @@ import { motion, useInView } from 'motion/react';
 import { Bike, Tv, Heart, MapPin, CheckCircle2, School, Sparkles, Award } from 'lucide-react';
 import { AnimatedCounter } from './AnimatedCounter';
 
+const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
+
 export function ImpactSection() {
   const progressRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(progressRef, { once: true, margin: '-40px' });
@@ -13,10 +15,10 @@ export function ImpactSection() {
 
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 25 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
+          transition={{ duration: 0.5, ease: EASE_NATURAL }}
           className="text-center mb-6"
         >
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E3EDD3] text-[#335C33] text-xs font-semibold uppercase tracking-wider mb-2.5">
@@ -32,23 +34,24 @@ export function ImpactSection() {
           </div>
         </motion.div>
 
-        {/* Heartwarming Unsplash Image with subtle aesthetic frame */}
+        {/* Heartwarming Image */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: '-30px' }}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={{ duration: 0.6, delay: 0.08, ease: EASE_NATURAL }}
           className="relative rounded-2xl overflow-hidden shadow-md border-2 border-[#E3EDD3] mb-6 aspect-[4/3]"
         >
           <img
             src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80"
             alt="Các em học sinh vùng cao trên con đường đến trường với nụ cười rạng rỡ"
             referrerPolicy="no-referrer"
+            loading="lazy"
             className="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-700"
           />
-          {/* Subtle gradient vignette */}
+          {/* Gradient vignette */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#2C2E2B]/80 via-transparent to-transparent" />
-          
+
           {/* Floating badge inside image */}
           <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[#F6F6EE]">
             <div className="flex items-center gap-2">
@@ -68,10 +71,10 @@ export function ImpactSection() {
 
         {/* Core Social Impact Copy */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.5, delay: 0.12, ease: EASE_NATURAL }}
           className="bg-[#E3EDD3]/90 rounded-2xl p-5 border border-[#335C33]/15 shadow-xs mb-6"
         >
           <p id="impact-copy-text" className="text-sm sm:text-base text-[#335C33] font-medium leading-relaxed text-center">
@@ -83,13 +86,13 @@ export function ImpactSection() {
         <motion.div
           id="progress-container"
           ref={progressRef}
-          initial={{ opacity: 0, y: 25 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.18, ease: EASE_NATURAL }}
           className="bg-[#F6F6EE] border-2 border-[#335C33]/20 rounded-2xl p-5 shadow-sm"
         >
-          {/* Target Title & Sub-Targets */}
+          {/* Target Title */}
           <div className="mb-3.5">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C5A35] flex items-center gap-1">
@@ -105,18 +108,15 @@ export function ImpactSection() {
             </h3>
           </div>
 
-          {/* Smoothly Animated Progress Bar */}
-          <div className="relative w-full h-4 bg-gray-200 rounded-full overflow-hidden mb-2 shadow-inner">
+          {/* Progress Bar — uses palette color, not gray-200 */}
+          <div className="relative w-full h-4 bg-[#E3EDD3] rounded-full overflow-hidden mb-2 shadow-inner">
             <motion.div
               id="progress-bar-fill"
               initial={{ width: 0 }}
               animate={{ width: isInView ? '35%' : '0%' }}
-              transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-              className="h-full bg-[#335C33] rounded-full relative"
-            >
-              {/* Subtle stripe highlight */}
-              <div className="absolute inset-0 bg-white/20 bg-[linear-gradient(45deg,rgba(255,255,255,0.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.15)_50%,rgba(255,255,255,0.15)_75%,transparent_75%,transparent)] bg-[length:16px_16px] animate-[move-stripe_2s_linear_infinite]" />
-            </motion.div>
+              transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              className="h-full bg-[#335C33] rounded-full"
+            />
           </div>
 
           {/* Text Below Progress Bar */}
@@ -124,7 +124,7 @@ export function ImpactSection() {
             <span className="text-[#335C33] flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-[#335C33]" />
               <span id="progress-percentage-label" className="font-bold text-sm">
-                Đã hoàn thành {isInView ? <AnimatedCounter to={35} duration={1.6} /> : 0}%
+                Đã hoàn thành {isInView ? <AnimatedCounter to={35} duration={1.5} /> : 0}%
               </span>
             </span>
             <span className="text-[#8C5A35] text-[11px]">
@@ -132,10 +132,10 @@ export function ImpactSection() {
             </span>
           </div>
 
-          {/* Breakdown items (77 xe đạp & 2 Smart TV) */}
+          {/* Breakdown items */}
           <div className="grid grid-cols-2 gap-2.5 mt-4 pt-3.5 border-t border-[#335C33]/15">
             <div className="flex items-center gap-2.5 p-2 rounded-xl bg-[#E3EDD3]/60">
-              <div className="w-8 h-8 rounded-lg bg-[#335C33] text-[#F6F6EE] flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-[#335C33] flex items-center justify-center flex-shrink-0">
                 <Bike className="w-4 h-4 text-[#E3EDD3]" />
               </div>
               <div className="min-w-0">
@@ -145,7 +145,7 @@ export function ImpactSection() {
             </div>
 
             <div className="flex items-center gap-2.5 p-2 rounded-xl bg-[#E3EDD3]/60">
-              <div className="w-8 h-8 rounded-lg bg-[#8C5A35] text-[#F6F6EE] flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-[#8C5A35] flex items-center justify-center flex-shrink-0">
                 <Tv className="w-4 h-4 text-[#E3EDD3]" />
               </div>
               <div className="min-w-0">
@@ -157,12 +157,12 @@ export function ImpactSection() {
 
         </motion.div>
 
-        {/* Real Quote / Mission note */}
+        {/* Mission note */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.4, delay: 0.25, ease: EASE_NATURAL }}
           className="mt-4 flex items-center justify-center gap-2 text-[11px] text-[#8C5A35] text-center"
         >
           <Award className="w-3.5 h-3.5 text-[#335C33]" />

@@ -1,1 +1,40 @@
 @import "tailwindcss";
+
+/* ─── Font System ───────────────────────────────────────────── */
+/* Heading: Lora (organic serif, full Vietnamese support)        */
+/* Body:    Raleway (elegant humanist sans, readable at small px) */
+
+@layer base {
+  :root {
+    --font-heading: 'Lora', Georgia, serif;
+    --font-body: 'Raleway', system-ui, sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Override Tailwind font-serif to use Lora */
+  .font-serif {
+    font-family: var(--font-heading) !important;
+  }
+
+  /* Respect user's motion preference — skip decorative animations */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
