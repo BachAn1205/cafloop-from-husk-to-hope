@@ -1,0 +1,6 @@
+{
+  "name": "CAFLOOP - From Husk to Hope",
+  "description": "Dự án kinh tế tuần hoàn tái chế vỏ cà phê thành trà Cascara gây quỹ giáo dục cho trẻ em vùng cao",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
