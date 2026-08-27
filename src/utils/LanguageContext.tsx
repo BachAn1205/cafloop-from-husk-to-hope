@@ -101,7 +101,15 @@ type TranslationKeys =
   | 'footerSlogan'
   | 'floatingAudioOn'
   | 'floatingAudioOff'
-  | 'floatingSupport';
+  | 'floatingSupport'
+  | 'donateModalTitle'
+  | 'donateModalSub'
+  | 'donateFieldAmount'
+  | 'donateFieldAmountPlaceholder'
+  | 'donateBtnNext'
+  | 'donateQRTitle'
+  | 'donateQRSub'
+  | 'donateBtnDone';
 
 const translations: Record<Language, Record<TranslationKeys, string>> = {
   vi: {
@@ -196,6 +204,14 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     modalSummaryLabel: 'Tổng tiền ủng hộ',
     modalFreeship: 'Freeship toàn quốc',
     modalBtnConfirm: 'Xác Nhận Ủng Hộ & Nhận Trà',
+    donateModalTitle: 'Quyên Góp Trực Tiếp',
+    donateModalSub: 'Góp sức xây dựng tương lai tươi sáng cho các em học sinh vùng cao.',
+    donateFieldAmount: 'Số tiền quyên góp',
+    donateFieldAmountPlaceholder: 'VD: 500,000',
+    donateBtnNext: 'Tiếp Tục Chuyển Khoản',
+    donateQRTitle: 'Quét Mã Thanh Toán',
+    donateQRSub: 'Mở ứng dụng ngân hàng hoặc ví điện tử (MoMo, VNPay...) để quét mã.',
+    donateBtnDone: 'Tôi đã chuyển khoản thành công',
     footerDesc: 'Dự án kinh tế tuần hoàn tái chế vỏ quả cà phê chín mọng thành trà Cascara thượng hạng, gây quỹ học bổng và trang thiết bị cho các điểm trường vùng cao Tây Nguyên.',
     footerPartner: 'Đối tác thụ hưởng: Trường TH Nguyễn Thị Minh Khai',
     footerToTop: 'Lên đầu trang',
@@ -296,7 +312,15 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     modalFieldAddressPlaceholder: 'Address to receive fundraising tea',
     modalSummaryLabel: 'Total Contribution Amount',
     modalFreeship: 'Free shipping nationwide',
-    modalBtnConfirm: 'Confirm Support & Get Tea',
+    modalBtnConfirm: 'Confirm Pledge & Get Box',
+    donateModalTitle: 'Direct Donation',
+    donateModalSub: 'Help us build a brighter future for students in the highlands.',
+    donateFieldAmount: 'Donation Amount (VND)',
+    donateFieldAmountPlaceholder: 'Ex: 500,000',
+    donateBtnNext: 'Proceed to Payment',
+    donateQRTitle: 'Scan to Pay',
+    donateQRSub: 'Open your banking app or e-wallet to scan this QR code.',
+    donateBtnDone: 'I have successfully transferred',
     footerDesc: 'A circular economy project upcycling coffee cherry husks into premium Cascara tea, funding scholarships and digital equipment for highland primary schools in the Central Highlands.',
     footerPartner: 'Beneficiary Partner: Nguyen Thi Minh Khai Primary School',
     footerToTop: 'Back to top',

@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model customers {
+  id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  full_name  String      @db.VarChar(255)
+  phone      String      @unique @db.VarChar(15)
+  email      String?     @db.VarChar(255)
+  address    String?
+  created_at DateTime?   @default(now()) @db.Timestamptz(6)
+  donations  donations[]
+  orders     orders[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model donations {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  donation_code String     @unique @db.VarChar(50)
+  customer_id   String?    @db.Uuid
+  amount        BigInt
+  status        String?    @default("pending") @db.VarChar(30)
+  created_at    DateTime?  @default(now()) @db.Timestamptz(6)
+  customers     customers? @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model order_items {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id   String?   @db.Uuid
+  product_id String?   @db.Uuid
+  quantity   Int       @default(1)
+  unit_price BigInt
+  subtotal   BigInt
+  orders     orders?   @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  products   products? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model orders {
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_code       String        @unique @db.VarChar(50)
+  customer_id      String?       @db.Uuid
+  total_amount     BigInt
+  shipping_address String
+  status           String?       @default("pending") @db.VarChar(30)
+  note             String?
+  created_at       DateTime?     @default(now()) @db.Timestamptz(6)
+  order_items      order_items[]
+  customers        customers?    @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model products {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String        @db.VarChar(255)
+  sku         String        @unique @db.VarChar(50)
+  price       BigInt        @default(150000)
+  unit        String?       @default("hộp") @db.VarChar(50)
+  description String?
+  is_active   Boolean?      @default(true)
+  created_at  DateTime?     @default(now()) @db.Timestamptz(6)
+  order_items order_items[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model transactions {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sepay_id         BigInt    @unique
+  gateway          String?   @db.VarChar(50)
+  account_number   String?   @db.VarChar(50)
+  amount           BigInt
+  content          String?
+  code             String?   @db.VarChar(100)
+  transaction_date DateTime? @db.Timestamptz(6)
+  raw_data         Json?
+  created_at       DateTime? @default(now()) @db.Timestamptz(6)
+}

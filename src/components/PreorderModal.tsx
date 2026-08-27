@@ -1,8 +1,11 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Heart, Plus, Minus, CheckCircle, Sparkles, Bike, Coffee } from 'lucide-react';
+import { X, Plus, Minus, CheckCircle, Sparkles, Bike, PackageCheck, QrCode, ChevronLeft, Loader2, Clock, AlertTriangle, MapPin, Maximize2, Check, PlusCircle, Trash2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useLanguage } from '../utils/LanguageContext';
+import { saveOrderToSupabase, PRODUCTS_LIST, fetchProductsFromSupabase, type ProductItem } from '../utils/supabaseDonation';
+import { checkPaymentReceived, QR_TIMEOUT_SECONDS, type SepayTransaction } from '../utils/sepay';
+import { AddAddressModal, type SavedAddress } from './AddAddressModal';
 
 interface PreorderModalProps {
   isOpen: boolean;
@@ -10,217 +13,690 @@ interface PreorderModalProps {
 }
 
 export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
-  const [quantity, setQuantity] = useState(1);
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [isSuccess, setIsSuccess] = useState(false);
+  // Products list from database
+  const [productsList, setProductsList] = useState<ProductItem[]>(PRODUCTS_LIST);
+
+  // Cart state: { [sku]: quantity }
+  const [cart, setCart] = useState<Record<string, number>>({});
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'qr'>('qr');
+
+  // Fetch products from database when modal opens
+  useEffect(() => {
+    if (!isOpen) return;
+    fetchProductsFromSupabase().then((data) => {
+      if (data && data.length > 0) {
+        setProductsList(data);
+      }
+    });
+  }, [isOpen]);
+
+  // Address management state
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>(() => {
+    try {
+      const stored = localStorage.getItem('cafloop_saved_addresses');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(() => {
+    try {
+      const stored = localStorage.getItem('cafloop_saved_addresses');
+      if (stored) {
+        const arr = JSON.parse(stored);
+        if (arr.length > 0) return arr[0].id;
+      }
+    } catch {
+      // safe fallback
+    }
+    return null;
+  });
+
+  const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
+  const [previewProduct, setPreviewProduct] = useState<ProductItem | null>(null);
+
+  // Workflow steps: 'form' | 'qr' | 'success'
+  const [step, setStep] = useState<'form' | 'qr' | 'success'>('form');
+  const [countdown, setCountdown] = useState(QR_TIMEOUT_SECONDS);
+  const [expired, setExpired] = useState(false);
   const { t } = useLanguage();
 
-  const pricePerUnit = 150000;
-  const totalPrice = quantity * pricePerUnit;
+  const sessionStartedAt = useRef<Date | null>(null);
+  const processedTxIds = useRef<Set<string>>(new Set());
 
-  const handleSubmit = (e: FormEvent) => {
+  // MOCK BANK INFO
+  const BANK_ID = 'mbbank';
+  const ACCOUNT_NO = '2666627122005';
+  const ACCOUNT_NAME = 'BACH KHANH AN';
+
+  // Save addresses to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('cafloop_saved_addresses', JSON.stringify(savedAddresses));
+    } catch (e) {
+      console.error('Failed to save addresses to localStorage', e);
+    }
+  }, [savedAddresses]);
+
+  // Derived totals
+  const totalItemsCount = Object.values(cart).reduce((a, b) => a + b, 0);
+
+  const totalPrice = Object.entries(cart).reduce((sum, [sku, qty]) => {
+    const prod = productsList.find((p) => p.sku === sku);
+    return sum + (prod ? prod.price * qty : 0);
+  }, 0);
+
+  const selectedAddress = savedAddresses.find((a) => a.id === selectedAddressId) || null;
+
+  const updateCartQuantity = (sku: string, delta: number) => {
+    setCart((prev) => {
+      const current = prev[sku] || 0;
+      const next = Math.max(0, current + delta);
+      if (next === 0) {
+        const copy = { ...prev };
+        delete copy[sku];
+        return copy;
+      }
+      return { ...prev, [sku]: next };
+    });
+  };
+
+  const handleSaveAddress = (newAddr: SavedAddress) => {
+    setSavedAddresses((prev) => [newAddr, ...prev]);
+    setSelectedAddressId(newAddr.id);
+    setIsAddAddressOpen(false);
+  };
+
+  const handleDeleteAddress = (idStr: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSavedAddresses((prev) => prev.filter((a) => a.id !== idStr));
+    if (selectedAddressId === idStr) {
+      const remaining = savedAddresses.filter((a) => a.id !== idStr);
+      setSelectedAddressId(remaining.length > 0 ? remaining[0].id : null);
+    }
+  };
+
+  const handleNext = (e: FormEvent) => {
     e.preventDefault();
+
+    if (totalItemsCount === 0 || totalPrice === 0) {
+      alert('Vui lòng chọn số lượng cho ít nhất 1 sản phẩm');
+      return;
+    }
+
+    if (!selectedAddress) {
+      alert('Vui lòng thêm hoặc chọn 1 địa chỉ nhận hàng');
+      return;
+    }
+
+    if (paymentMethod === 'cod') {
+      handleDone(selectedAddress);
+      return;
+    }
+
+    setStep('qr');
+    setCountdown(QR_TIMEOUT_SECONDS);
+    setExpired(false);
+    sessionStartedAt.current = new Date();
+    processedTxIds.current = new Set();
+  };
+
+  // Timer logic for QR
+  useEffect(() => {
+    if (step !== 'qr') return;
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setExpired(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [step]);
+
+  // Auto return to form when expired
+  useEffect(() => {
+    if (!expired) return;
+    const timeout = setTimeout(() => {
+      handleBackToForm();
+    }, 3000);
+    return () => clearTimeout(timeout);
+  }, [expired]);
+
+  // Auto check SePay polling
+  useEffect(() => {
+    if (step !== 'qr' || expired || !selectedAddress) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const tx = await checkPaymentReceived(
+          totalPrice,
+          selectedAddress.phone,
+          selectedAddress.name,
+          sessionStartedAt.current ?? new Date()
+        );
+        if (tx && !processedTxIds.current.has(String(tx.id))) {
+          processedTxIds.current.add(String(tx.id));
+          clearInterval(interval);
+          handleDone(selectedAddress, tx);
+        }
+      } catch (err) {
+        console.error('Lỗi tự động kiểm tra SePay:', err);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [step, totalPrice, selectedAddress, expired]);
+
+  const handleDone = (addr = selectedAddress, _tx?: SepayTransaction) => {
+    if (!addr) return;
+
+    const items = Object.entries(cart).map(([sku, qty]) => {
+      const p = productsList.find((item) => item.sku === sku);
+      return {
+        sku,
+        name: p ? p.name : sku,
+        quantity: qty,
+        unitPrice: p ? p.price : 0,
+      };
+    });
+
+    saveOrderToSupabase({
+      name: addr.name,
+      phone: addr.phone,
+      address: addr.fullAddress,
+      totalAmount: totalPrice,
+      items,
+    });
+
     try {
       confetti({
-        particleCount: 80,
-        spread: 70,
+        particleCount: 90,
+        spread: 75,
         origin: { y: 0.6 },
         colors: ['#335C33', '#8C5A35', '#E3EDD3'],
       });
     } catch {
       // safe fallback
     }
-    setIsSuccess(true);
+    setStep('success');
+  };
+
+  const handleBackToForm = () => {
+    setStep('form');
+    setExpired(false);
+    setCountdown(QR_TIMEOUT_SECONDS);
+    sessionStartedAt.current = null;
+    processedTxIds.current = new Set();
   };
 
   const handleReset = () => {
-    setIsSuccess(false);
-    setQuantity(1);
-    setName('');
-    setPhone('');
-    setAddress('');
+    setStep('form');
+    setCart({});
+    setPaymentMethod('qr');
+    setExpired(false);
+    setCountdown(QR_TIMEOUT_SECONDS);
     onClose();
   };
+
+  const formatCountdown = (secs: number) => {
+    const m = Math.floor(secs / 60).toString().padStart(2, '0');
+    const s = (secs % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
+  const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-qr_only.png?amount=${totalPrice}&addInfo=${encodeURIComponent(
+    `CAF ${selectedAddress?.phone || ''} ${selectedAddress?.name || 'Khach hang'}`
+  )}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
+
+  const countdownColor =
+    countdown < 60
+      ? 'text-white border-red-600 bg-red-600'
+      : countdown < 120
+      ? 'text-white border-amber-600 bg-amber-600'
+      : 'text-[#F6F6EE] border-[#335C33] bg-[#335C33]';
 
   if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="fixed inset-0 bg-black/60 backdrop-blur-xs"
-        />
-
-        {/* Modal Dialog */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.92, y: 20 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="relative z-10 w-full max-w-[420px] bg-[#F6F6EE] rounded-3xl p-6 shadow-2xl border border-[#335C33]/20 max-h-[90vh] overflow-y-auto"
-        >
-          {/* Close button */}
-          <button
+    <>
+      <AnimatePresence>
+        <div className="fixed inset-0 z-40 flex items-center justify-center p-3 sm:p-4 md:p-6">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-[#E3EDD3] text-[#335C33] hover:bg-[#d6e3c2] transition-colors cursor-pointer"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
+          />
+
+          {/* Modal Dialog */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: 20 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="relative z-10 w-full max-w-[460px] md:max-w-xl bg-[#F6F6EE] rounded-3xl p-5 sm:p-6 md:p-8 shadow-2xl border border-[#335C33]/20 max-h-[92vh] overflow-y-auto"
           >
-            <X className="w-4 h-4" />
-          </button>
-
-          {isSuccess ? (
-            <div className="text-center py-6">
-              <div className="w-16 h-16 rounded-full bg-[#E3EDD3] text-[#335C33] flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-10 h-10" />
-              </div>
-              <h3 className="text-xl font-bold text-[#335C33] font-serif mb-2">
-                {t('modalSuccessTitle')}
-              </h3>
-              <p className="text-xs text-[#2C2E2B]/80 leading-relaxed mb-5">
-                {t('modalSuccessDesc', { quantity })}
-              </p>
-              
-              <div className="bg-[#E3EDD3] rounded-2xl p-4 mb-5 text-left text-xs">
-                <div className="flex items-center gap-2 font-bold text-[#335C33] mb-1">
-                  <Bike className="w-4 h-4" />
-                  <span>{t('modalSuccessDirectImpact')}</span>
-                </div>
-                <p className="text-[#8C5A35]">
-                  {t('modalSuccessImpactDesc', { percent: quantity * 25 })}
-                </p>
-              </div>
-
+            {step === 'form' && (
               <button
-                onClick={handleReset}
-                className="w-full py-3 rounded-xl bg-[#335C33] text-[#F6F6EE] font-semibold text-xs hover:bg-[#284828] transition-colors cursor-pointer"
+                onClick={onClose}
+                className="absolute top-4 right-4 md:top-5 md:right-5 p-2 rounded-full bg-[#E3EDD3] text-[#335C33] hover:bg-[#d6e3c2] transition-colors cursor-pointer shadow-xs"
               >
-                {t('modalSuccessBtnDone')}
+                <X className="w-4 h-4 md:w-5 md:h-5" />
               </button>
-            </div>
-          ) : (
-            <div>
-              <div className="flex items-center gap-2 text-[#8C5A35] text-xs font-semibold uppercase tracking-wider mb-1">
-                <Sparkles className="w-3.5 h-3.5" />
-                {t('modalFundraiseYear')}
+            )}
+
+            {step === 'qr' && (
+              <button
+                onClick={handleBackToForm}
+                className="absolute top-4 left-4 md:top-5 md:left-5 p-2 rounded-full bg-[#E3EDD3] text-[#335C33] hover:bg-[#d6e3c2] transition-colors cursor-pointer shadow-xs"
+              >
+                <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+              </button>
+            )}
+
+            {step === 'success' ? (
+              <div className="text-center py-6 md:py-8">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#E3EDD3] text-[#335C33] flex items-center justify-center mx-auto mb-4 md:mb-5 shadow-sm">
+                  <CheckCircle className="w-10 h-10 md:w-12 md:h-12" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-[#335C33] font-serif mb-2 md:mb-3">
+                  {t('modalSuccessTitle')}
+                </h3>
+                <p className="text-xs md:text-sm text-[#2C2E2B]/80 leading-relaxed mb-4 px-2">
+                  Đã nhận đơn hàng gồm <strong className="text-[#335C33]">{totalItemsCount} sản phẩm</strong> của khách hàng <strong className="text-[#335C33]">{selectedAddress?.name}</strong>.
+                </p>
+
+                <div className="bg-[#E3EDD3] rounded-2xl p-4 md:p-5 mb-5 md:mb-6 text-left text-xs md:text-sm border border-[#335C33]/10">
+                  <div className="flex items-center gap-2 font-bold text-[#335C33] mb-1.5">
+                    <Bike className="w-4 h-4 md:w-5 md:h-5" />
+                    <span>{t('modalSuccessDirectImpact')}</span>
+                  </div>
+                  <p className="text-[#8C5A35]">
+                    100% lợi nhuận từ đơn hàng sẽ chuyển thành xe đạp và thiết bị học tập cho các em nhỏ vùng cao.
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleReset}
+                  className="w-full py-3 md:py-3.5 rounded-xl md:rounded-2xl bg-[#335C33] text-[#F6F6EE] font-semibold text-xs md:text-sm hover:bg-[#284828] transition-colors cursor-pointer shadow-md"
+                >
+                  {t('modalSuccessBtnDone')}
+                </button>
               </div>
-              <h3 className="text-xl font-bold text-[#335C33] font-serif mb-1">
-                {t('modalPreorderTitle')}
-              </h3>
-              <p className="text-xs text-[#8C5A35] mb-4">
-                {t('modalPreorderSub')}
-              </p>
+            ) : step === 'qr' ? (
+              <div className="text-center py-2">
+                <h3 className="text-xl md:text-2xl font-bold text-[#335C33] font-serif mb-2 mt-4 md:mt-2">
+                  Thanh Toán Đơn Hàng
+                </h3>
+                <p className="text-xs md:text-sm text-[#8C5A35] mb-4">
+                  Sử dụng ứng dụng ngân hàng để quét mã QR bên dưới
+                </p>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Quantity Selector */}
-                <div className="bg-[#E3EDD3]/70 rounded-2xl p-3.5 border border-[#335C33]/15 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-[#335C33] text-[#E3EDD3] flex items-center justify-center">
-                      <Coffee className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-[#335C33]">{t('modalItemName')}</p>
-                      <p className="text-[11px] text-[#8C5A35]">{t('modalItemPrice')}</p>
-                    </div>
+                {expired ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex items-center justify-center gap-2 text-xs text-red-700 font-semibold bg-red-50 py-2 px-4 rounded-full mb-4 mx-auto w-max border border-red-200"
+                  >
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <span>Phiên đã hết hạn! Đang quay lại...</span>
+                  </motion.div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2 text-xs text-[#335C33] font-medium bg-[#E3EDD3]/60 py-1.5 px-3 rounded-full mb-4 mx-auto w-max border border-[#335C33]/15">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-[#335C33]" />
+                    <span>Hệ thống đang tự động kiểm tra thanh toán...</span>
                   </div>
+                )}
 
-                  <div className="flex items-center gap-2 bg-[#F6F6EE] rounded-xl px-2 py-1 border border-[#335C33]/20">
-                    <button
-                      type="button"
-                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      className="p-1 text-[#335C33] hover:bg-[#E3EDD3] rounded cursor-pointer"
-                    >
-                      <Minus className="w-3.5 h-3.5" />
-                    </button>
-                    <span className="text-xs font-bold text-[#335C33] w-4 text-center">{quantity}</span>
-                    <button
-                      type="button"
-                      onClick={() => setQuantity((q) => q + 1)}
-                      className="p-1 text-[#335C33] hover:bg-[#E3EDD3] rounded cursor-pointer"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                    </button>
+                <div className={`bg-white p-4 md:p-5 rounded-2xl md:rounded-3xl shadow-md border mb-5 inline-block transition-all duration-300 ${expired ? 'opacity-40 grayscale' : 'border-[#335C33]/15'}`}>
+                  <img src={qrUrl} alt="VietQR" className="w-60 h-60 md:w-72 md:h-72 object-contain" />
+                </div>
+
+                <div className="bg-[#E3EDD3]/50 rounded-xl p-3 md:p-4 mb-5 text-left border border-[#335C33]/10">
+                  <div className="flex justify-between mb-1.5 text-xs md:text-sm">
+                    <span className="text-[#2C2E2B]/70">Chủ TK:</span>
+                    <span className="font-bold text-[#335C33]">{ACCOUNT_NAME}</span>
+                  </div>
+                  <div className="flex justify-between mb-1.5 text-xs md:text-sm">
+                    <span className="text-[#2C2E2B]/70">Số TK:</span>
+                    <span className="font-bold text-[#335C33]">{ACCOUNT_NO}</span>
+                  </div>
+                  <div className="flex justify-between text-xs md:text-sm border-t border-[#335C33]/10 pt-1.5 mt-1.5">
+                    <span className="text-[#2C2E2B]/70">Tổng tiền ({totalItemsCount} món):</span>
+                    <span className="font-bold text-[#8C5A35]">{totalPrice.toLocaleString('vi-VN')} đ</span>
                   </div>
                 </div>
 
-                {/* Form Fields */}
-                <div className="space-y-2.5">
-                  <div>
-                    <label className="block text-xs font-semibold text-[#335C33] mb-1">
-                      {t('modalFieldName')}
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder={t('modalFieldNamePlaceholder')}
-                      className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-[#F6F6EE] border border-[#335C33]/25 focus:outline-none focus:border-[#335C33] focus:ring-1 focus:ring-[#335C33]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-[#335C33] mb-1">
-                      {t('modalFieldPhone')}
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder={t('modalFieldPhonePlaceholder')}
-                      className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-[#F6F6EE] border border-[#335C33]/25 focus:outline-none focus:border-[#335C33] focus:ring-1 focus:ring-[#335C33]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-[#335C33] mb-1">
-                      {t('modalFieldAddress')}
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      placeholder={t('modalFieldAddressPlaceholder')}
-                      className="w-full text-xs px-3.5 py-2.5 rounded-xl bg-[#F6F6EE] border border-[#335C33]/25 focus:outline-none focus:border-[#335C33] focus:ring-1 focus:ring-[#335C33]"
-                    />
-                  </div>
-                </div>
-
-                {/* Total impact & price summary */}
-                <div className="pt-2 flex items-center justify-between border-t border-[#335C33]/15">
-                  <div>
-                    <p className="text-[10px] uppercase font-bold text-[#8C5A35]">{t('modalSummaryLabel')}</p>
-                    <p className="text-base font-extrabold text-[#335C33]">
-                      {totalPrice.toLocaleString('vi-VN')} đ
-                    </p>
-                  </div>
-                  <span className="text-[10px] text-[#335C33] bg-[#E3EDD3] px-2 py-1 rounded-md font-semibold">
-                    {t('modalFreeship')}
+                <div className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border font-mono font-bold text-sm transition-all duration-500 ${countdownColor}`}>
+                  <Clock className="w-4 h-4" />
+                  <span>
+                    {expired
+                      ? 'Phiên đã hết hạn'
+                      : `Mã QR hết hạn sau ${formatCountdown(countdown)}`}
                   </span>
                 </div>
 
-                {/* Submit button */}
-                <motion.button
-                  type="submit"
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full py-3.5 rounded-xl bg-[#335C33] text-[#F6F6EE] font-bold text-xs flex items-center justify-center gap-2 hover:bg-[#284828] transition-[background-color] duration-200 shadow-md cursor-pointer border border-transparent"
+                <button
+                  type="button"
+                  onClick={() => handleDone(selectedAddress)}
+                  className="mt-6 w-full py-2.5 rounded-xl bg-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-300 transition-colors"
                 >
-                  <Heart className="w-4 h-4 fill-current text-[#E3EDD3]" />
-                  <span>{t('modalBtnConfirm')}</span>
-                </motion.button>
-              </form>
-            </div>
-          )}
-        </motion.div>
-      </div>
-    </AnimatePresence>
+                  (Dev Only) Bỏ qua & Xác nhận ngay
+                </button>
+
+                <button
+                  onClick={handleBackToForm}
+                  className="mt-4 text-xs text-[#335C33]/60 hover:text-[#335C33] font-medium transition-colors cursor-pointer block mx-auto"
+                >
+                  Huỷ & chỉnh sửa giỏ hàng
+                </button>
+              </div>
+            ) : (
+              <div>
+                <div className="flex items-center gap-2 text-[#8C5A35] text-xs md:text-sm font-semibold uppercase tracking-wider mb-1">
+                  <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                  {t('modalFundraiseYear')}
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold text-[#335C33] font-serif mb-1">
+                  Đặt Hàng Sản Phẩm Tuần Hoàn
+                </h3>
+                <p className="text-xs text-[#8C5A35] mb-4">
+                  Chọn sản phẩm, số lượng và địa chỉ để ủng hộ dự án CAFLOOP
+                </p>
+
+                <form onSubmit={handleNext} className="space-y-4 md:space-y-5">
+                  {/* 1. Multi-Product List */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <label className="text-xs md:text-sm font-bold text-[#335C33] flex items-center gap-1.5">
+                        <PackageCheck className="w-4 h-4 text-[#8C5A35]" />
+                        Danh Sách Sản Phẩm
+                      </label>
+                      <span className="text-[11px] font-semibold text-[#8C5A35]">
+                        Đã chọn <strong className="text-[#335C33]">{totalItemsCount}</strong> món
+                      </span>
+                    </div>
+
+                    <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                      {productsList.map((prod) => {
+                        const qty = cart[prod.sku] || 0;
+                        const isSelected = qty > 0;
+                        return (
+                          <div
+                            key={prod.sku}
+                            className={`p-2.5 md:p-3 rounded-2xl border-2 transition-all flex items-center justify-between gap-3 ${
+                              isSelected
+                                ? 'bg-white border-[#335C33] shadow-xs ring-1 ring-[#335C33]/20'
+                                : 'bg-[#F4F6EE] border-[#335C33]/15 hover:border-[#335C33]/30'
+                            }`}
+                          >
+                            {/* Product Thumbnail & Lightbox trigger */}
+                            <div className="relative flex-shrink-0 group cursor-pointer" onClick={() => setPreviewProduct(prod)}>
+                              <img
+                                src={prod.image}
+                                alt={prod.name}
+                                className="w-14 h-14 md:w-16 md:h-16 object-cover rounded-xl border border-black/10 bg-white"
+                              />
+                              <div className="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                                <Maximize2 className="w-4 h-4" />
+                              </div>
+                            </div>
+
+                            {/* Product Info */}
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-xs md:text-sm font-bold text-[#335C33] line-clamp-1">
+                                {prod.name}
+                              </h4>
+                              <p className="text-[10px] md:text-xs text-[#8C5A35] line-clamp-1 mt-0.5">
+                                {prod.description}
+                              </p>
+                              <div className="text-xs md:text-sm font-mono font-bold text-[#335C33] mt-1">
+                                {prod.price.toLocaleString('vi-VN')}đ <span className="text-[10px] font-normal text-gray-500">/ {prod.unit}</span>
+                              </div>
+                            </div>
+
+                            {/* Quantity Controls */}
+                            <div className="flex items-center gap-1.5 bg-[#F6F6EE] p-1 rounded-xl border border-[#335C33]/20 flex-shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => updateCartQuantity(prod.sku, -1)}
+                                disabled={qty === 0}
+                                className={`p-1 rounded-lg transition-colors ${
+                                  qty > 0
+                                    ? 'bg-[#335C33] text-white hover:bg-[#284828] cursor-pointer'
+                                    : 'text-gray-400 opacity-50 cursor-not-allowed'
+                                }`}
+                              >
+                                <Minus className="w-3.5 h-3.5" />
+                              </button>
+                              <span className="text-xs md:text-sm font-mono font-bold text-[#335C33] w-6 text-center">
+                                {qty}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => updateCartQuantity(prod.sku, 1)}
+                                className="p-1 rounded-lg bg-[#335C33] text-white hover:bg-[#284828] transition-colors cursor-pointer"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 2. Saved Address Selector */}
+                  <div className="pt-2 border-t border-[#335C33]/15 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs md:text-sm font-bold text-[#335C33] flex items-center gap-1.5">
+                        <MapPin className="w-4 h-4 text-[#8C5A35]" />
+                        Địa Chỉ Nhận Hàng
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setIsAddAddressOpen(true)}
+                        className="text-xs font-bold text-[#335C33] hover:text-[#284828] flex items-center gap-1 bg-[#E3EDD3] px-2.5 py-1 rounded-lg hover:bg-[#d6e3c2] transition-colors cursor-pointer"
+                      >
+                        <PlusCircle className="w-3.5 h-3.5" />
+                        <span>Thêm địa chỉ mới</span>
+                      </button>
+                    </div>
+
+                    {savedAddresses.length === 0 ? (
+                      <div
+                        onClick={() => setIsAddAddressOpen(true)}
+                        className="p-3.5 rounded-2xl border-2 border-dashed border-[#335C33]/30 bg-white/60 text-center cursor-pointer hover:bg-white transition-colors"
+                      >
+                        <p className="text-xs font-semibold text-[#8C5A35]">
+                          Chưa có địa chỉ nào được lưu.
+                        </p>
+                        <p className="text-[11px] text-[#335C33] font-bold mt-0.5">
+                          + Bấm vào đây để thêm địa chỉ giao hàng
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 max-h-36 overflow-y-auto pr-1">
+                        {savedAddresses.map((addr) => {
+                          const isSelected = addr.id === selectedAddressId;
+                          return (
+                            <div
+                              key={addr.id}
+                              onClick={() => setSelectedAddressId(addr.id)}
+                              className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex items-start justify-between gap-2 ${
+                                isSelected
+                                  ? 'bg-white border-[#335C33] shadow-xs ring-1 ring-[#335C33]/20'
+                                  : 'bg-[#F4F6EE] border-[#335C33]/15 hover:border-[#335C33]/30'
+                              }`}
+                            >
+                              <div className="flex items-start gap-2.5">
+                                <div
+                                  className={`w-4 h-4 rounded-full border-2 flex items-center justify-center mt-0.5 flex-shrink-0 ${
+                                    isSelected
+                                      ? 'border-[#335C33] bg-[#335C33] text-white'
+                                      : 'border-gray-400'
+                                  }`}
+                                >
+                                  {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                                </div>
+                                <div className="text-xs">
+                                  <p className="font-bold text-[#335C33]">
+                                    {addr.name} <span className="font-mono text-gray-500 font-normal">({addr.phone})</span>
+                                  </p>
+                                  <p className="text-[#8C5A35] text-[11px] mt-0.5 line-clamp-1">
+                                    {addr.fullAddress}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={(e) => handleDeleteAddress(addr.id, e)}
+                                className="text-gray-400 hover:text-red-600 p-1 transition-colors"
+                                title="Xóa địa chỉ"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 3. Total Price Summary */}
+                  <div className="pt-3 border-t border-[#335C33]/15 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] md:text-xs uppercase font-bold text-[#8C5A35]">Tổng tiền sản phẩm</p>
+                      <p className="text-lg md:text-2xl font-extrabold text-[#335C33] font-mono">
+                        {totalPrice.toLocaleString('vi-VN')} đ
+                      </p>
+                    </div>
+                    <span className="text-[10px] md:text-xs text-[#335C33] bg-[#E3EDD3] px-2.5 py-1 rounded-md font-semibold border border-[#335C33]/10">
+                      {t('modalFreeship')}
+                    </span>
+                  </div>
+
+                  {/* 4. Payment Method Selector */}
+                  <div className="pt-2 border-t border-[#335C33]/15">
+                    <label className="block text-xs font-semibold text-[#335C33] mb-2">
+                      Phương thức thanh toán
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod('qr')}
+                        className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                          paymentMethod === 'qr'
+                            ? 'bg-[#335C33] text-white border-[#335C33] shadow-md'
+                            : 'bg-white text-[#8C5A35] border-[#335C33]/20 hover:bg-[#E3EDD3]'
+                        }`}
+                      >
+                        <QrCode className="w-4 h-4" />
+                        Chuyển khoản QR
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod('cod')}
+                        className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                          paymentMethod === 'cod'
+                            ? 'bg-[#335C33] text-white border-[#335C33] shadow-md'
+                            : 'bg-white text-[#8C5A35] border-[#335C33]/20 hover:bg-[#E3EDD3]'
+                        }`}
+                      >
+                        <PackageCheck className="w-4 h-4" />
+                        Thanh toán COD
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 5. Submit button */}
+                  <motion.button
+                    type="submit"
+                    disabled={totalItemsCount === 0 || !selectedAddressId}
+                    whileHover={{ scale: totalItemsCount > 0 && selectedAddressId ? 1.02 : 1 }}
+                    whileTap={{ scale: totalItemsCount > 0 && selectedAddressId ? 0.98 : 1 }}
+                    className={`w-full py-3.5 md:py-4 rounded-xl md:rounded-2xl font-bold text-xs md:text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-md border border-transparent mt-3 ${
+                      totalItemsCount > 0 && selectedAddressId
+                        ? 'bg-[#335C33] text-[#F6F6EE] hover:bg-[#284828] cursor-pointer'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
+                    }`}
+                  >
+                    {paymentMethod === 'qr' ? (
+                      <>
+                        <QrCode className="w-4 h-4 md:w-5 md:h-5 fill-current text-[#E3EDD3]" />
+                        <span>Xác Nhận & Thanh Toán QR ({totalItemsCount} món)</span>
+                      </>
+                    ) : (
+                      <>
+                        <PackageCheck className="w-4 h-4 md:w-5 md:h-5 fill-current text-[#E3EDD3]" />
+                        <span>Xác Nhận Đặt Hàng ({totalItemsCount} món)</span>
+                      </>
+                    )}
+                  </motion.button>
+                </form>
+              </div>
+            )}
+          </motion.div>
+        </div>
+      </AnimatePresence>
+
+      {/* MODAL 2: Add Address Modal */}
+      <AddAddressModal
+        isOpen={isAddAddressOpen}
+        onClose={() => setIsAddAddressOpen(false)}
+        onSaveAddress={handleSaveAddress}
+      />
+
+      {/* Image Preview Lightbox Modal */}
+      <AnimatePresence>
+        {previewProduct && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setPreviewProduct(null)}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="relative z-50 bg-white rounded-3xl p-4 max-w-md w-full overflow-hidden shadow-2xl border border-white/20"
+            >
+              <button
+                type="button"
+                onClick={() => setPreviewProduct(null)}
+                className="absolute top-6 right-6 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors z-10 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="w-full aspect-square rounded-2xl overflow-hidden bg-gray-50 flex items-center justify-center">
+                <img
+                  src={previewProduct.image}
+                  alt={previewProduct.name}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="mt-3 p-2 text-center">
+                <h4 className="text-base font-bold text-[#335C33]">{previewProduct.name}</h4>
+                <p className="text-xs text-[#8C5A35] mt-1">{previewProduct.description}</p>
+                <p className="text-sm font-mono font-bold text-[#335C33] mt-2">
+                  {previewProduct.price.toLocaleString('vi-VN')} đ / {previewProduct.unit}
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
