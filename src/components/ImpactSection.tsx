@@ -1,8 +1,10 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion, useInView } from 'motion/react';
 import { Bike, Tv, Heart, MapPin, CheckCircle2, School, Sparkles, Award } from 'lucide-react';
+import YouTube from 'react-youtube';
 import { AnimatedCounter } from './AnimatedCounter';
 import { useLanguage } from '../utils/LanguageContext';
+import { trungAudio } from '../utils/audio';
 
 const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
@@ -10,6 +12,19 @@ export function ImpactSection() {
   const progressRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(progressRef, { once: true, margin: '-40px' });
   const { t } = useLanguage();
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+
+  const handlePlayVideo = () => {
+    if (trungAudio.getIsPlaying()) {
+      trungAudio.stop();
+    }
+    setIsVideoPlaying(true);
+  };
+
+  const handlePauseOrEndVideo = () => {
+    setIsVideoPlaying(false);
+    trungAudio.play();
+  };
 
   return (
     <section id="impact-section" className="py-12 md:py-20 px-5 md:px-8 bg-[#F6F6EE] relative border-t border-[#335C33]/10">
@@ -39,26 +54,38 @@ export function ImpactSection() {
         {/* Desktop Split Screen Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           
-          {/* Left Column: Heartwarming Image */}
+          {/* Left Column: Heartwarming Video */}
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: '-30px' }}
             transition={{ duration: 0.6, delay: 0.08, ease: EASE_NATURAL }}
-            className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-lg border-2 border-[#E3EDD3] aspect-[4/3] lg:aspect-square w-full"
+            className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-lg border-2 border-[#E3EDD3] aspect-[4/3] lg:aspect-square w-full group bg-black"
           >
-            <img
-              src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1200&q=80"
-              alt="Các em học sinh vùng cao trên con đường đến trường với nụ cười rạng rỡ"
-              referrerPolicy="no-referrer"
-              loading="lazy"
-              className="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-700"
+            <YouTube
+              videoId="ZK2En3NWqTY"
+              className="absolute inset-0 w-full h-full"
+              iframeClassName="w-full h-full"
+              opts={{
+                width: '100%',
+                height: '100%',
+                playerVars: {
+                  autoplay: 0,
+                  controls: 1,
+                  rel: 0,
+                  showinfo: 0,
+                  modestbranding: 1,
+                },
+              }}
+              onPlay={handlePlayVideo}
+              onPause={handlePauseOrEndVideo}
+              onEnd={handlePauseOrEndVideo}
             />
-            {/* Gradient vignette */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#2C2E2B]/90 via-[#2C2E2B]/20 to-transparent" />
+            {/* Gradient vignette - fade out when playing */}
+            <div className={`absolute inset-0 bg-gradient-to-t from-[#2C2E2B]/90 via-[#2C2E2B]/20 to-transparent transition-opacity duration-300 pointer-events-none ${isVideoPlaying ? 'opacity-0' : 'opacity-100'}`} />
 
-            {/* Floating badge inside image */}
-            <div className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 flex items-center justify-between text-[#F6F6EE]">
+            {/* Floating badge inside image - hide when playing */}
+            <div className={`absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 flex items-center justify-between text-[#F6F6EE] transition-opacity duration-300 pointer-events-none ${isVideoPlaying ? 'opacity-0' : 'opacity-100'}`}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#335C33]/90 flex items-center justify-center backdrop-blur-md shadow-lg border border-white/10">
                   <School className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />

@@ -141,7 +141,7 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     esgCycleStep1Desc: 'Vỏ quả mọng đỏ',
     esgCycleStep2Title: '2. Phơi nắng',
     esgCycleStep2Desc: 'Trà Cascara thơm',
-    esgCycleStep3Title: '3. Học bổng',
+    esgCycleStep3Title: '3. Gây quỹ',
     esgCycleStep3Desc: 'Xe đạp & Smart TV',
     impactBadge: 'Tác Động Xã Hội',
     impactTitle: 'Hành Trình Gieo Mầm',
@@ -164,7 +164,7 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     storyTitle: 'Trà Cascara CAFLOOP',
     storySub: 'Mỗi giọt trà ngọt thanh mang theo niềm hy vọng đến trường',
     storyCardBadge: 'Phiên Bản Gây Quỹ Giới Hạn',
-    storyCardTitle: 'Hộp Trà Cascara 100g Thượng Hạng',
+    storyCardTitle: 'Túi Trà Cascara 100g Thượng Hạng',
     storyCardDesc: 'Vị ngọt mận chín, hoa hồng dại & mật ong rừng',
     storyHighlight1Title: 'Giàu Polyphenol: ',
     storyHighlight1Desc: 'Chống oxy hóa cao gấp 8 lần nước ép việt quất tự nhiên.',
@@ -193,7 +193,7 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     modalFundraiseYear: 'Gây Quỹ Giáo Dục 2026',
     modalPreorderTitle: 'Nhận Trà Cascara Gây Quỹ',
     modalPreorderSub: '100% lợi nhuận chuyển đổi thành xe đạp và trang thiết bị học tập.',
-    modalItemName: 'Hộp Trà Cascara (100g)',
+    modalItemName: 'Túi Trà Cascara (100g)',
     modalItemPrice: '150.000đ / hộp',
     modalFieldName: 'Họ và tên của bạn',
     modalFieldNamePlaceholder: 'VD: Nguyễn Văn A',
@@ -369,13 +369,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const t = (key: TranslationKeys, replacements?: Record<string, string | number>): string => {
     const dict = translations[language] || translations['vi'];
     let text = dict[key] || translations['vi'][key] || '';
-    
+
     if (replacements) {
       Object.entries(replacements).forEach(([k, v]) => {
         text = text.replace(`{${k}}`, String(v));
       });
     }
-    
+
     return text;
   };
 

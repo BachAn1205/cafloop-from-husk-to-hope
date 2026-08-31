@@ -41,6 +41,13 @@ export default function App() {
       setIsPlaying(playing);
     });
 
+    // Auto-play audio after 3 seconds
+    const autoPlayTimer = setTimeout(() => {
+      if (!trungAudio.getIsPlaying()) {
+        trungAudio.play();
+      }
+    }, 3000);
+
     const handleScroll = () => {
       if (window.scrollY > 350) {
         setShowFloatingBar(true);
@@ -52,6 +59,7 @@ export default function App() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       unsub();
+      clearTimeout(autoPlayTimer);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('keydown', handleKeyDown);
     };
@@ -76,7 +84,7 @@ export default function App() {
       */}
       <main
         id="app-main-container"
-        className="w-full max-w-[1920px] mx-auto min-h-screen bg-[#F6F6EE] shadow-2xl relative flex flex-col overflow-x-hidden border-x border-[#335C33]/10"
+        className="w-full max-w-[1920px] mx-auto min-h-screen bg-[#F6F6EE] shadow-2xl relative flex flex-col overflow-clip border-x border-[#335C33]/10"
       >
         {/* Navigation Bar */}
         <Navbar />
