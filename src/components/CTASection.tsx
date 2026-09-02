@@ -36,23 +36,14 @@ export function CTASection({ onOpenOrder, onOpenDonate }: CTASectionProps) {
     triggerConfetti();
     setSharedCount((prev) => prev + 1);
 
-    const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-      campaignUrl
-    )}&quote=${encodeURIComponent(shareQuote)}`;
+    // Cấu hình nội dung chia sẻ lên Facebook
+    const shareUrl = 'https://cafloop-from-husk-to-hope.vercel.app/';
+    const shareQuote = 'Cùng CAFLOOP biến vỏ cà phê thành cơ hội đến trường cho trẻ em vùng cao. 100% lợi nhuận gây quỹ sẽ được chuyển thành xe đạp và học cụ. Hãy chung tay gieo mầm hy vọng nhé! 🌱🚲';
+    const hashtag = '%23CAFLOOP'; // Chỉ hỗ trợ 1 hashtag chính thức qua API
 
-    if (navigator.share) {
-      navigator
-        .share({
-          title: 'CAFLOOP - ' + t('heroTitleLine2'),
-          text: shareQuote,
-          url: campaignUrl,
-        })
-        .catch(() => {
-          window.open(fbShareUrl, '_blank', 'width=600,height=500');
-        });
-    } else {
-      window.open(fbShareUrl, '_blank', 'width=600,height=500');
-    }
+    const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareQuote)}&hashtag=${hashtag}`;
+
+    window.open(fbShareUrl, '_blank', 'width=600,height=600,left=200,top=100');
   };
 
   const handleCopyLink = () => {
