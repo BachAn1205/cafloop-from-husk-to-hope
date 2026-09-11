@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Heart, Sparkles, QrCode, CheckCircle, ChevronLeft, Loader2, Clock, AlertTriangle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useLanguage } from '../utils/LanguageContext';
-import { checkPaymentReceived, type SepayTransaction } from '../utils/sepay';
+import { checkPaymentReceived, generatePaymentCode, type SepayTransaction } from '../utils/sepay';
 import { saveDonationToSupabase } from '../utils/supabaseDonation';
 
 interface DonateModalProps {
@@ -17,6 +17,8 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [amount, setAmount] = useState<string>('');
+  const [donationCode, setDonationCode] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [step, setStep] = useState<'form' | 'qr' | 'success'>('form');
   const [countdown, setCountdown] = useState(QR_TIMEOUT_SECONDS);
   const [expired, setExpired] = useState(false);
@@ -46,6 +48,9 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
       alert(language === 'vi' ? 'Vui lòng nhập số điện thoại hợp lệ (đủ 10 chữ số, bắt đầu bằng 0)' : 'Please enter a valid 10-digit phone number starting with 0');
       return;
     }
+
+    const newCode = generatePaymentCode('DONATE');
+    setDonationCode(newCode);
     setStep('qr');
     setCountdown(QR_TIMEOUT_SECONDS);
     setExpired(false);
@@ -81,17 +86,16 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
     return () => clearTimeout(timeout);
   }, [expired]);
 
-  // Tự động kiểm tra giao dịch tiền vào từ SePay khi ở màn hình quét QR
+  // Tự động kiểm tra giao dịch tiền vào từ SePay khi ở màn hình quét QR (Khớp chính xác donationCode & số tiền)
   useEffect(() => {
-    if (step !== 'qr' || expired) return;
+    if (step !== 'qr' || expired || !donationCode) return;
 
     const rawAmount = amount ? parseInt(amount.replace(/\D/g, ''), 10) : 0;
     const interval = setInterval(async () => {
       try {
         const tx = await checkPaymentReceived(
           rawAmount,
-          phone,
-          name,
+          donationCode,
           sessionStartedAt.current ?? new Date()
         );
         if (tx && !processedTxIds.current.has(String(tx.id))) {
@@ -105,17 +109,22 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [step, amount, phone, name, expired]);
+  }, [step, amount, donationCode, expired]);
 
   const handleDone = (tx: SepayTransaction) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     const rawAmount = amount ? parseInt(amount.replace(/\D/g, ''), 10) : 0;
 
-    // Tự động lưu khoản quyên góp vào Database Supabase (chỉ khi có giao dịch thật)
+    // Tự động lưu khoản quyên góp vào Database Supabase (Idempotent với donationCode)
     saveDonationToSupabase({
       name,
       phone,
       amount: rawAmount,
+      donationCode,
       sepayTransaction: tx,
+    }).finally(() => {
+      setIsSubmitting(false);
     });
 
     try {
@@ -134,6 +143,7 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
   const handleBackToForm = () => {
     setStep('form');
     setExpired(false);
+    setDonationCode('');
     setCountdown(QR_TIMEOUT_SECONDS);
     sessionStartedAt.current = null;
     processedTxIds.current = new Set();
@@ -144,6 +154,7 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
     setName('');
     setPhone('');
     setAmount('');
+    setDonationCode('');
     setExpired(false);
     setCountdown(QR_TIMEOUT_SECONDS);
     onClose();
@@ -163,9 +174,9 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
 
   const rawAmount = amount ? parseInt(amount.replace(/\D/g, ''), 10) : 0;
   
-  // VietQR URL Generate (qr_only template removes top logo & bottom footer)
+  // VietQR URL Generate với mã độc bản (qr_only template removes top logo & bottom footer)
   const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-qr_only.png?amount=${rawAmount}&addInfo=${encodeURIComponent(
-    `CAF ${phone} ${name || 'Nha Hao Tam'}`
+    donationCode
   )}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
 
   // Màu đếm ngược: đỏ khi < 60s, vàng khi < 120s, xanh đậm trên nền trắng còn lại
@@ -280,6 +291,12 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
                   <span className="text-[#2C2E2B]/70">{language === 'vi' ? 'Số TK:' : 'Account No:'}</span>
                   <span className="font-bold text-[#335C33]">{ACCOUNT_NO}</span>
                 </div>
+                <div className="flex justify-between mb-1.5 text-xs md:text-sm items-center">
+                  <span className="text-[#2C2E2B]/70">{language === 'vi' ? 'Nội dung CK:' : 'Transfer Content:'}</span>
+                  <span className="font-mono font-bold text-[#8C5A35] bg-white px-2 py-0.5 rounded border border-[#8C5A35]/30">
+                    {donationCode}
+                  </span>
+                </div>
                 <div className="flex justify-between text-xs md:text-sm border-t border-[#335C33]/10 pt-1.5 mt-1.5">
                   <span className="text-[#2C2E2B]/70">{language === 'vi' ? 'Số tiền:' : 'Amount:'}</span>
                   <span className="font-bold text-[#8C5A35]">{rawAmount.toLocaleString('vi-VN')} đ</span>
@@ -308,9 +325,9 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
             </div>
           ) : (
             <div>
-              <div className="flex items-center gap-2 text-[#8C5A35] text-xs md:text-sm font-semibold uppercase tracking-wider mb-1 md:mb-1.5">
-                <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                {t('modalFundraiseYear')}
+              <div className="section-badge mb-2">
+                <Sparkles className="text-[#8C5A35]" />
+                <span>{t('modalFundraiseYear')}</span>
               </div>
               <h3 className="text-xl md:text-2xl font-bold text-[#335C33] font-serif mb-1.5">
                 {t('donateModalTitle')}

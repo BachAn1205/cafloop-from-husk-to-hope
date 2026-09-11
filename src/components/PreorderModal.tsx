@@ -4,7 +4,7 @@ import { X, Plus, Minus, CheckCircle, Sparkles, Bike, PackageCheck, QrCode, Chev
 import confetti from 'canvas-confetti';
 import { useLanguage } from '../utils/LanguageContext';
 import { saveOrderToSupabase, PRODUCTS_LIST, fetchProductsFromSupabase, type ProductItem } from '../utils/supabaseDonation';
-import { checkPaymentReceived, QR_TIMEOUT_SECONDS, type SepayTransaction } from '../utils/sepay';
+import { checkPaymentReceived, generatePaymentCode, QR_TIMEOUT_SECONDS, type SepayTransaction } from '../utils/sepay';
 import { AddAddressModal, type SavedAddress } from './AddAddressModal';
 
 interface PreorderModalProps {
@@ -19,6 +19,8 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
   // Cart state: { [sku]: quantity }
   const [cart, setCart] = useState<Record<string, number>>({});
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'qr'>('qr');
+  const [orderCode, setOrderCode] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // Fetch products from database when modal opens
   useEffect(() => {
@@ -130,8 +132,11 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
       return;
     }
 
+    const generatedCode = generatePaymentCode('ORDER');
+    setOrderCode(generatedCode);
+
     if (paymentMethod === 'cod') {
-      handleDone(selectedAddress);
+      handleDone(selectedAddress, undefined, generatedCode);
       return;
     }
 
@@ -167,22 +172,21 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
     return () => clearTimeout(timeout);
   }, [expired]);
 
-  // Auto check SePay polling
+  // Auto check SePay polling (Bảo mật: Khớp chính xác mã đơn orderCode & số tiền)
   useEffect(() => {
-    if (step !== 'qr' || expired || !selectedAddress) return;
+    if (step !== 'qr' || expired || !selectedAddress || !orderCode) return;
 
     const interval = setInterval(async () => {
       try {
         const tx = await checkPaymentReceived(
           totalPrice,
-          selectedAddress.phone,
-          selectedAddress.name,
+          orderCode,
           sessionStartedAt.current ?? new Date()
         );
         if (tx && !processedTxIds.current.has(String(tx.id))) {
           processedTxIds.current.add(String(tx.id));
           clearInterval(interval);
-          handleDone(selectedAddress, tx);
+          handleDone(selectedAddress, tx, orderCode);
         }
       } catch (err) {
         console.error('Lỗi tự động kiểm tra SePay:', err);
@@ -190,10 +194,13 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [step, totalPrice, selectedAddress, expired]);
+  }, [step, totalPrice, selectedAddress, expired, orderCode]);
 
-  const handleDone = (addr = selectedAddress, _tx?: SepayTransaction) => {
-    if (!addr) return;
+  const handleDone = (addr = selectedAddress, _tx?: SepayTransaction, codeToUse?: string) => {
+    if (!addr || isSubmitting) return;
+    setIsSubmitting(true);
+
+    const finalOrderCode = codeToUse || orderCode || generatePaymentCode('ORDER');
 
     const items = Object.entries(cart).map(([sku, qty]) => {
       const p = productsList.find((item) => item.sku === sku);
@@ -210,7 +217,11 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
       phone: addr.phone,
       address: addr.fullAddress,
       totalAmount: totalPrice,
+      orderCode: finalOrderCode,
+      sepayTransaction: _tx,
       items,
+    }).finally(() => {
+      setIsSubmitting(false);
     });
 
     try {
@@ -230,6 +241,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
     setStep('form');
     setExpired(false);
     setCountdown(QR_TIMEOUT_SECONDS);
+    setOrderCode('');
     sessionStartedAt.current = null;
     processedTxIds.current = new Set();
   };
@@ -237,6 +249,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
   const handleReset = () => {
     setStep('form');
     setCart({});
+    setOrderCode('');
     setPaymentMethod('qr');
     setExpired(false);
     setCountdown(QR_TIMEOUT_SECONDS);
@@ -250,7 +263,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
   };
 
   const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-qr_only.png?amount=${totalPrice}&addInfo=${encodeURIComponent(
-    `CAF ${selectedAddress?.phone || ''} ${selectedAddress?.name || 'Khach hang'}`
+    orderCode
   )}&accountName=${encodeURIComponent(ACCOUNT_NAME)}`;
 
   const countdownColor =
@@ -281,12 +294,14 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative z-10 w-full max-w-[460px] md:max-w-xl bg-[#F6F6EE] rounded-3xl p-5 sm:p-6 md:p-8 shadow-2xl border border-[#335C33]/20 max-h-[92vh] overflow-y-auto"
+            className={`relative z-10 w-full ${
+              step === 'form' ? 'max-w-[480px] md:max-w-3xl lg:max-w-4xl' : 'max-w-[460px] md:max-w-xl'
+            } bg-[#F6F6EE] rounded-3xl p-5 sm:p-6 md:p-8 shadow-2xl border border-[#335C33]/20 max-h-[92vh] overflow-y-auto`}
           >
             {step === 'form' && (
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 md:top-5 md:right-5 p-2 rounded-full bg-[#E3EDD3] text-[#335C33] hover:bg-[#d6e3c2] transition-colors cursor-pointer shadow-xs"
+                className="absolute top-4 right-4 md:top-5 md:right-5 p-2 rounded-full bg-[#E3EDD3] text-[#335C33] hover:bg-[#d6e3c2] transition-colors cursor-pointer shadow-xs z-10"
               >
                 <X className="w-4 h-4 md:w-5 md:h-5" />
               </button>
@@ -295,7 +310,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
             {step === 'qr' && (
               <button
                 onClick={handleBackToForm}
-                className="absolute top-4 left-4 md:top-5 md:left-5 p-2 rounded-full bg-[#E3EDD3] text-[#335C33] hover:bg-[#d6e3c2] transition-colors cursor-pointer shadow-xs"
+                className="absolute top-4 left-4 md:top-5 md:left-5 p-2 rounded-full bg-[#E3EDD3] text-[#335C33] hover:bg-[#d6e3c2] transition-colors cursor-pointer shadow-xs z-10"
               >
                 <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
               </button>
@@ -368,6 +383,12 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                     <span className="text-[#2C2E2B]/70">Số TK:</span>
                     <span className="font-bold text-[#335C33]">{ACCOUNT_NO}</span>
                   </div>
+                  <div className="flex justify-between mb-1.5 text-xs md:text-sm items-center">
+                    <span className="text-[#2C2E2B]/70">Nội dung CK:</span>
+                    <span className="font-mono font-bold text-[#8C5A35] bg-white px-2 py-0.5 rounded border border-[#8C5A35]/30">
+                      {orderCode}
+                    </span>
+                  </div>
                   <div className="flex justify-between text-xs md:text-sm border-t border-[#335C33]/10 pt-1.5 mt-1.5">
                     <span className="text-[#2C2E2B]/70">Tổng tiền ({totalItemsCount} món):</span>
                     <span className="font-bold text-[#8C5A35]">{totalPrice.toLocaleString('vi-VN')} đ</span>
@@ -384,14 +405,6 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                 </div>
 
                 <button
-                  type="button"
-                  onClick={() => handleDone(selectedAddress)}
-                  className="mt-6 w-full py-2.5 rounded-xl bg-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-300 transition-colors"
-                >
-                  (Dev Only) Bỏ qua & Xác nhận ngay
-                </button>
-
-                <button
                   onClick={handleBackToForm}
                   className="mt-4 text-xs text-[#335C33]/60 hover:text-[#335C33] font-medium transition-colors cursor-pointer block mx-auto"
                 >
@@ -400,247 +413,255 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
               </div>
             ) : (
               <div>
-                <div className="flex items-center gap-2 text-[#8C5A35] text-xs md:text-sm font-semibold uppercase tracking-wider mb-1">
-                  <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                  {t('modalFundraiseYear')}
+                <div className="section-badge mb-2">
+                  <Sparkles className="text-[#8C5A35]" />
+                  <span>{t('modalFundraiseYear')}</span>
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold text-[#335C33] font-serif mb-1">
+                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#335C33] font-serif mb-1">
                   Đặt Hàng Sản Phẩm Tuần Hoàn
                 </h3>
-                <p className="text-xs text-[#8C5A35] mb-4">
+                <p className="text-xs md:text-sm text-[#8C5A35] mb-5">
                   Chọn sản phẩm, số lượng và địa chỉ để ủng hộ dự án CAFLOOP
                 </p>
 
-                <form onSubmit={handleNext} className="space-y-4 md:space-y-5">
-                  {/* 1. Multi-Product List */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <label className="text-xs md:text-sm font-bold text-[#335C33] flex items-center gap-1.5">
-                        <PackageCheck className="w-4 h-4 text-[#8C5A35]" />
-                        Danh Sách Sản Phẩm
-                      </label>
-                      <span className="text-[11px] font-semibold text-[#8C5A35]">
-                        Đã chọn <strong className="text-[#335C33]">{totalItemsCount}</strong> món
-                      </span>
-                    </div>
-
-                    <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
-                      {productsList.map((prod) => {
-                        const qty = cart[prod.sku] || 0;
-                        const isSelected = qty > 0;
-                        return (
-                          <div
-                            key={prod.sku}
-                            className={`p-2.5 md:p-3 rounded-2xl border-2 transition-all flex items-center justify-between gap-3 ${
-                              isSelected
-                                ? 'bg-white border-[#335C33] shadow-xs ring-1 ring-[#335C33]/20'
-                                : 'bg-[#F4F6EE] border-[#335C33]/15 hover:border-[#335C33]/30'
-                            }`}
-                          >
-                            {/* Product Thumbnail & Lightbox trigger */}
-                            <div className="relative flex-shrink-0 group cursor-pointer" onClick={() => setPreviewProduct(prod)}>
-                              <img
-                                src={prod.image}
-                                alt={prod.name}
-                                className="w-14 h-14 md:w-16 md:h-16 object-cover rounded-xl border border-black/10 bg-white"
-                              />
-                              <div className="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                                <Maximize2 className="w-4 h-4" />
-                              </div>
-                            </div>
-
-                            {/* Product Info */}
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-xs md:text-sm font-bold text-[#335C33] line-clamp-1">
-                                {prod.name}
-                              </h4>
-                              <p className="text-[10px] md:text-xs text-[#8C5A35] line-clamp-1 mt-0.5">
-                                {prod.description}
-                              </p>
-                              <div className="text-xs md:text-sm font-mono font-bold text-[#335C33] mt-1">
-                                {prod.price.toLocaleString('vi-VN')}đ <span className="text-[10px] font-normal text-gray-500">/ {prod.unit}</span>
-                              </div>
-                            </div>
-
-                            {/* Quantity Controls */}
-                            <div className="flex items-center gap-1.5 bg-[#F6F6EE] p-1 rounded-xl border border-[#335C33]/20 flex-shrink-0">
-                              <button
-                                type="button"
-                                onClick={() => updateCartQuantity(prod.sku, -1)}
-                                disabled={qty === 0}
-                                className={`p-1 rounded-lg transition-colors ${
-                                  qty > 0
-                                    ? 'bg-[#335C33] text-white hover:bg-[#284828] cursor-pointer'
-                                    : 'text-gray-400 opacity-50 cursor-not-allowed'
-                                }`}
-                              >
-                                <Minus className="w-3.5 h-3.5" />
-                              </button>
-                              <span className="text-xs md:text-sm font-mono font-bold text-[#335C33] w-6 text-center">
-                                {qty}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => updateCartQuantity(prod.sku, 1)}
-                                className="p-1 rounded-lg bg-[#335C33] text-white hover:bg-[#284828] transition-colors cursor-pointer"
-                              >
-                                <Plus className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* 2. Saved Address Selector */}
-                  <div className="pt-2 border-t border-[#335C33]/15 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs md:text-sm font-bold text-[#335C33] flex items-center gap-1.5">
-                        <MapPin className="w-4 h-4 text-[#8C5A35]" />
-                        Địa Chỉ Nhận Hàng
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => setIsAddAddressOpen(true)}
-                        className="text-xs font-bold text-[#335C33] hover:text-[#284828] flex items-center gap-1 bg-[#E3EDD3] px-2.5 py-1 rounded-lg hover:bg-[#d6e3c2] transition-colors cursor-pointer"
-                      >
-                        <PlusCircle className="w-3.5 h-3.5" />
-                        <span>Thêm địa chỉ mới</span>
-                      </button>
-                    </div>
-
-                    {savedAddresses.length === 0 ? (
-                      <div
-                        onClick={() => setIsAddAddressOpen(true)}
-                        className="p-3.5 rounded-2xl border-2 border-dashed border-[#335C33]/30 bg-white/60 text-center cursor-pointer hover:bg-white transition-colors"
-                      >
-                        <p className="text-xs font-semibold text-[#8C5A35]">
-                          Chưa có địa chỉ nào được lưu.
-                        </p>
-                        <p className="text-[11px] text-[#335C33] font-bold mt-0.5">
-                          + Bấm vào đây để thêm địa chỉ giao hàng
-                        </p>
+                <form onSubmit={handleNext}>
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-6 items-start">
+                    
+                    {/* LEFT COLUMN: Multi-Product List (7 cols on desktop) */}
+                    <div className="md:col-span-7 space-y-3">
+                      <div className="flex justify-between items-center pb-1.5 border-b border-[#335C33]/15">
+                        <label className="text-xs md:text-sm font-bold text-[#335C33] flex items-center gap-1.5">
+                          <PackageCheck className="w-4 h-4 text-[#8C5A35]" />
+                          Danh Sách Sản Phẩm
+                        </label>
+                        <span className="text-[11px] md:text-xs font-semibold text-[#8C5A35] bg-[#E3EDD3] px-2.5 py-0.5 rounded-full">
+                          Đã chọn <strong className="text-[#335C33]">{totalItemsCount}</strong> món
+                        </span>
                       </div>
-                    ) : (
-                      <div className="space-y-2 max-h-36 overflow-y-auto pr-1">
-                        {savedAddresses.map((addr) => {
-                          const isSelected = addr.id === selectedAddressId;
+
+                      <div className="space-y-2.5 md:h-[540px] md:max-h-[540px] md:overflow-y-auto md:pr-2 overscroll-contain transform-gpu [will-change:scroll-position]">
+                        {productsList.map((prod) => {
+                          const qty = cart[prod.sku] || 0;
+                          const isSelected = qty > 0;
                           return (
                             <div
-                              key={addr.id}
-                              onClick={() => setSelectedAddressId(addr.id)}
-                              className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex items-start justify-between gap-2 ${
+                              key={prod.sku}
+                              className={`p-2.5 md:p-3 rounded-2xl border-2 transition-[border-color,background-color,box-shadow] duration-150 flex items-center justify-between gap-3 transform-gpu ${
                                 isSelected
-                                  ? 'bg-white border-[#335C33] shadow-xs ring-1 ring-[#335C33]/20'
-                                  : 'bg-[#F4F6EE] border-[#335C33]/15 hover:border-[#335C33]/30'
+                                  ? 'bg-white border-[#527E52] shadow-xs ring-1 ring-[#527E52]/20'
+                                  : 'bg-[#F4F6EE] border-[#335C33]/15 hover:border-[#527E52]/40'
                               }`}
                             >
-                              <div className="flex items-start gap-2.5">
-                                <div
-                                  className={`w-4 h-4 rounded-full border-2 flex items-center justify-center mt-0.5 flex-shrink-0 ${
-                                    isSelected
-                                      ? 'border-[#335C33] bg-[#335C33] text-white'
-                                      : 'border-gray-400'
-                                  }`}
-                                >
-                                  {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-                                </div>
-                                <div className="text-xs">
-                                  <p className="font-bold text-[#335C33]">
-                                    {addr.name} <span className="font-mono text-gray-500 font-normal">({addr.phone})</span>
-                                  </p>
-                                  <p className="text-[#8C5A35] text-[11px] mt-0.5 line-clamp-1">
-                                    {addr.fullAddress}
-                                  </p>
+                              {/* Product Thumbnail & Lightbox trigger */}
+                              <div className="relative flex-shrink-0 group cursor-pointer" onClick={() => setPreviewProduct(prod)}>
+                                <img
+                                  src={prod.image}
+                                  alt={prod.name}
+                                  className="w-14 h-14 md:w-16 md:h-16 object-cover rounded-xl border border-black/10 bg-white"
+                                />
+                                <div className="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                                  <Maximize2 className="w-4 h-4" />
                                 </div>
                               </div>
 
-                              <button
-                                type="button"
-                                onClick={(e) => handleDeleteAddress(addr.id, e)}
-                                className="text-gray-400 hover:text-red-600 p-1 transition-colors"
-                                title="Xóa địa chỉ"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                              {/* Product Info */}
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-xs md:text-sm font-bold text-[#335C33] line-clamp-1">
+                                  {prod.name}
+                                </h4>
+                                <p className="text-[10px] md:text-xs text-[#8C5A35] line-clamp-1 mt-0.5">
+                                  {prod.description}
+                                </p>
+                                <div className="text-xs md:text-sm font-mono font-bold text-[#335C33] mt-1">
+                                  {prod.price.toLocaleString('vi-VN')}đ <span className="text-[10px] font-normal text-gray-500">/ {prod.unit}</span>
+                                </div>
+                              </div>
+
+                              {/* Quantity Controls */}
+                              <div className="flex items-center gap-1.5 bg-[#F6F6EE] p-1 rounded-xl border border-[#527E52]/25 flex-shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => updateCartQuantity(prod.sku, -1)}
+                                  disabled={qty === 0}
+                                  className={`p-1 rounded-lg transition-colors ${
+                                    qty > 0
+                                      ? 'bg-[#527E52] text-white hover:bg-[#436943] cursor-pointer'
+                                      : 'text-gray-400 opacity-50 cursor-not-allowed'
+                                  }`}
+                                >
+                                  <Minus className="w-3.5 h-3.5" />
+                                </button>
+                                <span className="text-xs md:text-sm font-mono font-bold text-[#527E52] w-6 text-center">
+                                  {qty}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => updateCartQuantity(prod.sku, 1)}
+                                  className="p-1 rounded-lg bg-[#527E52] text-white hover:bg-[#436943] transition-colors cursor-pointer"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </div>
                           );
                         })}
                       </div>
-                    )}
-                  </div>
-
-                  {/* 3. Total Price Summary */}
-                  <div className="pt-3 border-t border-[#335C33]/15 flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] md:text-xs uppercase font-bold text-[#8C5A35]">Tổng tiền sản phẩm</p>
-                      <p className="text-lg md:text-2xl font-extrabold text-[#335C33] font-mono">
-                        {totalPrice.toLocaleString('vi-VN')} đ
-                      </p>
                     </div>
-                    <span className="text-[10px] md:text-xs text-[#335C33] bg-[#E3EDD3] px-2.5 py-1 rounded-md font-semibold border border-[#335C33]/10">
-                      {t('modalFreeship')}
-                    </span>
-                  </div>
 
-                  {/* 4. Payment Method Selector */}
-                  <div className="pt-2 border-t border-[#335C33]/15">
-                    <label className="block text-xs font-semibold text-[#335C33] mb-2">
-                      Phương thức thanh toán
-                    </label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('qr')}
-                        className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
-                          paymentMethod === 'qr'
-                            ? 'bg-[#335C33] text-white border-[#335C33] shadow-md'
-                            : 'bg-white text-[#8C5A35] border-[#335C33]/20 hover:bg-[#E3EDD3]'
+                    {/* RIGHT COLUMN: Address, Summary & Payment (5 cols on desktop) */}
+                    <div className="md:col-span-5 md:h-[540px] flex flex-col justify-between bg-[#E3EDD3]/35 p-4 md:p-5 rounded-2xl border border-[#335C33]/15 space-y-4">
+                      
+                      {/* Saved Address Selector */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs md:text-sm font-bold text-[#335C33] flex items-center gap-1.5">
+                            <MapPin className="w-4 h-4 text-[#8C5A35]" />
+                            Địa Chỉ Nhận Hàng
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setIsAddAddressOpen(true)}
+                            className="text-[11px] md:text-xs font-bold text-[#335C33] hover:text-[#284828] flex items-center gap-1 bg-[#E3EDD3] px-2.5 py-1 rounded-lg hover:bg-[#d6e3c2] transition-colors cursor-pointer shadow-2xs"
+                          >
+                            <PlusCircle className="w-3.5 h-3.5" />
+                            <span>Thêm mới</span>
+                          </button>
+                        </div>
+
+                        {savedAddresses.length === 0 ? (
+                          <div
+                            onClick={() => setIsAddAddressOpen(true)}
+                            className="p-3.5 rounded-xl border-2 border-dashed border-[#335C33]/30 bg-white/70 text-center cursor-pointer hover:bg-white transition-colors"
+                          >
+                            <p className="text-xs font-semibold text-[#8C5A35]">
+                              Chưa có địa chỉ nào được lưu.
+                            </p>
+                            <p className="text-[11px] text-[#335C33] font-bold mt-0.5">
+                              + Bấm vào đây để thêm địa chỉ giao hàng
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="space-y-2 max-h-40 md:max-h-44 overflow-y-auto pr-1 overscroll-contain transform-gpu [will-change:scroll-position]">
+                            {savedAddresses.map((addr) => {
+                              const isSelected = addr.id === selectedAddressId;
+                              return (
+                                <div
+                                  key={addr.id}
+                                  onClick={() => setSelectedAddressId(addr.id)}
+                                  className={`p-2.5 rounded-xl border-2 transition-[border-color,background-color,box-shadow] duration-150 cursor-pointer flex items-start justify-between gap-2 transform-gpu ${
+                                    isSelected
+                                      ? 'bg-white border-[#527E52] shadow-xs ring-1 ring-[#527E52]/20'
+                                      : 'bg-white/60 border-[#335C33]/15 hover:border-[#527E52]/40'
+                                  }`}
+                                >
+                                  <div className="flex items-start gap-2 min-w-0">
+                                    <div
+                                      className={`w-4 h-4 rounded-full border-2 flex items-center justify-center mt-0.5 flex-shrink-0 ${
+                                        isSelected
+                                          ? 'border-[#527E52] bg-[#527E52] text-white'
+                                          : 'border-gray-400'
+                                      }`}
+                                    >
+                                      {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                                    </div>
+                                    <div className="text-xs min-w-0">
+                                      <p className="font-bold text-[#335C33] truncate">
+                                        {addr.name} <span className="font-mono text-gray-500 font-normal">({addr.phone})</span>
+                                      </p>
+                                      <p className="text-[#8C5A35] text-[11px] mt-0.5 line-clamp-2">
+                                        {addr.fullAddress}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    onClick={(e) => handleDeleteAddress(addr.id, e)}
+                                    className="text-gray-400 hover:text-red-600 p-1 transition-colors shrink-0"
+                                    title="Xóa địa chỉ"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Total Price Summary */}
+                      <div className="pt-3 border-t border-[#335C33]/15 flex items-center justify-between">
+                        <div>
+                          <p className="text-[10px] md:text-xs uppercase font-bold text-[#8C5A35]">Tổng tiền ({totalItemsCount} món)</p>
+                          <p className="text-lg md:text-2xl font-extrabold text-[#335C33] font-mono">
+                            {totalPrice.toLocaleString('vi-VN')} đ
+                          </p>
+                        </div>
+                        <span className="text-[10px] md:text-xs text-[#335C33] bg-white px-2.5 py-1 rounded-md font-semibold border border-[#335C33]/10 shadow-2xs">
+                          {t('modalFreeship')}
+                        </span>
+                      </div>
+
+                      {/* Payment Method Selector */}
+                      <div className="pt-2 border-t border-[#335C33]/15">
+                        <label className="block text-xs font-semibold text-[#335C33] mb-1.5">
+                          Phương thức thanh toán
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod('qr')}
+                            className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                              paymentMethod === 'qr'
+                                ? 'bg-[#335C33] text-white border-[#335C33] shadow-xs'
+                                : 'bg-white text-[#8C5A35] border-[#335C33]/20 hover:bg-[#E3EDD3]'
+                            }`}
+                          >
+                            <QrCode className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate">Chuyển khoản QR</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod('cod')}
+                            className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                              paymentMethod === 'cod'
+                                ? 'bg-[#335C33] text-white border-[#335C33] shadow-xs'
+                                : 'bg-white text-[#8C5A35] border-[#335C33]/20 hover:bg-[#E3EDD3]'
+                            }`}
+                          >
+                            <PackageCheck className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate">Thanh toán COD</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Submit button */}
+                      <motion.button
+                        type="submit"
+                        disabled={totalItemsCount === 0 || !selectedAddressId}
+                        whileHover={{ scale: totalItemsCount > 0 && selectedAddressId ? 1.02 : 1 }}
+                        whileTap={{ scale: totalItemsCount > 0 && selectedAddressId ? 0.98 : 1 }}
+                        className={`w-full py-3 md:py-3.5 rounded-xl md:rounded-2xl font-bold text-xs md:text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-md border border-transparent mt-2 ${
+                          totalItemsCount > 0 && selectedAddressId
+                            ? 'bg-[#335C33] text-[#F6F6EE] hover:bg-[#284828] cursor-pointer'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
                         }`}
                       >
-                        <QrCode className="w-4 h-4" />
-                        Chuyển khoản QR
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('cod')}
-                        className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
-                          paymentMethod === 'cod'
-                            ? 'bg-[#335C33] text-white border-[#335C33] shadow-md'
-                            : 'bg-white text-[#8C5A35] border-[#335C33]/20 hover:bg-[#E3EDD3]'
-                        }`}
-                      >
-                        <PackageCheck className="w-4 h-4" />
-                        Thanh toán COD
-                      </button>
+                        {paymentMethod === 'qr' ? (
+                          <>
+                            <QrCode className="w-4 h-4 fill-current text-[#E3EDD3]" />
+                            <span>Xác Nhận & Thanh Toán QR</span>
+                          </>
+                        ) : (
+                          <>
+                            <PackageCheck className="w-4 h-4 fill-current text-[#E3EDD3]" />
+                            <span>Xác Nhận Đặt Hàng ({totalItemsCount} món)</span>
+                          </>
+                        )}
+                      </motion.button>
                     </div>
-                  </div>
 
-                  {/* 5. Submit button */}
-                  <motion.button
-                    type="submit"
-                    disabled={totalItemsCount === 0 || !selectedAddressId}
-                    whileHover={{ scale: totalItemsCount > 0 && selectedAddressId ? 1.02 : 1 }}
-                    whileTap={{ scale: totalItemsCount > 0 && selectedAddressId ? 0.98 : 1 }}
-                    className={`w-full py-3.5 md:py-4 rounded-xl md:rounded-2xl font-bold text-xs md:text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-md border border-transparent mt-3 ${
-                      totalItemsCount > 0 && selectedAddressId
-                        ? 'bg-[#335C33] text-[#F6F6EE] hover:bg-[#284828] cursor-pointer'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
-                    }`}
-                  >
-                    {paymentMethod === 'qr' ? (
-                      <>
-                        <QrCode className="w-4 h-4 md:w-5 md:h-5 fill-current text-[#E3EDD3]" />
-                        <span>Xác Nhận & Thanh Toán QR ({totalItemsCount} món)</span>
-                      </>
-                    ) : (
-                      <>
-                        <PackageCheck className="w-4 h-4 md:w-5 md:h-5 fill-current text-[#E3EDD3]" />
-                        <span>Xác Nhận Đặt Hàng ({totalItemsCount} món)</span>
-                      </>
-                    )}
-                  </motion.button>
+                  </div>
                 </form>
               </div>
             )}

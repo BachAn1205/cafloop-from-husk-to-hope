@@ -4,6 +4,7 @@ import { HeroSection } from './components/HeroSection';
 import { ESGSection } from './components/ESGSection';
 import { ImpactSection } from './components/ImpactSection';
 import { CascaraStory } from './components/CascaraStory';
+import { BrandStorySection } from './components/BrandStorySection';
 import { CTASection } from './components/CTASection';
 import { Footer } from './components/Footer';
 import { PreorderModal } from './components/PreorderModal';
@@ -104,7 +105,10 @@ export default function App() {
         {/* Story of Cascara & Limited Fundraiser Box */}
         <CascaraStory onOpenOrder={() => setIsOrderOpen(true)} />
 
-        {/* 4. CALL TO ACTION (Lan Tỏa Tác Động) */}
+        {/* 4. BRAND STORY & FOUNDER (Tầm nhìn, Sứ mệnh, Giá trị cốt lõi, Chân dung Founder) */}
+        <BrandStorySection />
+
+        {/* 5. CALL TO ACTION (Lan Tỏa Tác Động) */}
         <CTASection 
           onOpenOrder={() => setIsOrderOpen(true)} 
           onOpenDonate={() => setIsDonateOpen(true)}
@@ -144,7 +148,7 @@ export default function App() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleShareClick}
-                  className="p-2 md:px-3 md:py-2 rounded-xl bg-[#1877F2] text-white hover:bg-[#166fe5] transition-colors cursor-pointer flex items-center justify-center"
+                  className="p-2 md:px-3 md:py-2 rounded-xl bg-[#1860C3] text-white hover:bg-[#134c9c] transition-colors cursor-pointer flex items-center justify-center shadow-xs"
                   title={language === 'vi' ? 'Chia sẻ lên Facebook' : 'Share on Facebook'}
                 >
                   <Share2 className="w-4 h-4" />

@@ -27,7 +27,7 @@ export const PRODUCTS_LIST: ProductItem[] = [
     name: 'Trà Vỏ Cà Phê Cascara - Túi Zip (50g)',
     price: 60000,
     unit: 'túi',
-    description: '100% tự nhiên - Từ nông trại Đắk Lắk. Vị trái cây nhẹ, ít caffeine.',
+    description: 'Vị trái cây nhẹ, ít caffeine.',
     image: teaZip50g,
   },
   {
@@ -35,7 +35,7 @@ export const PRODUCTS_LIST: ProductItem[] = [
     name: 'Trà Vỏ Cà Phê Cascara - Túi Zip (100g)',
     price: 80000,
     unit: 'túi',
-    description: '100% tự nhiên - Từ nông trại Đắk Lắk. Vị trái cây nhẹ, ít caffeine.',
+    description: 'Vị trái cây nhẹ, ít caffeine.',
     image: teaZip100g,
   },
   {
@@ -43,7 +43,7 @@ export const PRODUCTS_LIST: ProductItem[] = [
     name: 'Trà Vỏ Cà Phê Cascara - Hũ Nhựa (50g)',
     price: 60000,
     unit: 'hũ',
-    description: '100% tự nhiên - Từ nông trại Đắk Lắk. Vị trái cây nhẹ, ít caffeine.',
+    description: 'Vị trái cây nhẹ, ít caffeine.',
     image: teaCtn50g,
   },
   {
@@ -51,7 +51,7 @@ export const PRODUCTS_LIST: ProductItem[] = [
     name: 'Trà Vỏ Cà Phê Cascara - Hũ Nhựa (100g)',
     price: 80000,
     unit: 'hũ',
-    description: '100% tự nhiên - Từ nông trại Đắk Lắk. Vị trái cây nhẹ, ít caffeine.',
+    description: 'Vị trái cây nhẹ, ít caffeine.',
     image: teaCtn100g,
   },
   {
@@ -154,6 +154,7 @@ export interface SaveDonationParams {
   name: string;
   phone: string;
   amount: number;
+  donationCode?: string;
   sepayTransaction?: SepayTransaction | null;
 }
 
@@ -169,16 +170,31 @@ export interface SaveOrderParams {
   phone: string;
   address: string;
   totalAmount: number;
+  orderCode?: string;
   items?: OrderCartItem[];
   quantity?: number;
   productSku?: string;
   productName?: string;
+  sepayTransaction?: SepayTransaction | null;
 }
 
 export async function saveDonationToSupabase(params: SaveDonationParams) {
   try {
     const cleanPhone = params.phone.replace(/\D/g, '');
     const cleanName = params.name.trim() || 'Nhà Hảo Tâm';
+    const donationCode = params.donationCode || `DON-${cleanPhone.slice(-4)}-${Date.now().toString().slice(-6)}`;
+
+    // 0. Idempotency Check: Chống Replay / Race Condition
+    const { data: existingDonation } = await supabase
+      .from('donations')
+      .select('id')
+      .eq('donation_code', donationCode)
+      .maybeSingle();
+
+    if (existingDonation) {
+      console.log('✅ Đơn quyên góp đã tồn tại (Idempotent):', donationCode);
+      return true;
+    }
 
     // 1. Lưu hoặc lấy Khách hàng (Customer) dựa trên Số điện thoại
     let customerId: string | null = null;
@@ -198,7 +214,6 @@ export async function saveDonationToSupabase(params: SaveDonationParams) {
     }
 
     // 2. Lưu Đơn Quyên Góp (Donations)
-    const donationCode = `DON-${cleanPhone.slice(-4)}-${Date.now().toString().slice(-6)}`;
     const { error: donationError } = await supabase.from('donations').insert({
       donation_code: donationCode,
       customer_id: customerId,
@@ -212,7 +227,7 @@ export async function saveDonationToSupabase(params: SaveDonationParams) {
       console.log('✅ Đã lưu đơn quyên góp vào Supabase thành công!');
     }
 
-    // 3. Nếu có dữ liệu SePay Transaction thực tế, lưu vào bảng Transactions
+    // 3. Nếu có dữ liệu SePay Transaction thực tế, lưu vào bảng Transactions (Unique sepay_id)
     if (params.sepayTransaction) {
       const sepayId = params.sepayTransaction.id;
       const { error: txError } = await supabase.from('transactions').upsert(
@@ -247,6 +262,19 @@ export async function saveOrderToSupabase(params: SaveOrderParams) {
   try {
     const cleanPhone = params.phone.replace(/\D/g, '');
     const cleanName = params.name.trim() || 'Khách hàng';
+    const orderCode = params.orderCode || `CAF-${cleanPhone.slice(-4)}-${Date.now().toString().slice(-6)}`;
+
+    // 0. Idempotency Check: Chống Replay Attack & Duplicate order
+    const { data: existingOrder } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('order_code', orderCode)
+      .maybeSingle();
+
+    if (existingOrder) {
+      console.log('✅ Đơn hàng đã được lưu trước đó (Idempotent):', orderCode);
+      return true;
+    }
 
     // 1. Upsert Customer
     let customerId: string | null = null;
@@ -277,8 +305,8 @@ export async function saveOrderToSupabase(params: SaveOrderParams) {
 
     const noteSummary = itemsList.map((i) => `${i.quantity}x ${i.name}`).join(', ');
 
-    // 3. Insert Order
-    const orderCode = `ORD-${cleanPhone.slice(-4)}-${Date.now().toString().slice(-6)}`;
+    // 3. Insert Order with exact unique code and status
+    const initialStatus = params.sepayTransaction ? 'paid' : 'pending';
     const { data: orderData, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -286,7 +314,7 @@ export async function saveOrderToSupabase(params: SaveOrderParams) {
         customer_id: customerId,
         total_amount: params.totalAmount,
         shipping_address: params.address,
-        status: 'pending',
+        status: initialStatus,
         note: `Đặt ${noteSummary}`,
       })
       .select('id')
@@ -338,7 +366,25 @@ export async function saveOrderToSupabase(params: SaveOrderParams) {
       }
     }
 
-    console.log('✅ Đã lưu đơn hàng nhiều sản phẩm vào Supabase thành công!');
+    // 5. Nếu có giao dịch SePay, lưu vào bảng transactions với onConflict sepay_id
+    if (params.sepayTransaction) {
+      const sepayId = params.sepayTransaction.id;
+      await supabase.from('transactions').upsert(
+        {
+          sepay_id: sepayId,
+          gateway: params.sepayTransaction.bank_brand_name || 'MBBank',
+          account_number: params.sepayTransaction.account_number || '',
+          amount: parseFloat(params.sepayTransaction.amount_in || '0'),
+          content: params.sepayTransaction.transaction_content || '',
+          code: orderCode,
+          transaction_date: params.sepayTransaction.transaction_date || new Date().toISOString(),
+          raw_data: params.sepayTransaction,
+        },
+        { onConflict: 'sepay_id' }
+      );
+    }
+
+    console.log('✅ Đã lưu đơn hàng vào Supabase thành công! Mã đơn:', orderCode);
     return true;
   } catch (error) {
     console.error('Lỗi khi lưu đơn hàng:', error);

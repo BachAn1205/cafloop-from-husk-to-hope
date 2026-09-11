@@ -38,14 +38,14 @@ export function ImpactSection() {
           transition={{ duration: 0.5, ease: EASE_NATURAL }}
           className="text-center mb-8 md:mb-12"
         >
-          <div className="inline-flex items-center gap-1.5 px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-[#E3EDD3] text-[#335C33] text-xs md:text-sm font-semibold uppercase tracking-wider mb-3 md:mb-4">
-            <Heart className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#8C5A35] fill-[#8C5A35]/20" />
-            {t('impactBadge')}
+          <div className="section-badge mb-3 md:mb-4">
+            <Heart className="text-[#8C5A35] fill-[#8C5A35]/20" />
+            <span>{t('impactBadge')}</span>
           </div>
           <h2 id="impact-section-title" className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#335C33] font-serif tracking-tight">
             {t('impactTitle')}
           </h2>
-          <div className="flex items-center justify-center gap-1.5 text-xs md:text-sm lg:text-base text-[#8C5A35] mt-2.5 font-medium">
+          <div className="section-subtitle mt-2.5 flex items-center justify-center gap-1.5">
             <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#8C5A35]" />
             <span>{t('impactSchool')}</span>
           </div>

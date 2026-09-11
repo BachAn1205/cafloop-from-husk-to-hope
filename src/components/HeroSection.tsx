@@ -64,12 +64,10 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE_NATURAL }}
-              className="flex items-center gap-2 self-start mb-4 md:mb-6 px-3.5 md:px-4 py-1.5 md:py-2 rounded-full bg-[#E3EDD3]/90 backdrop-blur-xs border border-[#335C33]/20 shadow-xs"
+              className="section-badge self-start mb-4 md:mb-6"
             >
-              <Leaf className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#335C33]" />
-              <span className="text-xs md:text-sm font-bold text-[#335C33] tracking-wide uppercase">
-                {t('heroBadge')}
-              </span>
+              <Leaf className="text-[#335C33]" />
+              <span>{t('heroBadge')}</span>
             </motion.div>
 
             {/* Main Headline H1 — Lora via font-serif class */}
@@ -78,10 +76,10 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.08, ease: EASE_NATURAL }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-[72px] font-extrabold text-[#F6F6EE] leading-[1.1] tracking-tight font-serif mb-4 md:mb-6 drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-[56px] xl:text-[64px] font-extrabold text-[#F6F6EE] leading-[1.15] tracking-tight font-serif mb-4 md:mb-6 drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] max-w-2xl"
             >
               <span className="block">{t('heroTitleLine1')}</span>
-              <span className="block">{t('heroTitleLine2')}</span>
+              <span className="block whitespace-normal sm:whitespace-nowrap">{t('heroTitleLine2')}</span>
             </motion.h1>
 
             {/* Subtext */}
@@ -134,11 +132,11 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
                   <h2 className="text-[15px] md:text-lg font-bold text-[#F6F6EE] leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]">
                     {t('heroMusicTitle')}
                   </h2>
-                  <div className="flex items-center gap-1.5 mt-1 text-[#8C5A35]">
-                    <svg className="w-4 h-4 md:w-5 md:h-5 text-[#8C5A35]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <div className="flex items-center gap-1.5 mt-1 text-[#E3EDD3] drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
+                    <svg className="w-4 h-4 md:w-5 md:h-5 text-[#E3EDD3]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h12M4 18h8" />
                     </svg>
-                    <span className="text-xs md:text-sm font-semibold">
+                    <span className="text-xs md:text-sm font-semibold tracking-wide">
                       {isPlaying ? t('heroMusicOn') : t('heroMusicOff')}
                     </span>
                   </div>

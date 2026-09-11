@@ -12,8 +12,8 @@ export interface SepayTransaction {
 }
 
 export interface SepayListResponse {
-  status: number;
-  messages: {
+  status?: number;
+  messages?: {
     success: boolean;
   };
   transactions: SepayTransaction[];
@@ -26,48 +26,52 @@ export interface SepayBankAccount {
   account_name: string;
 }
 
-export const QR_TIMEOUT_SECONDS = 5 * 60;
+export const QR_TIMEOUT_SECONDS = 5 * 60; // 5 minutes
 
-const SEPAY_BASE_URL = typeof window !== 'undefined' ? '/sepay-api' : 'https://my.sepay.vn/userapi';
+/**
+ * Endpoint proxy bảo mật phía server (che giấu API Key khỏi trình duyệt)
+ */
+const SEPAY_API_ENDPOINT = '/api/sepay/transactions/list';
 
-function getApiKey(): string {
-  return (
-    import.meta.env.VITE_SEPAY_API_KEY ||
-    import.meta.env.SEPAY_API_KEY ||
-    ''
-  );
+/**
+ * Sinh mã thanh toán độc bản duy nhất (Không thể đoán trước, chống trùng lặp & cướp giao dịch)
+ * Ví dụ: CAF8P2K9M cho đơn hàng, DON4X7R1W cho quyên góp
+ */
+export function generatePaymentCode(type: 'ORDER' | 'DONATE'): string {
+  const prefix = type === 'ORDER' ? 'CAF' : 'DON';
+  // Bảng ký tự không chứa các ký tự dễ nhầm lẫn (bỏ 0, O, 1, I)
+  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+  let randomPart = '';
+  for (let i = 0; i < 6; i++) {
+    randomPart += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return `${prefix}${randomPart}`;
 }
 
 /**
-  * Lấy danh sách giao dịch từ SePay (Tiền vào / Tiền ra)
-  */
+ * Lấy danh sách giao dịch từ SePay qua Proxy bảo mật (Không để lộ API Key ở Frontend)
+ */
 export async function getSepayTransactions(params?: {
   limit?: number;
   transferType?: 'in' | 'out' | 'all';
   accountNumber?: string;
 }): Promise<SepayTransaction[]> {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    console.warn('SePay API Key chưa được cấu hình trong .env');
-    return [];
-  }
-
   try {
     const queryParams = new URLSearchParams();
     if (params?.limit) queryParams.append('limit', params.limit.toString());
     if (params?.accountNumber) queryParams.append('account_number', params.accountNumber);
 
-    const url = `${SEPAY_BASE_URL}/transactions/list?${queryParams.toString()}`;
+    const url = `${SEPAY_API_ENDPOINT}?${queryParams.toString()}`;
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
     });
 
     if (!response.ok) {
-      throw new Error(`SePay API Error: ${response.statusText}`);
+      console.warn(`SePay Secure Proxy returned status: ${response.status}`);
+      return [];
     }
 
     const data: SepayListResponse = await response.json();
@@ -82,52 +86,54 @@ export async function getSepayTransactions(params?: {
 
     return txs;
   } catch (error) {
-    console.error('Lỗi khi tải lịch sử giao dịch SePay:', error);
+    console.error('Lỗi khi tải lịch sử giao dịch SePay từ proxy:', error);
     return [];
   }
 }
 
 /**
-  * Kiểm tra giao dịch đã chuyển tiền thành công chưa (dựa trên Số tiền & Nội dung / SĐT)
-  * @param afterTime - Chỉ trả về các giao dịch sau thời điểm này (phòng tránh lựa chọn giao dịch cũ)
-  */
+ * Kiểm tra giao dịch đã thanh toán thành công hay chưa
+ * Áp dụng bảo mật nghiêm ngặt:
+ * 1. Khớp chính xác mã giao dịch độc bản bằng Regex (Chống cướp giao dịch / False matching)
+ * 2. Số tiền chuyển vào phải ĐỦ hoặc LỚN HƠN số tiền đơn hàng (Chống chuyển thiếu tiền)
+ * 3. Chỉ xét các giao dịch sau thời điểm mở phiên QR (Chống Replay Attack từ giao dịch cũ)
+ */
 export async function checkPaymentReceived(
   expectedAmount: number,
-  phone?: string,
-  name?: string,
+  paymentCode: string,
   afterTime?: Date
 ): Promise<SepayTransaction | null> {
+  if (!paymentCode || paymentCode.trim() === '') {
+    return null;
+  }
+
   const transactions = await getSepayTransactions({ limit: 20, transferType: 'in' });
+  const cleanCode = paymentCode.trim().toUpperCase();
+  const codeRegex = new RegExp(`\\b${cleanCode}\\b`, 'i');
 
   for (const tx of transactions) {
     const amountIn = parseFloat(tx.amount_in || '0');
 
-    // 0. Lọc giao dịch cũ hơn thời điểm mở QR
+    // 1. Chặn Replay Attack: Chỉ xét giao dịch sau thời điểm tạo mã QR (cho phép trễ 30s)
     if (afterTime) {
       const txTime = new Date(tx.transaction_date);
-      // Cho phép 30 giây trước khi mở QR (buffer for clock skew)
       const buffer = new Date(afterTime.getTime() - 30 * 1000);
       if (txTime < buffer) continue;
     }
 
-    // 1. Kiểm tra số tiền nhận khớp với số tiền người dùng nhập
-    if (Math.abs(amountIn - expectedAmount) < 1) {
-      const content = (tx.transaction_content || '').toLowerCase();
-      const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
-      const cleanName = name ? name.toLowerCase().trim() : '';
+    // 2. Chống chuyển thiếu tiền (Partial payment tampering): amount_in phải >= expectedAmount
+    if (amountIn < expectedAmount) {
+      continue;
+    }
 
-      // 2. Linh hoạt khớp nội dung
-      if (
-        (!cleanPhone && !cleanName) ||
-        (cleanPhone && content.includes(cleanPhone)) ||
-        (cleanName && content.includes(cleanName)) ||
-        content.includes('ung ho') ||
-        content.includes('caf') ||
-        content.includes('cafloop') ||
-        (tx.code && (tx.code.toLowerCase().includes(cleanPhone) || tx.code.toLowerCase().includes(cleanName)))
-      ) {
-        return tx;
-      }
+    // 3. Chống cướp giao dịch (Transaction Hijacking): Khớp chính xác mã đơn hàng duy nhất
+    const content = (tx.transaction_content || '').toUpperCase();
+    const txCode = (tx.code || '').toUpperCase();
+
+    const isCodeMatched = codeRegex.test(content) || codeRegex.test(txCode) || content.includes(cleanCode);
+
+    if (isCodeMatched) {
+      return tx;
     }
   }
 
@@ -135,8 +141,8 @@ export async function checkPaymentReceived(
 }
 
 /**
-  * Lấy tổng số tiền đã nhận quyên góp từ trước đến nay
-  */
+ * Lấy tổng số tiền đã nhận quyên góp từ trước đến nay
+ */
 export async function getTotalDonationsReceived(): Promise<number> {
   const transactions = await getSepayTransactions({ limit: 100, transferType: 'in' });
   return transactions.reduce((sum, tx) => sum + parseFloat(tx.amount_in || '0'), 0);

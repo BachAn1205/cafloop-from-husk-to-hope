@@ -20,14 +20,14 @@ export function ESGSection() {
           transition={{ duration: 0.5, ease: EASE_NATURAL }}
           className="text-center mb-10 md:mb-16"
         >
-          <div className="inline-flex items-center gap-1.5 px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-[#E3EDD3] text-[#335C33] text-xs md:text-sm font-semibold uppercase tracking-wider mb-3 md:mb-4">
-            <RefreshCw className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#335C33]" />
-            {t('esgBadge')}
+          <div className="section-badge mb-3 md:mb-4">
+            <RefreshCw className="text-[#335C33]" />
+            <span>{t('esgBadge')}</span>
           </div>
           <h2 id="esg-section-title" className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#335C33] font-serif tracking-tight">
             {t('esgTitle')}
           </h2>
-          <p className="text-sm md:text-base lg:text-lg text-[#8C5A35] mt-2.5 font-medium max-w-2xl mx-auto">
+          <p className="section-subtitle mt-2.5 max-w-2xl mx-auto">
             {t('esgSubtitle')}
           </p>
         </motion.div>

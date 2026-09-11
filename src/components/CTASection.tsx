@@ -66,9 +66,9 @@ export function CTASection({ onOpenOrder, onOpenDonate }: CTASectionProps) {
           transition={{ duration: 0.5, ease: EASE_NATURAL }}
           className="mb-5 md:mb-6"
         >
-          <div className="inline-flex items-center gap-1.5 px-3.5 md:px-4 py-1 md:py-1.5 rounded-full bg-[#E3EDD3] text-[#335C33] text-xs md:text-sm font-semibold uppercase tracking-wider mb-3 md:mb-4">
-            <Share2 className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#335C33]" />
-            {t('ctaBadge')}
+          <div className="section-badge mb-3 md:mb-4">
+            <Share2 className="text-[#335C33]" />
+            <span>{t('ctaBadge')}</span>
           </div>
 
           <h2 id="cta-section-title" className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#335C33] font-serif tracking-tight">
@@ -83,7 +83,7 @@ export function CTASection({ onOpenOrder, onOpenDonate }: CTASectionProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
           transition={{ duration: 0.5, delay: 0.08, ease: EASE_NATURAL }}
-          className="text-sm md:text-base lg:text-lg text-[#2C2E2B]/85 font-medium leading-relaxed mb-8 md:mb-10 px-2 max-w-xl mx-auto"
+          className="section-subtitle leading-relaxed mb-8 md:mb-10 px-2 max-w-xl mx-auto"
         >
           {t('ctaDesc')}
         </motion.p>
@@ -96,22 +96,22 @@ export function CTASection({ onOpenOrder, onOpenDonate }: CTASectionProps) {
           transition={{ duration: 0.5, delay: 0.14, ease: EASE_NATURAL }}
           className="flex flex-col md:flex-row items-stretch justify-center gap-3 md:gap-4 mb-8 md:mb-10 w-full"
         >
-          {/* Primary Facebook Share Button */}
+          {/* Primary Facebook Share Button (Subtle & Deeper Blue) */}
           <motion.button
             id="btn-facebook-share"
             onClick={handleFacebookShare}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="flex-1 py-3.5 md:py-4 px-4 md:px-6 rounded-xl md:rounded-2xl bg-[#1877F2] text-white font-bold text-sm md:text-base shadow-md hover:bg-[#166fe5] transition-[background-color] duration-200 flex items-center justify-center gap-2 cursor-pointer border border-transparent"
+            className="flex-1 min-h-[48px] md:min-h-[52px] py-3 md:py-3.5 px-4 md:px-5 rounded-xl md:rounded-2xl bg-[#1860C3] text-white font-bold text-xs sm:text-sm md:text-base shadow-md hover:bg-[#134c9c] transition-[background-color] duration-200 flex items-center justify-center gap-2 cursor-pointer border border-transparent"
           >
             {/* Facebook Icon */}
-            <div className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-white text-[#1877F2] flex items-center justify-center flex-shrink-0 shadow-xs">
-              <svg className="w-3.5 h-3.5 md:w-4 md:h-4 fill-current" viewBox="0 0 24 24">
+            <div className="w-6 h-6 md:w-6 md:h-6 rounded-full bg-white text-[#1860C3] flex items-center justify-center flex-shrink-0 shadow-xs">
+              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
             </div>
-            <span>{t('ctaBtnShare')}</span>
+            <span className="leading-tight">{t('ctaBtnShare')}</span>
           </motion.button>
 
           {/* Copy Link Button */}
@@ -121,17 +121,17 @@ export function CTASection({ onOpenOrder, onOpenDonate }: CTASectionProps) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.96 }}
             transition={{ duration: 0.12 }}
-            className="flex-1 py-3.5 md:py-4 px-4 md:px-6 rounded-xl md:rounded-2xl bg-[#E3EDD3] text-[#335C33] font-semibold text-xs md:text-sm flex items-center justify-center gap-2 hover:bg-[#d6e3c2] transition-[background-color] duration-200 border border-[#335C33]/15 cursor-pointer"
+            className="flex-1 min-h-[48px] md:min-h-[52px] py-3 md:py-3.5 px-4 md:px-5 rounded-xl md:rounded-2xl bg-[#E3EDD3] text-[#335C33] font-bold text-xs sm:text-sm md:text-base flex items-center justify-center gap-2 hover:bg-[#d6e3c2] transition-[background-color] duration-200 border border-[#335C33]/15 cursor-pointer"
           >
             {copied ? (
               <>
-                <Check className="w-4 h-4 md:w-5 md:h-5 text-[#335C33]" />
-                <span>{t('ctaBtnCopied')}</span>
+                <Check className="w-4 h-4 md:w-5 md:h-5 text-[#335C33] shrink-0" />
+                <span className="leading-tight">{t('ctaBtnCopied')}</span>
               </>
             ) : (
               <>
-                <Copy className="w-4 h-4 md:w-5 md:h-5 text-[#8C5A35]" />
-                <span>{t('ctaBtnCopy')}</span>
+                <Copy className="w-4 h-4 md:w-5 md:h-5 text-[#8C5A35] shrink-0" />
+                <span className="leading-tight">{t('ctaBtnCopy')}</span>
               </>
             )}
           </motion.button>
@@ -144,10 +144,10 @@ export function CTASection({ onOpenOrder, onOpenDonate }: CTASectionProps) {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.96 }}
               transition={{ duration: 0.12 }}
-              className="flex-1 py-3.5 md:py-4 px-4 md:px-6 rounded-xl md:rounded-2xl bg-[#335C33] text-[#F6F6EE] font-bold text-xs md:text-sm flex items-center justify-center gap-2 hover:bg-[#284828] transition-[background-color] duration-200 cursor-pointer shadow-md"
+              className="flex-1 min-h-[48px] md:min-h-[52px] py-3 md:py-3.5 px-4 md:px-5 rounded-xl md:rounded-2xl bg-[#335C33] text-[#F6F6EE] font-bold text-xs sm:text-sm md:text-base flex items-center justify-center gap-2 hover:bg-[#284828] transition-[background-color] duration-200 cursor-pointer shadow-md"
             >
-              <Heart className="w-4 h-4 md:w-5 md:h-5 text-[#E3EDD3] fill-[#E3EDD3]" />
-              <span>{language === 'vi' ? 'Quyên góp trực tiếp' : 'Donate directly'}</span>
+              <Heart className="w-4 h-4 md:w-5 md:h-5 text-[#E3EDD3] fill-[#E3EDD3] shrink-0" />
+              <span className="leading-tight">{language === 'vi' ? 'Quyên góp trực tiếp' : 'Donate directly'}</span>
             </motion.button>
           )}
         </motion.div>

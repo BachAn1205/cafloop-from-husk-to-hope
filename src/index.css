@@ -7,7 +7,16 @@
 @layer base {
   :root {
     --font-heading: 'Lora', Georgia, serif;
-    --font-body: 'Raleway', system-ui, sans-serif;
+    --font-body: 'Plus Jakarta Sans', 'Raleway', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  *,
+  *::before,
+  *::after {
+    font-variant-numeric: lining-nums proportional-nums;
+    -moz-font-feature-settings: "lnum" 1, "pnum" 1;
+    -webkit-font-feature-settings: "lnum" 1, "pnum" 1;
+    font-feature-settings: "lnum" 1, "pnum" 1;
   }
 
   html {
@@ -18,14 +27,125 @@
     font-family: var(--font-body);
     font-size: 16px;
     line-height: 1.6;
+    font-variant-numeric: lining-nums proportional-nums;
+    font-feature-settings: "lnum" 1, "pnum" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
   }
 
-  /* Override Tailwind font-serif to use Lora */
-  .font-serif {
+  input,
+  textarea,
+  select,
+  button {
+    font-family: inherit;
+    font-variant-numeric: lining-nums proportional-nums;
+    font-feature-settings: "lnum" 1, "pnum" 1;
+  }
+
+  /* Headings & Serif Titles: Tight, cohesive word and letter spacing */
+  h1, h2, h3, h4, h5, h6, .font-serif {
     font-family: var(--font-heading) !important;
+    font-variant-numeric: lining-nums proportional-nums;
+    font-feature-settings: "lnum" 1, "pnum" 1;
+    word-spacing: -0.02em;
+    letter-spacing: -0.02em;
+  }
+
+  /* Standard Unified Section Title Badge */
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    background-color: #E3EDD3;
+    color: #335C33;
+    border: 1px solid rgba(51, 92, 51, 0.15);
+    font-family: var(--font-body) !important;
+    font-size: 0.75rem; /* 12px */
+    line-height: 1.25;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  }
+
+  @media (min-width: 768px) {
+    .section-badge {
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      font-size: 0.8125rem; /* 13px */
+    }
+  }
+
+  .section-badge svg {
+    width: 0.9375rem; /* 15px */
+    height: 0.9375rem;
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 768px) {
+    .section-badge svg {
+      width: 1.05rem; /* ~17px */
+      height: 1.05rem;
+    }
+  }
+
+  /* Standard Unified Section Subtitle */
+  .section-subtitle {
+    color: #8C5A35 !important;
+    font-family: var(--font-body) !important;
+    font-size: 0.875rem; /* 14px */
+    font-weight: 500;
+    line-height: 1.6;
+  }
+
+  @media (min-width: 768px) {
+    .section-subtitle {
+      font-size: 1rem; /* 16px */
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-subtitle {
+      font-size: 1.125rem; /* 18px */
+    }
+  }
+
+  /* Specific containers requiring tabular monospace digits */
+  .tabular-nums, .font-mono {
+    font-variant-numeric: lining-nums tabular-nums;
+    font-feature-settings: "lnum" 1, "tnum" 1;
+  }
+
+  /* Custom Elegant Thin Scrollbar (No arrow buttons, long track, smooth) */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgba(227, 237, 211, 0.3);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(51, 92, 51, 0.3);
+    border-radius: 9999px;
+    min-height: 60px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(51, 92, 51, 0.55);
+  }
+  ::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(51, 92, 51, 0.3) rgba(227, 237, 211, 0.2);
   }
 
   /* Respect user's motion preference — skip decorative animations */

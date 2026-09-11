@@ -125,20 +125,20 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
               transition={{ duration: 0.5, ease: EASE_NATURAL }}
               className="text-center lg:text-left mb-8 md:mb-10"
             >
-              <div className="inline-flex items-center gap-1.5 px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-[#E3EDD3] text-[#335C33] text-xs md:text-sm font-semibold uppercase tracking-wider mb-3 md:mb-4">
-                <Coffee className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#8C5A35]" />
-                {t('storyBadge')}
+              <div className="section-badge mb-3 md:mb-4">
+                <Coffee className="text-[#8C5A35]" />
+                <span>{t('storyBadge')}</span>
               </div>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#335C33] font-serif tracking-tight">
                 {t('storyTitle')}
               </h2>
-              <p className="text-sm md:text-base lg:text-lg text-[#8C5A35] mt-2.5 font-medium">
+              <p className="section-subtitle mt-2.5">
                 {t('storySub')}
               </p>
             </motion.div>
 
-            {/* Trust Badges — staggered entrance */}
-            <div className="grid grid-cols-3 gap-3 md:gap-4 text-center lg:text-left text-[11px] md:text-xs lg:text-sm font-medium text-[#335C33]">
+            {/* Trust Badges — centered icon and text */}
+            <div className="grid grid-cols-3 gap-2.5 sm:gap-3 md:gap-4 text-center">
               {trustBadges.map(({ icon: Icon, label, color }, i) => (
                 <motion.div
                   key={label}
@@ -146,10 +146,12 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: 0.12 + i * 0.06, ease: EASE_NATURAL }}
-                  className="bg-[#E3EDD3]/70 rounded-xl md:rounded-2xl p-3 md:p-4 flex flex-col lg:flex-row items-center lg:items-start lg:gap-3 hover:bg-[#E3EDD3] transition-colors duration-300"
+                  className="bg-[#E3EDD3]/70 rounded-xl md:rounded-2xl p-2.5 sm:p-3 md:p-3.5 flex items-center justify-center gap-1.5 sm:gap-2 md:gap-2.5 hover:bg-[#E3EDD3] transition-colors duration-300 min-h-[48px] md:min-h-[52px]"
                 >
-                  <Icon className={`w-5 h-5 md:w-6 md:h-6 ${color} mb-1.5 lg:mb-0`} />
-                  <span className="leading-tight">{label}</span>
+                  <Icon className={`w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5 ${color} shrink-0`} />
+                  <span className="text-[11px] sm:text-xs md:text-sm font-semibold text-[#335C33] leading-none text-center">
+                    {label}
+                  </span>
                 </motion.div>
               ))}
             </div>

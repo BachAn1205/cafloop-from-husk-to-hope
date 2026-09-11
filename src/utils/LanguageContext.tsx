@@ -109,7 +109,39 @@ type TranslationKeys =
   | 'donateBtnNext'
   | 'donateQRTitle'
   | 'donateQRSub'
-  | 'donateBtnDone';
+  | 'donateBtnDone'
+  | 'brandStoryBadge'
+  | 'brandStoryTitle'
+  | 'brandStorySubtitle'
+  | 'visionTitle'
+  | 'visionDesc'
+  | 'missionTitle'
+  | 'missionDesc'
+  | 'coreValuesTitle'
+  | 'coreValuesSub'
+  | 'valUpcyclingTitle'
+  | 'valUpcyclingDesc'
+  | 'valGenuineTitle'
+  | 'valGenuineDesc'
+  | 'valCultureTitle'
+  | 'valCultureDesc'
+  | 'valEcosystemTitle'
+  | 'valEcosystemDesc'
+  | 'valStartSmallTitle'
+  | 'valStartSmallDesc'
+  | 'founderBadge'
+  | 'founderName'
+  | 'founderRole'
+  | 'founderQuote'
+  | 'founderStep1Title'
+  | 'founderStep1Desc'
+  | 'founderStep2Title'
+  | 'founderStep2Desc'
+  | 'founderStep3Title'
+  | 'founderStep3Desc'
+  | 'founderReadMoreBtn'
+  | 'founderModalTitle'
+  | 'founderModalClose';
 
 const translations: Record<Language, Record<TranslationKeys, string>> = {
   vi: {
@@ -120,7 +152,7 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     navAudioToggle: "Bật/Tắt âm thanh Đàn T'rưng",
     heroBadge: 'CAFLOOP • FROM HUSK TO HOPE',
     heroTitleLine1: 'Từ Vỏ Cà Phê Đến',
-    heroTitleLine2: 'Tương Lai Ngời Sáng',
+    heroTitleLine2: 'Tương Lai Ngời\u00A0Sáng',
     heroSubtext: 'Thưởng thức Trà Cascara CAFLOOP - Cùng chung tay góp quỹ giáo dục cho học sinh vùng cao.',
     heroMusicTitle: 'Lắng nghe thanh âm Đại Ngàn',
     heroMusicOn: 'Chạm để dừng phát nhạc',
@@ -172,7 +204,7 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     storyHighlight2Desc: 'Tỉnh táo tự nhiên, êm dịu dạ dày và giấc ngủ.',
     storyHighlight3Title: '100% Lợi Nhuận Gây Quỹ: ',
     storyHighlight3Desc: 'Mỗi hộp trà tài trợ 1 tuần học tập & bánh mì cho học sinh.',
-    storyBtnDonate: 'Ủng Hộ & Nhận Hộp Trà Gây Quỹ (150.000đ)',
+    storyBtnDonate: 'Ủng Hộ & Nhận Hộp Trà',
     storyBadgeClean: 'Nông Nghiệp Sạch',
     storyBadgeAdditive: 'Không Phụ Gia',
     storyBadgeTransparent: 'Minh Bạch 100%',
@@ -219,7 +251,39 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     footerSlogan: 'Vì một tương lai xanh và ngời sáng tri thức',
     floatingAudioOn: "T'rưng ON",
     floatingAudioOff: "T'rưng",
-    floatingSupport: 'Ủng hộ trà'
+    floatingSupport: 'Ủng hộ trà',
+    brandStoryBadge: 'Câu Chuyện Thương Hiệu',
+    brandStoryTitle: 'Hành Trình Tái Sinh & Hy Vọng',
+    brandStorySubtitle: 'Từ trăn trở nơi đại ngàn Tây Nguyên đến vòng tuần hoàn xanh bền vững',
+    visionTitle: 'Tầm Nhìn',
+    visionDesc: 'Xây dựng mô hình kinh tế tuần hoàn tại Tây Nguyên — nơi phụ phẩm nông nghiệp được tái sinh, văn hóa bản địa được tôn vinh, và đổi mới bền vững bắt nguồn từ chính cộng đồng.',
+    missionTitle: 'Sứ Mệnh',
+    missionDesc: 'Biến vỏ cà phê bỏ đi thành các sản phẩm tuần hoàn giá trị cao; kết nối nông dân, nghệ nhân Ê Đê và thế hệ trẻ để giảm lãng phí, bảo tồn di sản và lan tỏa lối sống xanh.',
+    coreValuesTitle: '5 Giá Trị Cốt Lõi',
+    coreValuesSub: 'Kim chỉ nam dẫn dắt mọi hành động và sản phẩm của Cafloop',
+    valUpcyclingTitle: 'Tái Sinh',
+    valUpcyclingDesc: 'Khơi mở tài nguyên giá trị từ nguồn phụ phẩm bị lãng quên.',
+    valGenuineTitle: 'Bền Vững Thực Chất',
+    valGenuineDesc: 'Tác động thật đo lường được cho môi trường & đời sống nông dân.',
+    valCultureTitle: 'Tôn Trọng Văn Hóa',
+    valCultureDesc: 'Gìn giữ tri thức bản địa cùng nét đẹp dệt may thổ cẩm Ê Đê.',
+    valEcosystemTitle: 'Kết Nối Cộng Đồng',
+    valEcosystemDesc: 'Nhịp cầu giữa nông dân vùng trồng, nghệ nhân và người tiêu dùng trẻ.',
+    valStartSmallTitle: 'Bắt Đầu Từ Điều Nhỏ',
+    valStartSmallDesc: 'Thay đổi lớn lao khởi đầu từ một vỏ cà phê nhỏ bé tại quê hương.',
+    founderBadge: 'Người Sáng Lập',
+    founderName: 'Phan Hoàng Quỳnh Chi',
+    founderRole: 'Founder Dự án CAFLOOP',
+    founderQuote: '“CAFLOOP không chỉ là một dự án khởi nghiệp, mà là câu trả lời thực tế cho trăn trở: Làm sao để giá trị chuỗi sản xuất thực sự ở lại với người nông dân và mảnh đất Tây Nguyên.”',
+    founderStep1Title: 'Trăn trở từ quê hương',
+    founderStep1Desc: 'Lớn lên giữa thủ phủ cà phê, chứng kiến hàng ngàn tấn vỏ quả bị đốt bỏ mỗi vụ mùa và khoảng cách phân bổ giá trị nông nghiệp.',
+    founderStep2Title: 'Nền tảng nghiên cứu',
+    founderStep2Desc: 'Nghiên cứu kinh tế về cơ chế tín chỉ tuần hoàn nông dân (C4F) và khảo sát truy xuất nguồn gốc QR-code tại Đắk Lắk.',
+    founderStep3Title: 'Hành động thực tiễn',
+    founderStep3Desc: 'Sáng lập CAFLOOP — biến trăn trở thành giải pháp kinh tế tuần hoàn tái sinh phụ phẩm, tạo sinh kế bền vững.',
+    founderReadMoreBtn: 'Đọc câu chuyện đầy đủ của Quỳnh Chi',
+    founderModalTitle: 'Câu Chuyện & Hành Trình: Phan Hoàng Quỳnh Chi',
+    founderModalClose: 'Đóng'
   },
   en: {
     navCircular: 'Circular',
@@ -281,7 +345,7 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     storyHighlight2Desc: 'Natural alertness, gentle on stomach & sleep.',
     storyHighlight3Title: '100% Fundraising Profits: ',
     storyHighlight3Desc: 'Each tea box sponsors 1 week of schooling & bread for a student.',
-    storyBtnDonate: 'Support & Get Fundraising Tea Box (150,000 VND)',
+    storyBtnDonate: 'Support & Get Tea Box',
     storyBadgeClean: 'Clean Agriculture',
     storyBadgeAdditive: 'Additive Free',
     storyBadgeTransparent: '100% Transparent',
@@ -328,7 +392,39 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     footerSlogan: 'For a green future and bright minds',
     floatingAudioOn: "T'rưng ON",
     floatingAudioOff: "T'rưng",
-    floatingSupport: 'Support tea'
+    floatingSupport: 'Support tea',
+    brandStoryBadge: 'Brand Story',
+    brandStoryTitle: 'A Journey of Regeneration & Hope',
+    brandStorySubtitle: 'From highland reflections to a sustainable circular economy loop',
+    visionTitle: 'Our Vision',
+    visionDesc: 'To pioneer a circular economy model in the Central Highlands — where agricultural by-products are regenerated, indigenous culture is honored, and sustainable innovations originate from local communities.',
+    missionTitle: 'Our Mission',
+    missionDesc: 'To transform discarded coffee husks into high-value circular products; connecting farmers, Ê Đê artisans, and the youth to eliminate agricultural waste, preserve heritage, and inspire sustainable living.',
+    coreValuesTitle: '5 Core Values',
+    coreValuesSub: 'The guiding compass for all actions and products at Cafloop',
+    valUpcyclingTitle: 'Upcycling',
+    valUpcyclingDesc: 'Discovering valuable new resources in what others discard.',
+    valGenuineTitle: 'Genuine Sustainability',
+    valGenuineDesc: 'Real, measurable positive impact on the land and local livelihoods.',
+    valCultureTitle: 'Cultural Reverence',
+    valCultureDesc: 'Preserving indigenous wisdom and Ê Đê traditional weaving art.',
+    valEcosystemTitle: 'Community Connection',
+    valEcosystemDesc: 'A meaningful bridge connecting farmers, artisans, and conscious youth.',
+    valStartSmallTitle: 'Starting Small',
+    valStartSmallDesc: 'Great systemic transformations begin with a humble coffee husk.',
+    founderBadge: 'Founder Profile',
+    founderName: 'Phan Hoang Quynh Chi',
+    founderRole: 'Founder of CAFLOOP Project',
+    founderQuote: '“CAFLOOP is not merely a startup, but a practical answer to an enduring question: How can the true value of the supply chain remain with local farmers and our highland soil.”',
+    founderStep1Title: 'Highland Roots',
+    founderStep1Desc: 'Raised in the coffee heartland, troubled by thousands of tons of husks burned each harvest and unfair value distribution.',
+    founderStep2Title: 'Academic Research',
+    founderStep2Desc: 'Researched market asymmetries through Circular Credits for Farmers (C4F) and QR-code supply traceability in Dak Lak.',
+    founderStep3Title: 'Real-world Action',
+    founderStep3Desc: 'Founded CAFLOOP to translate academic research into a viable circular model that uplifts highland communities.',
+    founderReadMoreBtn: 'Read Quynh Chi’s Full Story',
+    founderModalTitle: 'Founder Journey: Phan Hoang Quynh Chi',
+    founderModalClose: 'Close'
   }
 };
 
