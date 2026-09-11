@@ -90,7 +90,7 @@ export function BrandStorySection() {
             transition={{ duration: 0.5 }}
             className="section-badge mb-3 md:mb-4"
           >
-            <Sparkles className="text-[#335C33]" />
+            <Sparkles className="text-[#8C5A35]" />
             <span>{t('brandStoryBadge')}</span>
           </motion.div>
 

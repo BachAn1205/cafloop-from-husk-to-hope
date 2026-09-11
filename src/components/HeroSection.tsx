@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Music, TreePine, ArrowDown, HeartHandshake, Coffee, Leaf } from 'lucide-react';
+import { Music, ArrowDown, HeartHandshake, Coffee, Leaf } from 'lucide-react';
 import { trungAudio } from '../utils/audio';
 import { useLanguage } from '../utils/LanguageContext';
 import heroBgMobile from '../../assets/image/h.jpg';
@@ -111,12 +111,7 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
                     transition={{ duration: 0.1 }}
                     className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#E3EDD3] border border-[#335C33]/20 flex items-center justify-center shadow-md cursor-pointer transition-[background-color] duration-200 text-[#335C33] hover:bg-[#d9e7c5]"
                   >
-                    <div className="flex flex-col items-center justify-center">
-                      <TreePine className="w-5 h-5 md:w-6 md:h-6 text-[#335C33]" />
-                      <div className="flex gap-0.5 mt-0.5">
-                        <Music className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#335C33]" />
-                      </div>
-                    </div>
+                    <Music className="w-6 h-6 md:w-7 md:h-7 text-[#335C33]" />
                   </motion.button>
                 </div>
 

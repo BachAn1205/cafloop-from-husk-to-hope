@@ -148,7 +148,7 @@ export default function App() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleShareClick}
-                  className="p-2 md:px-3 md:py-2 rounded-xl bg-[#1860C3] text-white hover:bg-[#134c9c] transition-colors cursor-pointer flex items-center justify-center shadow-xs"
+                  className="p-2 md:px-3 md:py-2 rounded-xl bg-white/15 text-[#E3EDD3] hover:bg-white/25 transition-colors cursor-pointer flex items-center justify-center shadow-xs border border-white/15"
                   title={language === 'vi' ? 'Chia sẻ lên Facebook' : 'Share on Facebook'}
                 >
                   <Share2 className="w-4 h-4" />

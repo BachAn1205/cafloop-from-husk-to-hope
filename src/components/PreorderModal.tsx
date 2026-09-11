@@ -395,7 +395,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                   </div>
                 </div>
 
-                <div className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border font-mono font-bold text-sm transition-all duration-500 ${countdownColor}`}>
+                <div className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border font-bold text-sm transition-all duration-500 ${countdownColor}`}>
                   <Clock className="w-4 h-4" />
                   <span>
                     {expired
@@ -472,8 +472,9 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                                 <p className="text-[10px] md:text-xs text-[#8C5A35] line-clamp-1 mt-0.5">
                                   {prod.description}
                                 </p>
-                                <div className="text-xs md:text-sm font-mono font-bold text-[#335C33] mt-1">
-                                  {prod.price.toLocaleString('vi-VN')}đ <span className="text-[10px] font-normal text-gray-500">/ {prod.unit}</span>
+                                <div className="text-xs md:text-sm font-bold text-[#335C33] mt-1 flex items-baseline gap-1.5">
+                                  <span className="text-sm md:text-base font-extrabold text-[#335C33]">{prod.price.toLocaleString('vi-VN')}đ</span>
+                                  <span className="text-xs md:text-sm font-bold text-[#8C5A35]">/ {prod.unit}</span>
                                 </div>
                               </div>
 
@@ -491,7 +492,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                                 >
                                   <Minus className="w-3.5 h-3.5" />
                                 </button>
-                                <span className="text-xs md:text-sm font-mono font-bold text-[#527E52] w-6 text-center">
+                                <span className="text-xs md:text-sm font-bold text-[#527E52] w-6 text-center">
                                   {qty}
                                 </span>
                                 <button
@@ -566,7 +567,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                                     </div>
                                     <div className="text-xs min-w-0">
                                       <p className="font-bold text-[#335C33] truncate">
-                                        {addr.name} <span className="font-mono text-gray-500 font-normal">({addr.phone})</span>
+                                        {addr.name} <span className="text-gray-600 font-medium">({addr.phone})</span>
                                       </p>
                                       <p className="text-[#8C5A35] text-[11px] mt-0.5 line-clamp-2">
                                         {addr.fullAddress}
@@ -593,7 +594,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                       <div className="pt-3 border-t border-[#335C33]/15 flex items-center justify-between">
                         <div>
                           <p className="text-[10px] md:text-xs uppercase font-bold text-[#8C5A35]">Tổng tiền ({totalItemsCount} món)</p>
-                          <p className="text-lg md:text-2xl font-extrabold text-[#335C33] font-mono">
+                          <p className="text-lg md:text-2xl font-extrabold text-[#335C33]">
                             {totalPrice.toLocaleString('vi-VN')} đ
                           </p>
                         </div>
@@ -710,8 +711,9 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
               <div className="mt-3 p-2 text-center">
                 <h4 className="text-base font-bold text-[#335C33]">{previewProduct.name}</h4>
                 <p className="text-xs text-[#8C5A35] mt-1">{previewProduct.description}</p>
-                <p className="text-sm font-mono font-bold text-[#335C33] mt-2">
-                  {previewProduct.price.toLocaleString('vi-VN')} đ / {previewProduct.unit}
+                <p className="text-sm md:text-base font-bold text-[#335C33] mt-2 flex items-center justify-center gap-1.5">
+                  <span className="font-extrabold">{previewProduct.price.toLocaleString('vi-VN')} đ</span>
+                  <span className="text-[#8C5A35]">/ {previewProduct.unit}</span>
                 </p>
               </div>
             </motion.div>

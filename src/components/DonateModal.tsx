@@ -304,7 +304,7 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
               </div>
 
               {/* ⏳ Đồng hồ đếm ngược */}
-              <div className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border font-mono font-bold text-sm transition-all duration-500 ${countdownColor}`}>
+              <div className={`flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border font-bold text-sm transition-all duration-500 ${countdownColor}`}>
                 <Clock className="w-4 h-4" />
                 <span>
                   {expired

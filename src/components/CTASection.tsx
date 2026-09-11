@@ -39,7 +39,7 @@ export function CTASection({ onOpenOrder, onOpenDonate }: CTASectionProps) {
     // Cấu hình nội dung chia sẻ lên Facebook
     const shareUrl = 'https://cafloop-from-husk-to-hope.vercel.app/';
     const shareQuote = 'Cùng CAFLOOP biến vỏ cà phê thành cơ hội đến trường cho trẻ em vùng cao. 100% lợi nhuận gây quỹ sẽ được chuyển thành xe đạp và học cụ. Hãy chung tay gieo mầm hy vọng nhé! 🌱🚲';
-    const hashtag = '%23CAFLOOP'; // Chỉ hỗ trợ 1 hashtag chính thức qua API
+    const hashtag = '%23CAFLOOP';
 
     const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareQuote)}&hashtag=${hashtag}`;
 
@@ -67,7 +67,7 @@ export function CTASection({ onOpenOrder, onOpenDonate }: CTASectionProps) {
           className="mb-5 md:mb-6"
         >
           <div className="section-badge mb-3 md:mb-4">
-            <Share2 className="text-[#335C33]" />
+            <Share2 className="text-[#8C5A35]" />
             <span>{t('ctaBadge')}</span>
           </div>
 
@@ -96,17 +96,17 @@ export function CTASection({ onOpenOrder, onOpenDonate }: CTASectionProps) {
           transition={{ duration: 0.5, delay: 0.14, ease: EASE_NATURAL }}
           className="flex flex-col md:flex-row items-stretch justify-center gap-3 md:gap-4 mb-8 md:mb-10 w-full"
         >
-          {/* Primary Facebook Share Button (Subtle & Deeper Blue) */}
+          {/* Primary Facebook Share Button (Option 2: Forest Green) */}
           <motion.button
             id="btn-facebook-share"
             onClick={handleFacebookShare}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="flex-1 min-h-[48px] md:min-h-[52px] py-3 md:py-3.5 px-4 md:px-5 rounded-xl md:rounded-2xl bg-[#1860C3] text-white font-bold text-xs sm:text-sm md:text-base shadow-md hover:bg-[#134c9c] transition-[background-color] duration-200 flex items-center justify-center gap-2 cursor-pointer border border-transparent"
+            className="flex-1 min-h-[48px] md:min-h-[52px] py-3 md:py-3.5 px-4 md:px-5 rounded-xl md:rounded-2xl bg-[#335C33] text-[#F6F6EE] font-bold text-xs sm:text-sm md:text-base shadow-md hover:bg-[#284828] transition-[background-color,transform] duration-200 flex items-center justify-center gap-2 cursor-pointer border border-transparent"
           >
             {/* Facebook Icon */}
-            <div className="w-6 h-6 md:w-6 md:h-6 rounded-full bg-white text-[#1860C3] flex items-center justify-center flex-shrink-0 shadow-xs">
+            <div className="w-6 h-6 md:w-6 md:h-6 rounded-full bg-[#E3EDD3] text-[#335C33] flex items-center justify-center flex-shrink-0 shadow-xs">
               <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
               </svg>
