@@ -25,6 +25,14 @@ type TranslationKeys =
   | 'esgCardHuskDesc'
   | 'esgCardCO2Title'
   | 'esgCardCO2Desc'
+  | 'esgCardByProductTitle'
+  | 'esgCardByProductDesc'
+  | 'esgCardLaborTitle'
+  | 'esgCardLaborDesc'
+  | 'esgCardQRTitle'
+  | 'esgCardQRDesc'
+  | 'esgCardHouseholdsTitle'
+  | 'esgCardHouseholdsDesc'
   | 'esgCycleTitle'
   | 'esgCycleZeroWaste'
   | 'esgCycleStep1Title'
@@ -49,6 +57,8 @@ type TranslationKeys =
   | 'impactBikesDesc'
   | 'impactTVsTitle'
   | 'impactTVsDesc'
+  | 'impactCompletionTitle'
+  | 'impactCompletionValue'
   | 'impactTransparency'
   | 'storyBadge'
   | 'storyTitle'
@@ -60,9 +70,27 @@ type TranslationKeys =
   | 'storyHighlight1Desc'
   | 'storyHighlight2Title'
   | 'storyHighlight2Desc'
-  | 'storyHighlight3Title'
-  | 'storyHighlight3Desc'
   | 'storyBtnDonate'
+  | 'storyProd2Badge'
+  | 'storyProd2Title'
+  | 'storyProd2Desc'
+  | 'storyProd2Highlight1Title'
+  | 'storyProd2Highlight1Desc'
+  | 'storyProd2Highlight2Title'
+  | 'storyProd2Highlight2Desc'
+  | 'storyProd2Highlight3Title'
+  | 'storyProd2Highlight3Desc'
+  | 'storyProd2BtnDonate'
+  | 'storyProd3Badge'
+  | 'storyProd3Title'
+  | 'storyProd3Desc'
+  | 'storyProd3Highlight1Title'
+  | 'storyProd3Highlight1Desc'
+  | 'storyProd3Highlight2Title'
+  | 'storyProd3Highlight2Desc'
+  | 'storyProd3Highlight3Title'
+  | 'storyProd3Highlight3Desc'
+  | 'storyProd3BtnDonate'
   | 'storyBadgeClean'
   | 'storyBadgeAdditive'
   | 'storyBadgeTransparent'
@@ -167,6 +195,14 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     esgCardHuskDesc: 'Thu gom từ 12 nông hộ Tây Nguyên',
     esgCardCO2Title: 'CO2 giảm tải',
     esgCardCO2Desc: 'Ngăn chặn khí mê-tan phân hủy hở',
+    esgCardByProductTitle: 'Khối lượng phụ phẩm tái sử dụng',
+    esgCardByProductDesc: 'Thu gom và tái chế vỏ cà phê chín mọng thành trà & túi thơm.',
+    esgCardLaborTitle: 'Giờ công lao động cộng đồng',
+    esgCardLaborDesc: 'Ước tính TB 2 giờ dệt & hoàn thiện/túi thổ cẩm thủ công.',
+    esgCardQRTitle: 'Lượt quét mã QR truy cập web',
+    esgCardQRDesc: 'Lượt quan tâm và đồng hành cùng chiến dịch kinh tế tuần hoàn.',
+    esgCardHouseholdsTitle: 'Hộ dân hỗ trợ trực tiếp',
+    esgCardHouseholdsDesc: 'Nông hộ và các nghệ nhân Ê Đê đồng hành tạo sinh kế.',
     esgCycleTitle: 'Vòng Lặp Tuần Hoàn CAFLOOP',
     esgCycleZeroWaste: '100% Zero-Waste',
     esgCycleStep1Title: '1. Thu hoạch',
@@ -186,11 +222,13 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     impactPhase: 'Giai đoạn 1',
     impactTargetTitle: 'Mục tiêu: 77 xe đạp & 02 Smart TV (Trường TH Nguyễn Thị Minh Khai)',
     impactCompleted: 'Đã hoàn thành',
-    impactRemaining: 'Còn 65% để hoàn tất mục tiêu',
-    impactBikesTitle: '27 / 77 Xe Đạp',
+    impactRemaining: 'Đạt 100% mục tiêu giai đoạn 1',
+    impactBikesTitle: '77 / 77 Xe Đạp',
     impactBikesDesc: 'Đã sẵn sàng bàn giao',
-    impactTVsTitle: '01 / 02 Smart TV',
+    impactTVsTitle: '02 / 02 Smart TV',
     impactTVsDesc: 'Cho phòng học số',
+    impactCompletionTitle: 'Thời gian hoàn thành:',
+    impactCompletionValue: '15/09/2026 (Hoàn tất 100% trước hạn)',
     impactTransparency: 'Minh bạch 100% tài chính và tiến độ trao quà trực tiếp tại điểm trường',
     storyBadge: 'Hương Vị Đại Ngàn',
     storyTitle: 'Trà Cascara CAFLOOP',
@@ -205,6 +243,26 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     storyHighlight3Title: '100% Lợi Nhuận Gây Quỹ: ',
     storyHighlight3Desc: 'Mỗi hộp trà tài trợ 1 tuần học tập & bánh mì cho học sinh.',
     storyBtnDonate: 'Ủng Hộ & Nhận Hộp Trà',
+    storyProd2Badge: 'SẢN PHẨM MỚI',
+    storyProd2Title: 'Túi Thơm Thảo Mộc',
+    storyProd2Desc: 'Mang hương thơm đại ngàn vào không gian của bạn',
+    storyProd2Highlight1Title: 'Thư giãn: ',
+    storyProd2Highlight1Desc: 'Hương thơm dịu nhẹ giúp giảm căng thẳng và mệt mỏi.',
+    storyProd2Highlight2Title: 'Khử mùi: ',
+    storyProd2Highlight2Desc: 'Hiệu quả không gian nhỏ như xe hơi, tủ quần áo.',
+    storyProd2Highlight3Title: '100% tự nhiên: ',
+    storyProd2Highlight3Desc: 'An toàn cho sức khỏe, không chứa hóa chất.',
+    storyProd2BtnDonate: 'Ủng Hộ & Nhận Túi Thơm',
+    storyProd3Badge: 'BẢN SẮC VÙNG CAO',
+    storyProd3Title: 'Túi Thổ Cẩm Bản Địa',
+    storyProd3Desc: 'Tôn vinh nét đẹp văn hóa truyền thống Tây Nguyên',
+    storyProd3Highlight1Title: 'Thủ công: ',
+    storyProd3Highlight1Desc: 'Dệt tay tỉ mỉ bởi các nghệ nhân địa phương.',
+    storyProd3Highlight2Title: 'Độc bản: ',
+    storyProd3Highlight2Desc: 'Mỗi chiếc túi mang một hoa văn duy nhất không đụng hàng.',
+    storyProd3Highlight3Title: 'Bền vững: ',
+    storyProd3Highlight3Desc: 'Góp phần tạo sinh kế ổn định cho phụ nữ vùng cao.',
+    storyProd3BtnDonate: 'Ủng Hộ & Nhận Túi Thổ Cẩm',
     storyBadgeClean: 'Nông Nghiệp Sạch',
     storyBadgeAdditive: 'Không Phụ Gia',
     storyBadgeTransparent: 'Minh Bạch 100%',
@@ -308,6 +366,14 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     esgCardHuskDesc: 'Collected from 12 highland farming families',
     esgCardCO2Title: 'CO2 Offset',
     esgCardCO2Desc: 'Preventing methane emissions from open decay',
+    esgCardByProductTitle: 'Upcycled By-products Weight',
+    esgCardByProductDesc: 'Coffee cherry husks upcycled into premium tea & scent sachets.',
+    esgCardLaborTitle: 'Community Labor Hours',
+    esgCardLaborDesc: 'Estimated avg 2 hours of weaving & finishing per handmade brocade bag.',
+    esgCardQRTitle: 'QR Scans & Web Visits',
+    esgCardQRDesc: 'Visitors exploring and engaging with our circular economy mission.',
+    esgCardHouseholdsTitle: 'Households Supported',
+    esgCardHouseholdsDesc: 'Local farmers and Ê Đê weaving artisans supported with sustainable income.',
     esgCycleTitle: 'CAFLOOP Circular Loop',
     esgCycleZeroWaste: '100% Zero-Waste',
     esgCycleStep1Title: '1. Harvest',
@@ -327,11 +393,13 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     impactPhase: 'Phase 1',
     impactTargetTitle: 'Target: 77 bicycles & 2 Smart TVs (Nguyen Thi Minh Khai Primary School)',
     impactCompleted: 'Completed',
-    impactRemaining: '65% remaining to complete target',
-    impactBikesTitle: '27 / 77 Bicycles',
+    impactRemaining: '100% goal achieved for Phase 1',
+    impactBikesTitle: '77 / 77 Bicycles',
     impactBikesDesc: 'Ready for delivery',
-    impactTVsTitle: '01 / 02 Smart TV',
+    impactTVsTitle: '02 / 02 Smart TVs',
     impactTVsDesc: 'For digital classrooms',
+    impactCompletionTitle: 'Completion Timeline:',
+    impactCompletionValue: 'Sep 15, 2026 (100% achieved ahead of schedule)',
     impactTransparency: '100% transparent finance and direct delivery progress at the school site',
     storyBadge: 'Mountain Flavor',
     storyTitle: 'CAFLOOP Cascara Tea',
@@ -346,6 +414,26 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     storyHighlight3Title: '100% Fundraising Profits: ',
     storyHighlight3Desc: 'Each tea box sponsors 1 week of schooling & bread for a student.',
     storyBtnDonate: 'Support & Get Tea Box',
+    storyProd2Badge: 'NEW PRODUCT',
+    storyProd2Title: 'Aroma Herbal Sachet',
+    storyProd2Desc: 'Bring the pure aroma of the highland forest into your living space',
+    storyProd2Highlight1Title: 'Relaxation: ',
+    storyProd2Highlight1Desc: 'Gentle natural aroma eases stress, soothing the mind and body.',
+    storyProd2Highlight2Title: 'Odor Eliminator: ',
+    storyProd2Highlight2Desc: 'Highly effective for compact spaces such as cars, wardrobes & desks.',
+    storyProd2Highlight3Title: '100% Natural: ',
+    storyProd2Highlight3Desc: 'Safe for daily health, free from artificial chemicals & fragrances.',
+    storyProd2BtnDonate: 'Support & Get Sachet',
+    storyProd3Badge: 'HIGHLAND HERITAGE',
+    storyProd3Title: 'Indigenous Brocade Bag',
+    storyProd3Desc: 'Honoring the traditional cultural craftsmanship of the Central Highlands',
+    storyProd3Highlight1Title: 'Handmade: ',
+    storyProd3Highlight1Desc: 'Meticulously handwoven by local ethnic artisans.',
+    storyProd3Highlight2Title: 'Unique Pattern: ',
+    storyProd3Highlight2Desc: 'Every piece carries an authentic, one-of-a-kind pattern.',
+    storyProd3Highlight3Title: 'Sustainable: ',
+    storyProd3Highlight3Desc: 'Provides steady sustainable livelihoods for highland women.',
+    storyProd3BtnDonate: 'Support & Get Brocade Bag',
     storyBadgeClean: 'Clean Agriculture',
     storyBadgeAdditive: 'Additive Free',
     storyBadgeTransparent: '100% Transparent',

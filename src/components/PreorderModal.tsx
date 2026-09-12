@@ -62,7 +62,61 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
   const [step, setStep] = useState<'form' | 'qr' | 'success'>('form');
   const [countdown, setCountdown] = useState(QR_TIMEOUT_SECONDS);
   const [expired, setExpired] = useState(false);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  const PRODUCT_TRANSLATIONS_EN: Record<string, { name: string; description: string; unit: string }> = {
+    'CASCARA-ZIP-50G': {
+      name: 'Cascara Coffee Husk Tea - Zip Bag (50g)',
+      description: 'Light fruity notes, low caffeine.',
+      unit: 'bag',
+    },
+    'CASCARA-ZIP-100G': {
+      name: 'Cascara Coffee Husk Tea - Zip Bag (100g)',
+      description: 'Light fruity notes, low caffeine.',
+      unit: 'bag',
+    },
+    'CASCARA-JAR-50G': {
+      name: 'Cascara Coffee Husk Tea - Plastic Jar (50g)',
+      description: 'Light fruity notes, low caffeine.',
+      unit: 'jar',
+    },
+    'CASCARA-JAR-100G': {
+      name: 'Cascara Coffee Husk Tea - Plastic Jar (100g)',
+      description: 'Light fruity notes, low caffeine.',
+      unit: 'jar',
+    },
+    'GIFT-BROCADE': {
+      name: 'Central Highlands Brocade Bag',
+      description: 'Handmade - Durable, convenient - Rich ethnic cultural identity.',
+      unit: 'bag',
+    },
+    'GIFT-SCENT': {
+      name: 'Aroma Coffee Scent Sachet',
+      description: 'Natural aroma - Odor eliminating - Ideal for car, closet & decor.',
+      unit: 'bag',
+    },
+    'COMBO-130K': {
+      name: '130k Gift Combo',
+      description: 'Includes: Cascara tea jar + Coffee scent sachet.',
+      unit: 'combo',
+    },
+    'COMBO-250K': {
+      name: '250k Gift Combo',
+      description: 'Includes: Cascara tea jar + Coffee scent sachet + Brocade bag.',
+      unit: 'combo',
+    },
+  };
+
+  const getProductDisplay = (prod: ProductItem) => {
+    if (language === 'en' && PRODUCT_TRANSLATIONS_EN[prod.sku]) {
+      return PRODUCT_TRANSLATIONS_EN[prod.sku];
+    }
+    return {
+      name: prod.name,
+      description: prod.description,
+      unit: prod.unit,
+    };
+  };
 
   const sessionStartedAt = useRef<Date | null>(null);
   const processedTxIds = useRef<Set<string>>(new Set());
@@ -123,12 +177,12 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
     e.preventDefault();
 
     if (totalItemsCount === 0 || totalPrice === 0) {
-      alert('Vui lòng chọn số lượng cho ít nhất 1 sản phẩm');
+      alert(language === 'vi' ? 'Vui lòng chọn số lượng cho ít nhất 1 sản phẩm' : 'Please select quantity for at least 1 product');
       return;
     }
 
     if (!selectedAddress) {
-      alert('Vui lòng thêm hoặc chọn 1 địa chỉ nhận hàng');
+      alert(language === 'vi' ? 'Vui lòng thêm hoặc chọn 1 địa chỉ nhận hàng' : 'Please add or select a shipping address');
       return;
     }
 
@@ -325,7 +379,15 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                   {t('modalSuccessTitle')}
                 </h3>
                 <p className="text-xs md:text-sm text-[#2C2E2B]/80 leading-relaxed mb-4 px-2">
-                  Đã nhận đơn hàng gồm <strong className="text-[#335C33]">{totalItemsCount} sản phẩm</strong> của khách hàng <strong className="text-[#335C33]">{selectedAddress?.name}</strong>.
+                  {language === 'vi' ? (
+                    <>
+                      Đã nhận đơn hàng gồm <strong className="text-[#335C33]">{totalItemsCount} sản phẩm</strong> của khách hàng <strong className="text-[#335C33]">{selectedAddress?.name}</strong>.
+                    </>
+                  ) : (
+                    <>
+                      Order received with <strong className="text-[#335C33]">{totalItemsCount} item(s)</strong> for customer <strong className="text-[#335C33]">{selectedAddress?.name}</strong>.
+                    </>
+                  )}
                 </p>
 
                 <div className="bg-[#E3EDD3] rounded-2xl p-4 md:p-5 mb-5 md:mb-6 text-left text-xs md:text-sm border border-[#335C33]/10">
@@ -334,7 +396,9 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                     <span>{t('modalSuccessDirectImpact')}</span>
                   </div>
                   <p className="text-[#8C5A35]">
-                    100% lợi nhuận từ đơn hàng sẽ chuyển thành xe đạp và thiết bị học tập cho các em nhỏ vùng cao.
+                    {language === 'vi'
+                      ? '100% lợi nhuận từ đơn hàng sẽ chuyển thành xe đạp và thiết bị học tập cho các em nhỏ vùng cao.'
+                      : '100% of profits from this order will be converted into bicycles and learning equipment for highland children.'}
                   </p>
                 </div>
 
@@ -348,10 +412,12 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
             ) : step === 'qr' ? (
               <div className="text-center py-2">
                 <h3 className="text-xl md:text-2xl font-bold text-[#335C33] font-serif mb-2 mt-4 md:mt-2">
-                  Thanh Toán Đơn Hàng
+                  {language === 'vi' ? 'Thanh Toán Đơn Hàng' : 'Order Payment'}
                 </h3>
                 <p className="text-xs md:text-sm text-[#8C5A35] mb-4">
-                  Sử dụng ứng dụng ngân hàng để quét mã QR bên dưới
+                  {language === 'vi'
+                    ? 'Sử dụng ứng dụng ngân hàng để quét mã QR bên dưới'
+                    : 'Use your mobile banking app to scan the QR code below'}
                 </p>
 
                 {expired ? (
@@ -361,12 +427,12 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                     className="flex items-center justify-center gap-2 text-xs text-red-700 font-semibold bg-red-50 py-2 px-4 rounded-full mb-4 mx-auto w-max border border-red-200"
                   >
                     <AlertTriangle className="w-3.5 h-3.5" />
-                    <span>Phiên đã hết hạn! Đang quay lại...</span>
+                    <span>{language === 'vi' ? 'Phiên đã hết hạn! Đang quay lại...' : 'Session expired! Returning...'}</span>
                   </motion.div>
                 ) : (
                   <div className="flex items-center justify-center gap-2 text-xs text-[#335C33] font-medium bg-[#E3EDD3]/60 py-1.5 px-3 rounded-full mb-4 mx-auto w-max border border-[#335C33]/15">
                     <Loader2 className="w-3.5 h-3.5 animate-spin text-[#335C33]" />
-                    <span>Hệ thống đang tự động kiểm tra thanh toán...</span>
+                    <span>{language === 'vi' ? 'Hệ thống đang tự động kiểm tra thanh toán...' : 'Automatically verifying payment...'}</span>
                   </div>
                 )}
 
@@ -376,21 +442,23 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
 
                 <div className="bg-[#E3EDD3]/50 rounded-xl p-3 md:p-4 mb-5 text-left border border-[#335C33]/10">
                   <div className="flex justify-between mb-1.5 text-xs md:text-sm">
-                    <span className="text-[#2C2E2B]/70">Chủ TK:</span>
+                    <span className="text-[#2C2E2B]/70">{language === 'vi' ? 'Chủ TK:' : 'Account Name:'}</span>
                     <span className="font-bold text-[#335C33]">{ACCOUNT_NAME}</span>
                   </div>
                   <div className="flex justify-between mb-1.5 text-xs md:text-sm">
-                    <span className="text-[#2C2E2B]/70">Số TK:</span>
+                    <span className="text-[#2C2E2B]/70">{language === 'vi' ? 'Số TK:' : 'Account No:'}</span>
                     <span className="font-bold text-[#335C33]">{ACCOUNT_NO}</span>
                   </div>
                   <div className="flex justify-between mb-1.5 text-xs md:text-sm items-center">
-                    <span className="text-[#2C2E2B]/70">Nội dung CK:</span>
+                    <span className="text-[#2C2E2B]/70">{language === 'vi' ? 'Nội dung CK:' : 'Transfer Memo:'}</span>
                     <span className="font-mono font-bold text-[#8C5A35] bg-white px-2 py-0.5 rounded border border-[#8C5A35]/30">
                       {orderCode}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs md:text-sm border-t border-[#335C33]/10 pt-1.5 mt-1.5">
-                    <span className="text-[#2C2E2B]/70">Tổng tiền ({totalItemsCount} món):</span>
+                    <span className="text-[#2C2E2B]/70">
+                      {language === 'vi' ? `Tổng tiền (${totalItemsCount} món):` : `Total amount (${totalItemsCount} items):`}
+                    </span>
                     <span className="font-bold text-[#8C5A35]">{totalPrice.toLocaleString('vi-VN')} đ</span>
                   </div>
                 </div>
@@ -399,8 +467,8 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                   <Clock className="w-4 h-4" />
                   <span>
                     {expired
-                      ? 'Phiên đã hết hạn'
-                      : `Mã QR hết hạn sau ${formatCountdown(countdown)}`}
+                      ? (language === 'vi' ? 'Phiên đã hết hạn' : 'Session expired')
+                      : (language === 'vi' ? `Mã QR hết hạn sau ${formatCountdown(countdown)}` : `QR expires in ${formatCountdown(countdown)}`)}
                   </span>
                 </div>
 
@@ -408,7 +476,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                   onClick={handleBackToForm}
                   className="mt-4 text-xs text-[#335C33]/60 hover:text-[#335C33] font-medium transition-colors cursor-pointer block mx-auto"
                 >
-                  Huỷ & chỉnh sửa giỏ hàng
+                  {language === 'vi' ? 'Huỷ & chỉnh sửa giỏ hàng' : 'Cancel & edit cart'}
                 </button>
               </div>
             ) : (
@@ -418,10 +486,12 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                   <span>{t('modalFundraiseYear')}</span>
                 </div>
                 <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#335C33] font-serif mb-1">
-                  Đặt Hàng Sản Phẩm Tuần Hoàn
+                  {language === 'vi' ? 'Đặt Hàng Sản Phẩm Tuần Hoàn' : 'Order Circular Products'}
                 </h3>
                 <p className="text-xs md:text-sm text-[#8C5A35] mb-5">
-                  Chọn sản phẩm, số lượng và địa chỉ để ủng hộ dự án CAFLOOP
+                  {language === 'vi'
+                    ? 'Chọn sản phẩm, số lượng và địa chỉ để ủng hộ dự án CAFLOOP'
+                    : 'Select products, quantity and shipping address to support CAFLOOP project'}
                 </p>
 
                 <form onSubmit={handleNext}>
@@ -432,15 +502,20 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                       <div className="flex justify-between items-center pb-1.5 border-b border-[#335C33]/15">
                         <label className="text-xs md:text-sm font-bold text-[#335C33] flex items-center gap-1.5">
                           <PackageCheck className="w-4 h-4 text-[#8C5A35]" />
-                          Danh Sách Sản Phẩm
+                          {language === 'vi' ? 'Danh Sách Sản Phẩm' : 'Product List'}
                         </label>
                         <span className="text-[11px] md:text-xs font-semibold text-[#8C5A35] bg-[#E3EDD3] px-2.5 py-0.5 rounded-full">
-                          Đã chọn <strong className="text-[#335C33]">{totalItemsCount}</strong> món
+                          {language === 'vi' ? (
+                            <>Đã chọn <strong className="text-[#335C33]">{totalItemsCount}</strong> món</>
+                          ) : (
+                            <>Selected <strong className="text-[#335C33]">{totalItemsCount}</strong> item(s)</>
+                          )}
                         </span>
                       </div>
 
                       <div className="space-y-2.5 md:h-[540px] md:max-h-[540px] md:overflow-y-auto md:pr-2 overscroll-contain transform-gpu [will-change:scroll-position]">
                         {productsList.map((prod) => {
+                          const display = getProductDisplay(prod);
                           const qty = cart[prod.sku] || 0;
                           const isSelected = qty > 0;
                           return (
@@ -456,7 +531,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                               <div className="relative flex-shrink-0 group cursor-pointer" onClick={() => setPreviewProduct(prod)}>
                                 <img
                                   src={prod.image}
-                                  alt={prod.name}
+                                  alt={display.name}
                                   className="w-14 h-14 md:w-16 md:h-16 object-cover rounded-xl border border-black/10 bg-white"
                                 />
                                 <div className="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
@@ -467,14 +542,14 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                               {/* Product Info */}
                               <div className="flex-1 min-w-0">
                                 <h4 className="text-xs md:text-sm font-bold text-[#335C33] line-clamp-1">
-                                  {prod.name}
+                                  {display.name}
                                 </h4>
                                 <p className="text-[10px] md:text-xs text-[#8C5A35] line-clamp-1 mt-0.5">
-                                  {prod.description}
+                                  {display.description}
                                 </p>
                                 <div className="text-xs md:text-sm font-bold text-[#335C33] mt-1 flex items-baseline gap-1.5">
                                   <span className="text-sm md:text-base font-extrabold text-[#335C33]">{prod.price.toLocaleString('vi-VN')}đ</span>
-                                  <span className="text-xs md:text-sm font-bold text-[#8C5A35]">/ {prod.unit}</span>
+                                  <span className="text-xs md:text-sm font-bold text-[#8C5A35]">/ {display.unit}</span>
                                 </div>
                               </div>
 
@@ -517,7 +592,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                         <div className="flex items-center justify-between">
                           <label className="text-xs md:text-sm font-bold text-[#335C33] flex items-center gap-1.5">
                             <MapPin className="w-4 h-4 text-[#8C5A35]" />
-                            Địa Chỉ Nhận Hàng
+                            {language === 'vi' ? 'Địa Chỉ Nhận Hàng' : 'Shipping Address'}
                           </label>
                           <button
                             type="button"
@@ -525,7 +600,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                             className="text-[11px] md:text-xs font-bold text-[#335C33] hover:text-[#284828] flex items-center gap-1 bg-[#E3EDD3] px-2.5 py-1 rounded-lg hover:bg-[#d6e3c2] transition-colors cursor-pointer shadow-2xs"
                           >
                             <PlusCircle className="w-3.5 h-3.5" />
-                            <span>Thêm mới</span>
+                            <span>{language === 'vi' ? 'Thêm mới' : 'Add new'}</span>
                           </button>
                         </div>
 
@@ -535,10 +610,10 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                             className="p-3.5 rounded-xl border-2 border-dashed border-[#335C33]/30 bg-white/70 text-center cursor-pointer hover:bg-white transition-colors"
                           >
                             <p className="text-xs font-semibold text-[#8C5A35]">
-                              Chưa có địa chỉ nào được lưu.
+                              {language === 'vi' ? 'Chưa có địa chỉ nào được lưu.' : 'No saved addresses yet.'}
                             </p>
                             <p className="text-[11px] text-[#335C33] font-bold mt-0.5">
-                              + Bấm vào đây để thêm địa chỉ giao hàng
+                              {language === 'vi' ? '+ Bấm vào đây để thêm địa chỉ giao hàng' : '+ Click here to add shipping address'}
                             </p>
                           </div>
                         ) : (
@@ -579,7 +654,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                                     type="button"
                                     onClick={(e) => handleDeleteAddress(addr.id, e)}
                                     className="text-gray-400 hover:text-red-600 p-1 transition-colors shrink-0"
-                                    title="Xóa địa chỉ"
+                                    title={language === 'vi' ? 'Xóa địa chỉ' : 'Delete address'}
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
                                   </button>
@@ -593,7 +668,9 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                       {/* Total Price Summary */}
                       <div className="pt-3 border-t border-[#335C33]/15 flex items-center justify-between">
                         <div>
-                          <p className="text-[10px] md:text-xs uppercase font-bold text-[#8C5A35]">Tổng tiền ({totalItemsCount} món)</p>
+                          <p className="text-[10px] md:text-xs uppercase font-bold text-[#8C5A35]">
+                            {language === 'vi' ? `Tổng tiền (${totalItemsCount} món)` : `Total (${totalItemsCount} items)`}
+                          </p>
                           <p className="text-lg md:text-2xl font-extrabold text-[#335C33]">
                             {totalPrice.toLocaleString('vi-VN')} đ
                           </p>
@@ -606,7 +683,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                       {/* Payment Method Selector */}
                       <div className="pt-2 border-t border-[#335C33]/15">
                         <label className="block text-xs font-semibold text-[#335C33] mb-1.5">
-                          Phương thức thanh toán
+                          {language === 'vi' ? 'Phương thức thanh toán' : 'Payment Method'}
                         </label>
                         <div className="grid grid-cols-2 gap-2">
                           <button
@@ -619,7 +696,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                             }`}
                           >
                             <QrCode className="w-3.5 h-3.5 shrink-0" />
-                            <span className="truncate">Chuyển khoản QR</span>
+                            <span className="truncate">{language === 'vi' ? 'Chuyển khoản QR' : 'QR Bank Transfer'}</span>
                           </button>
                           <button
                             type="button"
@@ -631,7 +708,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                             }`}
                           >
                             <PackageCheck className="w-3.5 h-3.5 shrink-0" />
-                            <span className="truncate">Thanh toán COD</span>
+                            <span className="truncate">{language === 'vi' ? 'Thanh toán COD' : 'COD Payment'}</span>
                           </button>
                         </div>
                       </div>
@@ -651,12 +728,16 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                         {paymentMethod === 'qr' ? (
                           <>
                             <QrCode className="w-4 h-4 fill-current text-[#E3EDD3]" />
-                            <span>Xác Nhận & Thanh Toán QR</span>
+                            <span>{language === 'vi' ? 'Xác Nhận & Thanh Toán QR' : 'Confirm & Pay via QR'}</span>
                           </>
                         ) : (
                           <>
                             <PackageCheck className="w-4 h-4 fill-current text-[#E3EDD3]" />
-                            <span>Xác Nhận Đặt Hàng ({totalItemsCount} món)</span>
+                            <span>
+                              {language === 'vi'
+                                ? `Xác Nhận Đặt Hàng (${totalItemsCount} món)`
+                                : `Confirm Order (${totalItemsCount} items)`}
+                            </span>
                           </>
                         )}
                       </motion.button>
@@ -704,16 +785,16 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
               <div className="w-full aspect-square rounded-2xl overflow-hidden bg-gray-50 flex items-center justify-center">
                 <img
                   src={previewProduct.image}
-                  alt={previewProduct.name}
+                  alt={getProductDisplay(previewProduct).name}
                   className="w-full h-full object-contain"
                 />
               </div>
               <div className="mt-3 p-2 text-center">
-                <h4 className="text-base font-bold text-[#335C33]">{previewProduct.name}</h4>
-                <p className="text-xs text-[#8C5A35] mt-1">{previewProduct.description}</p>
+                <h4 className="text-base font-bold text-[#335C33]">{getProductDisplay(previewProduct).name}</h4>
+                <p className="text-xs text-[#8C5A35] mt-1">{getProductDisplay(previewProduct).description}</p>
                 <p className="text-sm md:text-base font-bold text-[#335C33] mt-2 flex items-center justify-center gap-1.5">
                   <span className="font-extrabold">{previewProduct.price.toLocaleString('vi-VN')} đ</span>
-                  <span className="text-[#8C5A35]">/ {previewProduct.unit}</span>
+                  <span className="text-[#8C5A35]">/ {getProductDisplay(previewProduct).unit}</span>
                 </p>
               </div>
             </motion.div>

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { motion, useInView } from 'motion/react';
-import { Bike, Tv, Heart, MapPin, CheckCircle2, School, Sparkles, Award } from 'lucide-react';
+import { Bike, Tv, Heart, MapPin, CheckCircle2, School, Sparkles, Award, CalendarCheck } from 'lucide-react';
 import YouTube from 'react-youtube';
 import { AnimatedCounter } from './AnimatedCounter';
 import { useLanguage } from '../utils/LanguageContext';
@@ -152,7 +152,7 @@ export function ImpactSection() {
                 <motion.div
                   id="progress-bar-fill"
                   initial={{ width: 0 }}
-                  animate={{ width: isInView ? '35%' : '0%' }}
+                  animate={{ width: isInView ? '100%' : '0%' }}
                   transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
                   className="h-full bg-gradient-to-r from-[#335C33] to-[#4A7F4A] rounded-full relative overflow-hidden"
                 >
@@ -162,11 +162,11 @@ export function ImpactSection() {
               </div>
 
               {/* Text Below Progress Bar */}
-              <div className="flex items-center justify-between text-xs md:text-sm font-semibold mb-6">
+              <div className="flex items-center justify-between text-xs md:text-sm font-semibold mb-5">
                 <span className="text-[#335C33] flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-[#335C33]" />
                   <span id="progress-percentage-label" className="font-bold text-sm md:text-base">
-                    {t('impactCompleted')} {isInView ? <AnimatedCounter to={35} duration={1.5} /> : 0}%
+                    {t('impactCompleted')} {isInView ? <AnimatedCounter to={100} duration={1.5} /> : 0}%
                   </span>
                 </span>
                 <span className="text-[#8C5A35]">
@@ -175,7 +175,7 @@ export function ImpactSection() {
               </div>
 
               {/* Breakdown items */}
-              <div className="grid grid-cols-2 gap-3 md:gap-5 pt-5 md:pt-6 border-t border-[#335C33]/15">
+              <div className="grid grid-cols-2 gap-3 md:gap-5 pt-4 md:pt-5 border-t border-[#335C33]/15">
                 <div className="flex items-center gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60 hover:bg-[#E3EDD3] transition-colors duration-300">
                   <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#335C33] flex items-center justify-center flex-shrink-0 shadow-xs">
                     <Bike className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
@@ -194,6 +194,21 @@ export function ImpactSection() {
                     <p className="text-xs md:text-sm font-bold text-[#335C33] truncate">{t('impactTVsTitle')}</p>
                     <p className="text-[10px] md:text-xs text-[#8C5A35] mt-0.5">{t('impactTVsDesc')}</p>
                   </div>
+                </div>
+              </div>
+
+              {/* Completion Timeline Banner */}
+              <div className="mt-4 md:mt-5 pt-3.5 border-t border-[#335C33]/15 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#E3EDD3]/45 p-3 sm:p-3.5 rounded-xl md:rounded-2xl border border-[#335C33]/10">
+                <div className="flex items-center gap-2 text-xs md:text-sm text-[#335C33] font-bold">
+                  <div className="w-6 h-6 md:w-7 md:h-7 rounded-lg bg-[#335C33] text-[#E3EDD3] flex items-center justify-center shrink-0 shadow-2xs">
+                    <CalendarCheck className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                  </div>
+                  <span>{t('impactCompletionTitle')}</span>
+                </div>
+                <div className="flex items-center gap-1.5 self-start sm:self-auto">
+                  <span className="text-xs md:text-sm font-extrabold text-[#335C33] bg-white px-2.5 sm:px-3 py-1 rounded-lg border border-[#335C33]/15 shadow-2xs">
+                    {t('impactCompletionValue')}
+                  </span>
                 </div>
               </div>
 

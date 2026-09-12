@@ -41,28 +41,28 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
     {
       id: 2,
       image: tuithomImg,
-      badge: 'SẢN PHẨM MỚI',
-      title: 'Túi Thơm Thảo Mộc',
-      desc: 'Mang hương thơm đại ngàn vào không gian của bạn',
+      badge: t('storyProd2Badge'),
+      title: t('storyProd2Title'),
+      desc: t('storyProd2Desc'),
       highlights: [
-        { icon: Leaf, title: 'Thư giãn: ', desc: 'Hương thơm dịu nhẹ giúp giảm căng thẳng và mệt mỏi.', color: 'text-[#8C5A35]' },
-        { icon: Flame, title: 'Khử mùi: ', desc: 'Hiệu quả không gian nhỏ như xe hơi, tủ quần áo.', color: 'text-[#335C33]' },
-        { icon: ShieldCheck, title: '100% tự nhiên: ', desc: 'An toàn cho sức khỏe, không chứa hóa chất.', color: 'text-[#335C33]' },
+        { icon: Leaf, title: t('storyProd2Highlight1Title'), desc: t('storyProd2Highlight1Desc'), color: 'text-[#8C5A35]' },
+        { icon: Flame, title: t('storyProd2Highlight2Title'), desc: t('storyProd2Highlight2Desc'), color: 'text-[#335C33]' },
+        { icon: ShieldCheck, title: t('storyProd2Highlight3Title'), desc: t('storyProd2Highlight3Desc'), color: 'text-[#335C33]' },
       ],
-      priceText: 'Ủng Hộ & Nhận Túi Thơm'
+      priceText: t('storyProd2BtnDonate')
     },
     {
       id: 3,
       image: bagImg,
-      badge: 'BẢN SẮC VÙNG CAO',
-      title: 'Túi Thổ Cẩm Bản Địa',
-      desc: 'Tôn vinh nét đẹp văn hóa truyền thống Tây Nguyên',
+      badge: t('storyProd3Badge'),
+      title: t('storyProd3Title'),
+      desc: t('storyProd3Desc'),
       highlights: [
-        { icon: Heart, title: 'Thủ công: ', desc: 'Dệt tay tỉ mỉ bởi các nghệ nhân địa phương.', color: 'text-[#8C5A35]' },
-        { icon: ShieldCheck, title: 'Độc bản: ', desc: 'Mỗi chiếc túi mang một hoa văn duy nhất không đụng hàng.', color: 'text-[#335C33]' },
-        { icon: Check, title: 'Bền vững: ', desc: 'Góp phần tạo sinh kế ổn định cho phụ nữ vùng cao.', color: 'text-[#335C33]' },
+        { icon: Heart, title: t('storyProd3Highlight1Title'), desc: t('storyProd3Highlight1Desc'), color: 'text-[#8C5A35]' },
+        { icon: ShieldCheck, title: t('storyProd3Highlight2Title'), desc: t('storyProd3Highlight2Desc'), color: 'text-[#335C33]' },
+        { icon: Check, title: t('storyProd3Highlight3Title'), desc: t('storyProd3Highlight3Desc'), color: 'text-[#335C33]' },
       ],
-      priceText: 'Ủng Hộ & Nhận Túi Thổ Cẩm'
+      priceText: t('storyProd3BtnDonate')
     }
   ];
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, MapPin, ChevronDown } from 'lucide-react';
+import { useLanguage } from '../utils/LanguageContext';
 
 export interface SavedAddress {
   id: string;
@@ -18,12 +19,14 @@ interface AddAddressModalProps {
   onSaveAddress: (newAddr: SavedAddress) => void;
 }
 
-function SearchableDropdown({ options, value, onChange, placeholder, disabled }: {
+function SearchableDropdown({ options, value, onChange, placeholder, disabled, emptyText, searchPlaceholder }: {
   options: { value: number; label: string }[];
   value: number | '';
   onChange: (value: number) => void;
   placeholder: string;
   disabled?: boolean;
+  emptyText?: string;
+  searchPlaceholder?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -73,7 +76,7 @@ function SearchableDropdown({ options, value, onChange, placeholder, disabled }:
                 autoFocus
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="Tìm kiếm..."
+                placeholder={searchPlaceholder || "Tìm kiếm..."}
                 className="w-full text-xs md:text-sm px-3 py-1.5 rounded-lg bg-white border border-[#335C33]/20 focus:outline-none focus:border-[#335C33]"
               />
             </div>
@@ -90,7 +93,7 @@ function SearchableDropdown({ options, value, onChange, placeholder, disabled }:
                   {opt.label}
                 </div>
               )) : (
-                <div className="p-3 text-center text-xs text-gray-500">Không tìm thấy</div>
+                <div className="p-3 text-center text-xs text-gray-500">{emptyText || 'Không tìm thấy'}</div>
               )}
             </div>
           </motion.div>
@@ -101,6 +104,7 @@ function SearchableDropdown({ options, value, onChange, placeholder, disabled }:
 }
 
 export function AddAddressModal({ isOpen, onClose, onSaveAddress }: AddAddressModalProps) {
+  const { language } = useLanguage();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [provinces, setProvinces] = useState<any[]>([]);
@@ -170,11 +174,11 @@ export function AddAddressModal({ isOpen, onClose, onSaveAddress }: AddAddressMo
     e.preventDefault();
     const cleanPhone = phone.replace(/\D/g, '');
     if (!/^0\d{9}$/.test(cleanPhone)) {
-      alert('Vui lòng nhập số điện thoại hợp lệ (đủ 10 chữ số, bắt đầu bằng 0)');
+      alert(language === 'vi' ? 'Vui lòng nhập số điện thoại hợp lệ (đủ 10 chữ số, bắt đầu bằng 0)' : 'Please enter a valid 10-digit phone number starting with 0');
       return;
     }
     if (!selectedProvince || !selectedDistrict || !street.trim()) {
-      alert('Vui lòng điền đầy đủ Tỉnh/Thành, Quận/Huyện và Tên đường');
+      alert(language === 'vi' ? 'Vui lòng điền đầy đủ Tỉnh/Thành, Quận/Huyện và Tên đường' : 'Please select Province/City, District/Ward and enter Street Address');
       return;
     }
 
@@ -234,30 +238,30 @@ export function AddAddressModal({ isOpen, onClose, onSaveAddress }: AddAddressMo
 
           <div className="flex items-center gap-2 text-[#335C33] font-bold text-lg mb-1 font-serif">
             <MapPin className="w-5 h-5 text-[#8C5A35]" />
-            <span>Thêm Địa Chỉ Nhận Hàng</span>
+            <span>{language === 'vi' ? 'Thêm Địa Chỉ Nhận Hàng' : 'Add Delivery Address'}</span>
           </div>
           <p className="text-xs text-[#8C5A35] mb-4">
-            Nhập thông tin người nhận và địa chỉ giao hàng của bạn
+            {language === 'vi' ? 'Nhập thông tin người nhận và địa chỉ giao hàng của bạn' : 'Enter recipient details and shipping address'}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-3.5">
             <div>
               <label className="block text-xs font-semibold text-[#335C33] mb-1">
-                Họ và tên người nhận *
+                {language === 'vi' ? 'Họ và tên người nhận *' : 'Recipient Full Name *'}
               </label>
               <input
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Nhập họ và tên..."
+                placeholder={language === 'vi' ? 'Nhập họ và tên...' : 'Enter full name...'}
                 className="w-full text-xs md:text-sm px-3.5 py-2.5 rounded-xl bg-[#F6F6EE] border border-[#335C33]/25 focus:outline-none focus:border-[#335C33] focus:ring-1 focus:ring-[#335C33] transition-all"
               />
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-[#335C33] mb-1">
-                Số điện thoại * (10 chữ số)
+                {language === 'vi' ? 'Số điện thoại * (10 chữ số)' : 'Phone Number * (10 digits)'}
               </label>
               <input
                 type="tel"
@@ -272,10 +276,12 @@ export function AddAddressModal({ isOpen, onClose, onSaveAddress }: AddAddressMo
 
             <div>
               <label className="block text-xs font-semibold text-[#335C33] mb-1">
-                Tỉnh / Thành phố *
+                {language === 'vi' ? 'Tỉnh / Thành phố *' : 'Province / City *'}
               </label>
               <SearchableDropdown
-                placeholder="Chọn Tỉnh/Thành phố"
+                placeholder={language === 'vi' ? 'Chọn Tỉnh/Thành phố' : 'Select Province/City'}
+                emptyText={language === 'vi' ? 'Không tìm thấy' : 'No results found'}
+                searchPlaceholder={language === 'vi' ? 'Tìm kiếm...' : 'Search...'}
                 options={provinces.map(p => ({ value: p.code, label: p.name }))}
                 value={selectedProvince?.code || ''}
                 onChange={(val) => handleProvinceChange(val.toString())}
@@ -284,10 +290,12 @@ export function AddAddressModal({ isOpen, onClose, onSaveAddress }: AddAddressMo
 
             <div>
               <label className="block text-xs font-semibold text-[#335C33] mb-1">
-                Quận / Huyện / Phường / Xã *
+                {language === 'vi' ? 'Quận / Huyện / Phường / Xã *' : 'District / Ward *'}
               </label>
               <SearchableDropdown
-                placeholder="Chọn Quận/Huyện/Phường/Xã"
+                placeholder={language === 'vi' ? 'Chọn Quận/Huyện/Phường/Xã' : 'Select District/Ward'}
+                emptyText={language === 'vi' ? 'Không tìm thấy' : 'No results found'}
+                searchPlaceholder={language === 'vi' ? 'Tìm kiếm...' : 'Search...'}
                 options={districts.map(d => ({ value: d.code, label: d.name }))}
                 value={selectedDistrict?.code || ''}
                 onChange={(val) => handleDistrictChange(val.toString())}
@@ -297,14 +305,14 @@ export function AddAddressModal({ isOpen, onClose, onSaveAddress }: AddAddressMo
 
             <div>
               <label className="block text-xs font-semibold text-[#335C33] mb-1">
-                Số nhà, Tên đường *
+                {language === 'vi' ? 'Số nhà, Tên đường *' : 'Street Address *'}
               </label>
               <input
                 type="text"
                 required
                 value={street}
                 onChange={(e) => setStreet(e.target.value)}
-                placeholder="VD: Số 123 Đường Nguyễn Trãi..."
+                placeholder={language === 'vi' ? 'VD: Số 123 Đường Nguyễn Trãi...' : 'e.g. 123 Nguyen Trai Street...'}
                 className="w-full text-xs md:text-sm px-3.5 py-2.5 rounded-xl bg-[#F6F6EE] border border-[#335C33]/25 focus:outline-none focus:border-[#335C33] focus:ring-1 focus:ring-[#335C33] transition-all"
               />
             </div>
@@ -315,13 +323,13 @@ export function AddAddressModal({ isOpen, onClose, onSaveAddress }: AddAddressMo
                 onClick={handleReset}
                 className="flex-1 py-3 rounded-xl border border-[#335C33]/20 text-[#8C5A35] font-semibold text-xs hover:bg-[#E3EDD3]/50 transition-colors cursor-pointer"
               >
-                Hủy
+                {language === 'vi' ? 'Hủy' : 'Cancel'}
               </button>
               <button
                 type="submit"
                 className="flex-1 py-3 rounded-xl bg-[#335C33] text-[#F6F6EE] font-bold text-xs hover:bg-[#284828] transition-colors shadow-md cursor-pointer"
               >
-                Lưu Địa Chỉ
+                {language === 'vi' ? 'Lưu Địa Chỉ' : 'Save Address'}
               </button>
             </div>
           </form>
