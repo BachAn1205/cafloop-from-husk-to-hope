@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { motion, useInView } from 'motion/react';
-import { Bike, Tv, Heart, MapPin, CheckCircle2, School, Sparkles, Award, CalendarCheck } from 'lucide-react';
+import { Bike, Tv, Heart, MapPin, CheckCircle2, Sparkles, Award, CalendarCheck } from 'lucide-react';
 import YouTube from 'react-youtube';
 import { AnimatedCounter } from './AnimatedCounter';
 import { useLanguage } from '../utils/LanguageContext';
@@ -81,24 +81,6 @@ export function ImpactSection() {
               onPause={handlePauseOrEndVideo}
               onEnd={handlePauseOrEndVideo}
             />
-            {/* Gradient vignette - fade out when playing */}
-            <div className={`absolute inset-0 bg-gradient-to-t from-[#2C2E2B]/90 via-[#2C2E2B]/20 to-transparent transition-opacity duration-300 pointer-events-none ${isVideoPlaying ? 'opacity-0' : 'opacity-100'}`} />
-
-            {/* Floating badge inside image - hide when playing */}
-            <div className={`absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 flex items-center justify-between text-[#F6F6EE] transition-opacity duration-300 pointer-events-none ${isVideoPlaying ? 'opacity-0' : 'opacity-100'}`}>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#335C33]/90 flex items-center justify-center backdrop-blur-md shadow-lg border border-white/10">
-                  <School className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
-                </div>
-                <div>
-                  <p className="text-sm md:text-base font-bold leading-tight">{t('impactImgBadgeTitle')}</p>
-                  <p className="text-[11px] md:text-xs text-[#E3EDD3] leading-tight mt-0.5">{t('impactImgBadgeDesc')}</p>
-                </div>
-              </div>
-              <span className="text-[11px] md:text-xs font-semibold bg-[#8C5A35]/90 px-3 md:px-4 py-1.5 md:py-2 rounded-full backdrop-blur-md shadow-lg border border-white/10">
-                {t('impactImgBadgeSeason')}
-              </span>
-            </div>
           </motion.div>
 
           {/* Right Column: Copy & Progress */}

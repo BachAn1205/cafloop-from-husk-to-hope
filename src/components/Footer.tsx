@@ -37,7 +37,7 @@ export function Footer({ onOpenAdmin }: FooterProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-20px' }}
       transition={{ duration: 0.5, ease: EASE_NATURAL }}
-      className="bg-[#E3EDD3]/50 border-t border-[#335C33]/15 pt-10 pb-12 px-5 md:px-8 text-center md:text-left text-[#2C2E2B]"
+      className="bg-[#E3EDD3]/50 border-t border-[#335C33]/15 pt-10 pb-20 md:pb-12 px-5 md:px-8 text-center md:text-left text-[#2C2E2B]"
     >
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-8 mb-8 md:mb-10">
@@ -84,10 +84,10 @@ export function Footer({ onOpenAdmin }: FooterProps) {
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="pt-5 md:pt-6 border-t border-[#335C33]/10 text-[10px] md:text-xs text-[#2C2E2B]/60 flex flex-col md:flex-row justify-between items-center gap-2 md:gap-0">
+        {/* Copyright & Slogan (Centered in 2 lines: copyright top, slogan bottom) */}
+        <div className="pt-5 md:pt-6 border-t border-[#335C33]/10 text-[10px] md:text-xs text-[#2C2E2B]/60 flex flex-col items-center justify-center text-center gap-1.5">
           <p>{t('footerCopyright')}</p>
-          <div className="flex items-center gap-1 text-[#8C5A35]">
+          <div className="flex items-center justify-center gap-1 text-[#8C5A35]">
             <span>{t('footerSlogan')}</span>
             <Heart className="w-3 h-3 md:w-3.5 md:h-3.5 text-[#335C33] fill-current" />
           </div>

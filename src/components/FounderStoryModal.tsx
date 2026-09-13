@@ -113,7 +113,7 @@ export function FounderStoryModal({ isOpen, onClose }: FounderStoryModalProps) {
                 </div>
                 <p className="text-sm md:text-base text-stone-700 pl-9.5">
                   {isVi
-                    ? 'Lớn lên tại mảnh đất Tây Nguyên, gắn bó sâu sắc với nhịp sống của những gia đình canh tác cà phê, Quỳnh Chi luôn trăn trở trước một nghịch lý: phần lớn giá trị kinh tế của chuỗi sản xuất không nằm lại ở nơi tạo ra nguyên liệu thô. Mỗi mùa thu hoạch, hàng nghìn tấn vỏ quả cà phê bị bỏ lại — chất đống, đốt bỏ, gây ô nhiễm và dần trôi vào quên lãng.'
+                    ? 'Lớn lên tại mảnh đất Tây Nguyên, gắn bó sâu sắc với nhịp sống của những gia đình canh tác cà phê, Quỳnh Chi luôn trăn trở trước một nghịch lý: phần lớn giá trị kinh tế của chuỗi sản xuất không nằm lại ở nơi tạo ra nguyên liệu thô. Mỗi mùa thu hoạch, hàng nghìn tấn vỏ quả cà phê bị bỏ lại - chất đống, đốt bỏ, gây ô nhiễm và dần trôi vào quên lãng.'
                     : 'Growing up in the heart of Vietnam’s coffee highlands and closely observing local farming families, Quynh Chi was constantly moved by a striking paradox: the majority of supply chain value never remains in the region producing raw materials. Each harvest season, thousands of tons of nutrient-rich coffee husks are discarded, burned, or left to rot.'}
                 </p>
               </div>
@@ -124,15 +124,15 @@ export function FounderStoryModal({ isOpen, onClose }: FounderStoryModalProps) {
                   <div className="w-7 h-7 rounded-lg bg-[#335C33]/10 flex items-center justify-center shrink-0">
                     <BookOpen className="w-4 h-4 text-[#335C33]" />
                   </div>
-                  <h4>{isVi ? '2. Nền tảng học thuật: Dự án C4F & Truy xuất QR' : '2. Academic Grounding: C4F & Traceability'}</h4>
+                  <h4>{isVi ? '2. Nền tảng học thuật & Các nghiên cứu chuyên sâu' : '2. Academic Grounding & Core Research'}</h4>
                 </div>
                 <div className="pl-9.5 space-y-2 text-sm md:text-base text-stone-700">
                   <p>
                     {isVi
-                      ? 'Để tìm câu trả lời mang tính hệ thống, Quỳnh Chi lựa chọn con đường nghiên cứu kinh tế:'
-                      : 'To seek systemic answers, Quynh Chi delved into economic and supply chain research:'}
+                      ? 'Để tìm câu trả lời mang tính hệ thống, Quỳnh Chi lựa chọn con đường nghiên cứu kinh tế và phát triển bền vững:'
+                      : 'To seek systemic answers, Quynh Chi delved into development economics and sustainable value chains:'}
                   </p>
-                  <ul className="space-y-2 list-none pt-1">
+                  <ul className="space-y-2.5 list-none pt-1">
                     <li className="flex items-start gap-2 p-3 rounded-xl bg-stone-100/70 border border-stone-200/60">
                       <span className="text-[#335C33] font-bold shrink-0">•</span>
                       <span>
@@ -155,6 +155,17 @@ export function FounderStoryModal({ isOpen, onClose }: FounderStoryModalProps) {
                           : 'Conducted field research in Dak Lak on transparency and rebuilding trust between conscious consumers and indigenous growers.'}
                       </span>
                     </li>
+                    <li className="flex items-start gap-2 p-3 rounded-xl bg-stone-100/70 border border-stone-200/60">
+                      <span className="text-[#335C33] font-bold shrink-0">•</span>
+                      <span>
+                        <strong className="text-[#335C33]">
+                          {isVi ? 'Nghiên cứu Nhận thức PTBV & Hướng nghiệp ngành Cà phê (2024–2025):' : 'ESD & Sustainable Coffee Career Orientation (2024–2025):'}
+                        </strong>{' '}
+                        {isVi
+                          ? 'Khảo sát 200 học sinh THPT tại Đắk Lắk, chỉ ra 80% học sinh ở mức nhận thức PTBV trung bình hoặc thấp (nông thôn chiếm 47%). Bằng mô hình hồi quy Binary Logistic (p < 0,001), nghiên cứu chứng minh nhận thức PTBV có tác động trực tiếp thúc đẩy xu hướng chọn nghề nghiệp xanh; từ đó kiến nghị chuyển giao giáo dục PTBV sang phát triển năng lực hành động gắn với chuỗi cà phê bản địa (chế biến sâu, thích ứng khí hậu và liên kết bền vững).'
+                          : 'Surveyed 200 high school seniors in Dak Lak, revealing 80% held moderate-to-low sustainability awareness (47% in rural areas). Using Binary Logistic regression (p < 0.001), the study proved that ESD awareness strongly drives green career choices, advocating for action-oriented education tailored to Dak Lak’s deep-processing and climate-resilient coffee value chain.'}
+                      </span>
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -169,8 +180,8 @@ export function FounderStoryModal({ isOpen, onClose }: FounderStoryModalProps) {
                 </div>
                 <p className="text-sm md:text-base text-stone-700 pl-9.5">
                   {isVi
-                    ? 'Sự giao thoa giữa hai đề tài nghiên cứu đã mở ra hướng đi rõ ràng: Thay vì dừng lại ở các bài báo học thuật, Quỳnh Chi chọn bắt đầu bằng hành động cụ thể từ điểm nhỏ nhất — tái chế phụ phẩm vỏ cà phê tại chính quê hương. CAFLOOP ra đời để hiện thực hóa triết lý: “From Husk To Hope” — biến thứ tưởng như phế bỏ thành trà Cascara thượng hạng, túi thơm thảo mộc và quà tặng thổ cẩm dệt tay của phụ nữ Ê Đê, qua đó gây quỹ giáo dục thiết thực cho học sinh vùng cao.'
-                    : 'The intersection of both research streams led to a decisive conclusion: rather than confining solutions to academic papers, Quynh Chi chose tangible grassroots action. CAFLOOP was born to manifest the philosophy “From Husk To Hope” — turning coffee waste into gourmet Cascara tea, herbal sachets, and handcrafted Ê Đê textiles, directly funding educational resources for highland children.'}
+                    ? 'Sự giao thoa giữa các đề tài nghiên cứu đã mở ra hướng đi rõ ràng: Thay vì dừng lại ở các bài báo học thuật, Quỳnh Chi chọn bắt đầu bằng hành động cụ thể từ điểm nhỏ nhất - tái chế phụ phẩm vỏ cà phê tại chính quê hương. CAFLOOP ra đời để hiện thực hóa triết lý: “From Husk To Hope” - biến thứ tưởng như phế bỏ thành trà Cascara thượng hạng, túi thơm thảo mộc và quà tặng thổ cẩm dệt tay của phụ nữ Ê Đê, qua đó gây quỹ giáo dục thiết thực cho học sinh vùng cao.'
+                    : 'The intersection of these research streams led to a decisive conclusion: rather than confining solutions to academic papers, Quynh Chi chose tangible grassroots action. CAFLOOP was born to manifest the philosophy “From Husk To Hope” — turning coffee waste into gourmet Cascara tea, herbal sachets, and handcrafted Ê Đê textiles, directly funding educational resources for highland children.'}
                 </p>
               </div>
 
@@ -182,7 +193,7 @@ export function FounderStoryModal({ isOpen, onClose }: FounderStoryModalProps) {
                     : '“CAFLOOP is not just a startup, but a living answer to the question that accompanied me ever since I left the highlands.”'}
                 </p>
                 <span className="block text-xs font-bold uppercase tracking-wider text-stone-600 mt-2">
-                  — Phan Hoàng Quỳnh Chi
+                  - Phan Hoàng Quỳnh Chi
                 </span>
               </div>
             </div>

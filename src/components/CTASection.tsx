@@ -83,7 +83,7 @@ export function CTASection({ onOpenOrder, onOpenDonate }: CTASectionProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
           transition={{ duration: 0.5, delay: 0.08, ease: EASE_NATURAL }}
-          className="section-subtitle leading-relaxed mb-8 md:mb-10 px-2 max-w-xl mx-auto"
+          className="section-subtitle leading-relaxed mb-8 md:mb-10 px-2 max-w-3xl mx-auto md:whitespace-nowrap"
         >
           {t('ctaDesc')}
         </motion.p>

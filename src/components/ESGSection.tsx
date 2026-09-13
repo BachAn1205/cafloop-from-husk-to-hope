@@ -55,13 +55,10 @@ export function ESGSection() {
             <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-[#335C33]/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform duration-500" />
             
             <div>
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4">
                 <div className="w-11 h-11 rounded-xl bg-[#335C33] text-[#F6F6EE] flex items-center justify-center shadow-xs">
                   <Recycle className="w-5 h-5 text-[#E3EDD3]" />
                 </div>
-                <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-[#335C33] bg-[#F6F6EE]/90 px-2.5 py-1 rounded-full border border-[#335C33]/10">
-                  {language === 'vi' ? 'Môi Trường' : 'Environment'}
-                </span>
               </div>
 
               <p className="text-xs md:text-sm font-bold text-[#335C33] leading-snug mb-2">
@@ -95,13 +92,10 @@ export function ESGSection() {
             <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-[#335C33]/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform duration-500" />
 
             <div>
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4">
                 <div className="w-11 h-11 rounded-xl bg-[#335C33] text-[#F6F6EE] flex items-center justify-center shadow-xs">
                   <Sprout className="w-5 h-5 text-[#E3EDD3]" />
                 </div>
-                <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-[#335C33] bg-[#F6F6EE]/90 px-2.5 py-1 rounded-full border border-[#335C33]/10">
-                  ESG 2026
-                </span>
               </div>
 
               <p className="text-xs md:text-sm font-bold text-[#335C33] leading-snug mb-2">
@@ -135,13 +129,10 @@ export function ESGSection() {
             <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-[#335C33]/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform duration-500" />
 
             <div>
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4">
                 <div className="w-11 h-11 rounded-xl bg-[#335C33] text-[#F6F6EE] flex items-center justify-center shadow-xs">
                   <Sparkles className="w-5 h-5 text-[#E3EDD3]" />
                 </div>
-                <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-[#335C33] bg-[#F6F6EE]/90 px-2.5 py-1 rounded-full border border-[#335C33]/10">
-                  {language === 'vi' ? 'Khí Thải' : 'Carbon'}
-                </span>
               </div>
 
               <p className="text-xs md:text-sm font-bold text-[#335C33] leading-snug mb-2">
@@ -175,13 +166,10 @@ export function ESGSection() {
             <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-[#8C5A35]/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform duration-500" />
             
             <div>
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4">
                 <div className="w-11 h-11 rounded-xl bg-[#8C5A35] text-[#F6F6EE] flex items-center justify-center shadow-xs">
                   <Clock className="w-5 h-5 text-[#E3EDD3]" />
                 </div>
-                <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-[#8C5A35] bg-[#F6F6EE]/90 px-2.5 py-1 rounded-full border border-[#8C5A35]/15">
-                  {language === 'vi' ? 'Kết Quả (Outcome)' : 'Outcome'}
-                </span>
               </div>
 
               <p className="text-xs md:text-sm font-bold text-[#335C33] leading-snug mb-2">
@@ -217,13 +205,10 @@ export function ESGSection() {
             <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-[#8C5A35]/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform duration-500" />
             
             <div>
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4">
                 <div className="w-11 h-11 rounded-xl bg-[#8C5A35] text-[#F6F6EE] flex items-center justify-center shadow-xs">
                   <QrCode className="w-5 h-5 text-[#E3EDD3]" />
                 </div>
-                <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-[#8C5A35] bg-[#F6F6EE]/90 px-2.5 py-1 rounded-full border border-[#8C5A35]/15">
-                  {language === 'vi' ? 'Truy Xuất QR' : 'QR Scan'}
-                </span>
               </div>
 
               <p className="text-xs md:text-sm font-bold text-[#335C33] leading-snug mb-2">
@@ -259,13 +244,10 @@ export function ESGSection() {
             <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-[#8C5A35]/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform duration-500" />
             
             <div>
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4">
                 <div className="w-11 h-11 rounded-xl bg-[#8C5A35] text-[#F6F6EE] flex items-center justify-center shadow-xs">
                   <Users className="w-5 h-5 text-[#E3EDD3]" />
                 </div>
-                <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-[#8C5A35] bg-[#F6F6EE]/90 px-2.5 py-1 rounded-full border border-[#8C5A35]/15">
-                  {language === 'vi' ? 'Sinh Kế' : 'Community'}
-                </span>
               </div>
 
               <p className="text-xs md:text-sm font-bold text-[#335C33] leading-snug mb-2">
@@ -298,14 +280,11 @@ export function ESGSection() {
           transition={{ duration: 0.5, delay: 0.28, ease: EASE_NATURAL }}
           className="bg-[#F6F6EE] border border-[#335C33]/20 rounded-2xl md:rounded-3xl p-5 md:p-8 shadow-sm"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 md:mb-8 pb-4 border-b border-[#335C33]/15">
+          <div className="mb-6 md:mb-8 pb-4 border-b border-[#335C33]/15">
             <h3 className="text-base md:text-xl font-bold text-[#335C33] font-serif flex items-center gap-2">
               <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-[#8C5A35]" />
               {t('esgCycleTitle')}
             </h3>
-            <span className="self-start sm:self-auto text-xs md:text-sm font-semibold text-[#8C5A35] px-3.5 py-1 bg-[#E3EDD3] rounded-full border border-[#335C33]/10">
-              {t('esgCycleZeroWaste')}
-            </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 text-center">
