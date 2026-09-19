@@ -114,11 +114,17 @@ export async function checkPaymentReceived(
   for (const tx of transactions) {
     const amountIn = parseFloat(tx.amount_in || '0');
 
-    // 1. Chặn Replay Attack: Chỉ xét giao dịch sau thời điểm tạo mã QR (cho phép trễ 30s)
-    if (afterTime) {
-      const txTime = new Date(tx.transaction_date);
-      const buffer = new Date(afterTime.getTime() - 30 * 1000);
-      if (txTime < buffer) continue;
+    // 1. Chặn Replay Attack: Xét giao dịch trong phiên QR (cho phép trễ 15 phút do chênh lệch giờ ngân hàng/SePay)
+    if (afterTime && tx.transaction_date) {
+      // Chuẩn hoá định dạng ngày GMT+7 của SePay (YYYY-MM-DD HH:mm:ss -> YYYY-MM-DDTHH:mm:ss+07:00)
+      const dateStr = tx.transaction_date.includes('T')
+        ? tx.transaction_date
+        : tx.transaction_date.replace(' ', 'T') + '+07:00';
+      const txTime = new Date(dateStr);
+      if (!isNaN(txTime.getTime())) {
+        const buffer = new Date(afterTime.getTime() - 15 * 60 * 1000);
+        if (txTime < buffer) continue;
+      }
     }
 
     // 2. Chống chuyển thiếu tiền (Partial payment tampering): amount_in phải >= expectedAmount
