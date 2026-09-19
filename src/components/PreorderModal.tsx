@@ -12,7 +12,23 @@ interface PreorderModalProps {
   onClose: () => void;
 }
 
+/**
+ * Tạo/lấy Session ID ẩn danh (per-browser-session) để tách địa chỉ của từng người dùng.
+ * Dùng sessionStorage để ID tự hết hạn khi đóng tab, tránh dữ liệu stale lâu dài.
+ */
+function getSessionId(): string {
+  const key = 'cafloop_session_id';
+  let id = sessionStorage.getItem(key);
+  if (!id) {
+    id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    sessionStorage.setItem(key, id);
+  }
+  return id;
+}
+
 export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
+  // Key localStorage riêng biệt cho từng phiên trình duyệt (tránh chia sẻ địa chỉ giữa người dùng khác nhau)
+  const addressKey = `cafloop_saved_addresses_${getSessionId()}`;
   // Products list from database
   const [productsList, setProductsList] = useState<ProductItem[]>(PRODUCTS_LIST);
 
@@ -32,10 +48,10 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
     });
   }, [isOpen]);
 
-  // Address management state
+  // Address management state — scoped to current session ID
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>(() => {
     try {
-      const stored = localStorage.getItem('cafloop_saved_addresses');
+      const stored = localStorage.getItem(addressKey);
       return stored ? JSON.parse(stored) : [];
     } catch {
       return [];
@@ -44,7 +60,7 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
 
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(() => {
     try {
-      const stored = localStorage.getItem('cafloop_saved_addresses');
+      const stored = localStorage.getItem(addressKey);
       if (stored) {
         const arr = JSON.parse(stored);
         if (arr.length > 0) return arr[0].id;
@@ -126,14 +142,14 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
   const ACCOUNT_NO = '0972582580';
   const ACCOUNT_NAME = 'PHAN HOANG QUYNH CHI';
 
-  // Save addresses to localStorage
+  // Save addresses to localStorage (scoped to session)
   useEffect(() => {
     try {
-      localStorage.setItem('cafloop_saved_addresses', JSON.stringify(savedAddresses));
+      localStorage.setItem(addressKey, JSON.stringify(savedAddresses));
     } catch (e) {
       console.error('Failed to save addresses to localStorage', e);
     }
-  }, [savedAddresses]);
+  }, [savedAddresses, addressKey]);
 
   // Derived totals
   const totalItemsCount = Object.values(cart).reduce((a, b) => a + b, 0);
