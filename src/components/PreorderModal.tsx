@@ -13,22 +13,26 @@ interface PreorderModalProps {
 }
 
 /**
- * Tạo/lấy Session ID ẩn danh (per-browser-session) để tách địa chỉ của từng người dùng.
- * Dùng sessionStorage để ID tự hết hạn khi đóng tab, tránh dữ liệu stale lâu dài.
+ * Tạo/lấy Device ID ẩn danh cố định (per-browser) để tách địa chỉ của từng người dùng.
+ * - Cùng trình duyệt, mở lại web: vẫn giữ địa chỉ cũ (đã lưu trong localStorage).
+ * - Khác trình duyệt / thiết bị: tự động tạo ID mới, địa chỉ riêng biệt.
+ * - Nếu chia sẻ thiết bị, người dùng có thể bấm "Xóa dữ liệu của tôi" để reset.
  */
-function getSessionId(): string {
-  const key = 'cafloop_session_id';
-  let id = sessionStorage.getItem(key);
+function getDeviceId(): string {
+  const key = 'cafloop_device_id';
+  let id = localStorage.getItem(key);
   if (!id) {
     id = Math.random().toString(36).slice(2) + Date.now().toString(36);
-    sessionStorage.setItem(key, id);
+    localStorage.setItem(key, id);
   }
   return id;
 }
 
 export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
-  // Key localStorage riêng biệt cho từng phiên trình duyệt (tránh chia sẻ địa chỉ giữa người dùng khác nhau)
-  const addressKey = `cafloop_saved_addresses_${getSessionId()}`;
+  // Key localStorage riêng biệt cho từng thiết bị/trình duyệt
+  // Cùng người, mở lại lần sau vẫn thấy địa chỉ cũ. Khác browser/thiết bị thì tách hoàn toàn.
+  const deviceId = getDeviceId();
+  const addressKey = `cafloop_saved_addresses_${deviceId}`;
   // Products list from database
   const [productsList, setProductsList] = useState<ProductItem[]>(PRODUCTS_LIST);
 
@@ -634,6 +638,24 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                           </div>
                         ) : (
                           <div className="space-y-2 max-h-40 md:max-h-44 overflow-y-auto pr-1 overscroll-contain transform-gpu [will-change:scroll-position]">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (window.confirm(
+                                  language === 'vi'
+                                    ? 'Xóa toàn bộ địa chỉ đã lưu và đặt lại thiết bị? Bạn sẽ phải nhập lại lần sau.'
+                                    : 'Delete all saved addresses and reset device? You will need to re-enter next time.'
+                                )) {
+                                  localStorage.removeItem('cafloop_device_id');
+                                  localStorage.removeItem(addressKey);
+                                  setSavedAddresses([]);
+                                  setSelectedAddressId(null);
+                                }
+                              }}
+                              className="text-[10px] text-[#2C2E2B]/40 hover:text-red-500 transition-colors w-full text-right mb-0.5"
+                            >
+                              {language === 'vi' ? '⚠️ Không phải bạn? Xóa dữ liệu' : '⚠️ Not you? Clear data'}
+                            </button>
                             {savedAddresses.map((addr) => {
                               const isSelected = addr.id === selectedAddressId;
                               return (
