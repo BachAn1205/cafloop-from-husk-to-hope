@@ -31,8 +31,8 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
 
   // MOCK BANK INFO
   const BANK_ID = 'mbbank';
-  const ACCOUNT_NO = '2666627122005';
-  const ACCOUNT_NAME = 'BACH KHANH AN';
+  const ACCOUNT_NO = '0972582580';
+  const ACCOUNT_NAME = 'PHAN HOANG QUYNH CHI';
 
   const quickAmounts = [50000, 100000, 200000, 500000];
 
@@ -173,7 +173,7 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
   };
 
   const rawAmount = amount ? parseInt(amount.replace(/\D/g, ''), 10) : 0;
-  
+
   // VietQR URL Generate với mã độc bản (qr_only template removes top logo & bottom footer)
   const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-qr_only.png?amount=${rawAmount}&addInfo=${encodeURIComponent(
     donationCode
@@ -184,8 +184,8 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
     countdown < 60
       ? 'text-white border-red-600 bg-red-600'
       : countdown < 120
-      ? 'text-white border-amber-600 bg-amber-600'
-      : 'text-[#F6F6EE] border-[#335C33] bg-[#335C33]';
+        ? 'text-white border-amber-600 bg-amber-600'
+        : 'text-[#F6F6EE] border-[#335C33] bg-[#335C33]';
 
   if (!isOpen) return null;
 
@@ -234,11 +234,11 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
                 {language === 'vi' ? 'Cảm ơn bạn!' : 'Thank you!'}
               </h3>
               <p className="text-xs md:text-sm text-[#2C2E2B]/80 leading-relaxed mb-6 px-2">
-                {language === 'vi' 
+                {language === 'vi'
                   ? 'Số tiền quyên góp của bạn sẽ được chuyển thành học bổng và trang thiết bị cho các em học sinh vùng cao.'
                   : 'Your donation will be transformed into scholarships and equipment for students in the highlands.'}
               </p>
-              
+
               <button
                 onClick={handleReset}
                 className="w-full py-3.5 md:py-4 rounded-xl md:rounded-2xl bg-[#335C33] text-[#F6F6EE] font-semibold text-xs md:text-sm hover:bg-[#284828] transition-colors cursor-pointer shadow-md"
@@ -310,8 +310,8 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
                   {expired
                     ? (language === 'vi' ? 'Phiên đã hết hạn' : 'Session expired')
                     : (language === 'vi'
-                        ? `Mã QR hết hạn sau ${formatCountdown(countdown)}`
-                        : `QR expires in ${formatCountdown(countdown)}`)}
+                      ? `Mã QR hết hạn sau ${formatCountdown(countdown)}`
+                      : `QR expires in ${formatCountdown(countdown)}`)}
                 </span>
               </div>
 

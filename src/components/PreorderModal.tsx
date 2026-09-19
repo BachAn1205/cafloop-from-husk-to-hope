@@ -123,8 +123,8 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
 
   // MOCK BANK INFO
   const BANK_ID = 'mbbank';
-  const ACCOUNT_NO = '2666627122005';
-  const ACCOUNT_NAME = 'BACH KHANH AN';
+  const ACCOUNT_NO = '0972582580';
+  const ACCOUNT_NAME = 'PHAN HOANG QUYNH CHI';
 
   // Save addresses to localStorage
   useEffect(() => {

@@ -364,7 +364,7 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                         <p className="text-xl md:text-2xl font-bold text-emerald-800 font-mono">
                           {sepayTxs.length}
                         </p>
-                        <span className="text-[11px] text-[#2C2E2B]/60 mt-1 block">MB Bank 2666627122005</span>
+                        <span className="text-[11px] text-[#2C2E2B]/60 mt-1 block">MB Bank 0972582580</span>
                       </div>
                     </div>
 
