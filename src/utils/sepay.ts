@@ -111,6 +111,8 @@ export async function checkPaymentReceived(
   const cleanCode = paymentCode.trim().toUpperCase();
   const codeRegex = new RegExp(`\\b${cleanCode}\\b`, 'i');
 
+  console.log(`[SePay Check] Đang tìm mã: ${cleanCode} | Cần >= ${expectedAmount}đ | Tổng GD nhận được: ${transactions.length}`);
+
   for (const tx of transactions) {
     const amountIn = parseFloat(tx.amount_in || '0');
 
@@ -123,12 +125,16 @@ export async function checkPaymentReceived(
       const txTime = new Date(dateStr);
       if (!isNaN(txTime.getTime())) {
         const buffer = new Date(afterTime.getTime() - 15 * 60 * 1000);
-        if (txTime < buffer) continue;
+        if (txTime < buffer) {
+          console.log(`[SePay Check] ⏩ Bỏ qua GD ${tx.id} (quá cũ: ${tx.transaction_date})`);
+          continue;
+        }
       }
     }
 
     // 2. Chống chuyển thiếu tiền (Partial payment tampering): amount_in phải >= expectedAmount
     if (amountIn < expectedAmount) {
+      console.log(`[SePay Check] ⏩ Bỏ qua GD ${tx.id} (tiền thiếu: ${amountIn} < ${expectedAmount})`);
       continue;
     }
 
@@ -138,11 +144,15 @@ export async function checkPaymentReceived(
 
     const isCodeMatched = codeRegex.test(content) || codeRegex.test(txCode) || content.includes(cleanCode);
 
+    console.log(`[SePay Check] GD ${tx.id} | content: "${tx.transaction_content}" | code matched: ${isCodeMatched}`);
+
     if (isCodeMatched) {
+      console.log(`[SePay Check] ✅ KHỚP! GD ${tx.id} - ${amountIn}đ - "${tx.transaction_content}"`);
       return tx;
     }
   }
 
+  console.log(`[SePay Check] ❌ Chưa tìm thấy giao dịch khớp mã ${cleanCode}`);
   return null;
 }
 

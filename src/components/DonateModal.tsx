@@ -39,8 +39,8 @@ export function DonateModal({ isOpen, onClose }: DonateModalProps) {
   const handleNext = (e: FormEvent) => {
     e.preventDefault();
     const numericAmount = amount ? parseInt(amount.replace(/\D/g, ''), 10) : 0;
-    if (!numericAmount || numericAmount < 5000) {
-      alert(language === 'vi' ? 'Vui lòng nhập số tiền hợp lệ (tối thiểu 5.000đ)' : 'Please enter a valid amount (min 5,000 VND)');
+    if (!numericAmount || numericAmount < 2000) {
+      alert(language === 'vi' ? 'Vui lòng nhập số tiền hợp lệ (tối thiểu 2.000đ)' : 'Please enter a valid amount (min 2,000 VND)');
       return;
     }
     const cleanPhone = phone.replace(/\D/g, '');
