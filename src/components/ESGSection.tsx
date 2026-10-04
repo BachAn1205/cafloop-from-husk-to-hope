@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Recycle, Clock, QrCode, Users, TrendingUp, Sparkles, RefreshCw, Sun, Sprout } from 'lucide-react';
+import { Recycle, Clock, QrCode, Users, TrendingUp, Sparkles, Sun, Sprout } from 'lucide-react';
 import { AnimatedCounter } from './AnimatedCounter';
 import { useLanguage } from '../utils/LanguageContext';
 import { getQRScanCount } from '../utils/visitorTracker';
@@ -27,10 +27,6 @@ export function ESGSection() {
           transition={{ duration: 0.5, ease: EASE_NATURAL }}
           className="text-center mb-10 md:mb-14"
         >
-          <div className="section-badge mb-3 md:mb-4">
-            <RefreshCw className="text-[#8C5A35]" />
-            <span>{t('esgBadge')}</span>
-          </div>
           <h2 id="esg-section-title" className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#335C33] font-serif tracking-tight">
             {t('esgTitle')}
           </h2>

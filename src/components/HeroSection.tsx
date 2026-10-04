@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Music, ArrowDown, HeartHandshake, Coffee, Leaf } from 'lucide-react';
+import { Music, ArrowDown, HeartHandshake, Coffee } from 'lucide-react';
 import { trungAudio } from '../utils/audio';
 import { useLanguage } from '../utils/LanguageContext';
 import heroBgMobile from '../../assets/image/h.jpg';
@@ -59,17 +59,6 @@ export function HeroSection({ onExploreClick, onOpenOrder }: HeroSectionProps) {
           {/* Left Column: Text & Actions */}
           <div className="md:col-span-7 lg:col-span-6 flex flex-col justify-center">
             
-            {/* Tag / Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: EASE_NATURAL }}
-              className="section-badge self-start mb-4 md:mb-6"
-            >
-              <Leaf className="text-[#335C33]" />
-              <span>{t('heroBadge')}</span>
-            </motion.div>
-
             {/* Main Headline H1 — Lora via font-serif class */}
             <motion.h1
               id="hero-main-heading"

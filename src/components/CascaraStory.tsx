@@ -198,9 +198,6 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
                       />
                     </div>
                     <div>
-                      <span className="inline-block text-[10px] md:text-xs font-bold uppercase tracking-wider text-[#8C5A35] bg-[#E3EDD3] px-2.5 md:px-3 py-1 rounded-md mb-1.5 md:mb-2">
-                        {activeProduct.badge}
-                      </span>
                       <h3 className="text-lg md:text-xl font-bold text-[#335C33] leading-snug">
                         {activeProduct.title}
                       </h3>

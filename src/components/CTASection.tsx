@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Share2, Copy, Check, Heart } from 'lucide-react';
+import { Copy, Check, Heart } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useLanguage } from '../utils/LanguageContext';
 
@@ -66,10 +66,6 @@ export function CTASection({ onOpenOrder, onOpenDonate }: CTASectionProps) {
           transition={{ duration: 0.5, ease: EASE_NATURAL }}
           className="mb-5 md:mb-6"
         >
-          <div className="section-badge mb-3 md:mb-4">
-            <Share2 className="text-[#8C5A35]" />
-            <span>{t('ctaBadge')}</span>
-          </div>
 
           <h2 id="cta-section-title" className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#335C33] font-serif tracking-tight">
             {t('ctaTitle')}

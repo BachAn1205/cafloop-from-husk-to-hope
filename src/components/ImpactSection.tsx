@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { motion, useInView } from 'motion/react';
-import { Bike, Tv, Heart, MapPin, CheckCircle2, Sparkles, Award, CalendarCheck } from 'lucide-react';
+import { Bike, Tv, MapPin, CheckCircle2, Sparkles, Award, CalendarCheck } from 'lucide-react';
 import YouTube from 'react-youtube';
 import { AnimatedCounter } from './AnimatedCounter';
 import { useLanguage } from '../utils/LanguageContext';
@@ -38,10 +38,6 @@ export function ImpactSection() {
           transition={{ duration: 0.5, ease: EASE_NATURAL }}
           className="text-center mb-8 md:mb-12"
         >
-          <div className="section-badge mb-3 md:mb-4">
-            <Heart className="text-[#8C5A35] fill-[#8C5A35]/20" />
-            <span>{t('impactBadge')}</span>
-          </div>
           <h2 id="impact-section-title" className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#335C33] font-serif tracking-tight">
             {t('impactTitle')}
           </h2>

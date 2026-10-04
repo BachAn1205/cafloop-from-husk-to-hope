@@ -70,6 +70,8 @@ type TranslationKeys =
   | 'storyHighlight1Desc'
   | 'storyHighlight2Title'
   | 'storyHighlight2Desc'
+  | 'storyHighlight3Title'
+  | 'storyHighlight3Desc'
   | 'storyBtnDonate'
   | 'storyProd2Badge'
   | 'storyProd2Title'

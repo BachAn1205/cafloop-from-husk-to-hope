@@ -9,7 +9,6 @@ import {
   Users,
   Sprout,
   ArrowRight,
-  Sparkles,
   BookOpen
 } from 'lucide-react';
 import { useLanguage } from '../utils/LanguageContext';
@@ -83,16 +82,6 @@ export function BrandStorySection() {
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="section-badge mb-3 md:mb-4"
-          >
-            <Sparkles className="text-[#8C5A35]" />
-            <span>{t('brandStoryBadge')}</span>
-          </motion.div>
 
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -130,10 +119,7 @@ export function BrandStorySection() {
                 <Compass className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#8C5A35]">
-                  {language === 'vi' ? 'Định hướng tương lai' : 'Future Direction'}
-                </span>
-                <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[#335C33] mt-1">
+                <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[#335C33]">
                   {t('visionTitle')}
                 </h3>
               </div>
@@ -164,10 +150,7 @@ export function BrandStorySection() {
                 <Target className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#E3EDD3]/80">
-                  {language === 'vi' ? 'Hành động mỗi ngày' : 'Daily Commitment'}
-                </span>
-                <h3 className="text-2xl sm:text-3xl font-serif font-bold text-white mt-1">
+                <h3 className="text-2xl sm:text-3xl font-serif font-bold text-white">
                   {t('missionTitle')}
                 </h3>
               </div>
@@ -266,10 +249,6 @@ export function BrandStorySection() {
               
               {/* Badge & Title */}
               <div>
-                <span className="section-badge mb-2.5">
-                  <Sparkles className="text-[#8C5A35]" />
-                  <span>{t('founderBadge')}</span>
-                </span>
                 <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[#335C33]">
                   {t('founderName')}
                 </h3>
