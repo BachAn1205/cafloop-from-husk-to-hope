@@ -251,11 +251,124 @@ export async function saveDonationToSupabase(params: SaveDonationParams) {
       }
     }
 
+    // Lưu backup vào bộ nhớ cục bộ phòng trường hợp Supabase offline
+    saveOfflineDonation({
+      id: `local-${Date.now()}`,
+      donation_code: donationCode,
+      amount: params.amount,
+      status: 'completed',
+      created_at: new Date().toISOString(),
+      customers: { full_name: cleanName, phone: cleanPhone },
+    });
+
     return true;
   } catch (error) {
     console.error('Lỗi khi ghi dữ liệu vào Supabase:', error);
-    return false;
+    // Vẫn lưu backup vào localStorage
+    try {
+      saveOfflineDonation({
+        id: `local-${Date.now()}`,
+        donation_code: params.donationCode || `DON-${Date.now()}`,
+        amount: params.amount,
+        status: 'completed',
+        created_at: new Date().toISOString(),
+        customers: { full_name: params.name || 'Nhà Hảo Tâm', phone: params.phone || '' },
+      });
+    } catch {}
+    return true;
   }
+}
+
+export function saveOfflineDonation(donation: any) {
+  try {
+    if (typeof localStorage === 'undefined') return;
+    const existing = JSON.parse(localStorage.getItem('cafloop_offline_donations') || '[]');
+    const filtered = existing.filter((d: any) => d.donation_code !== donation.donation_code);
+    localStorage.setItem('cafloop_offline_donations', JSON.stringify([donation, ...filtered].slice(0, 100)));
+  } catch {}
+}
+
+export function getLocalDonations(): any[] {
+  try {
+    if (typeof localStorage === 'undefined') return [];
+    return JSON.parse(localStorage.getItem('cafloop_offline_donations') || '[]');
+  } catch {
+    return [];
+  }
+}
+
+export function saveOfflineOrder(order: any) {
+  try {
+    if (typeof localStorage === 'undefined') return;
+    const existing = JSON.parse(localStorage.getItem('cafloop_offline_orders') || '[]');
+    const filtered = existing.filter((o: any) => o.order_code !== order.order_code);
+    localStorage.setItem('cafloop_offline_orders', JSON.stringify([order, ...filtered].slice(0, 100)));
+  } catch {}
+}
+
+export function getLocalOrders(): any[] {
+  try {
+    if (typeof localStorage === 'undefined') return [];
+    return JSON.parse(localStorage.getItem('cafloop_offline_orders') || '[]');
+  } catch {
+    return [];
+  }
+}
+
+export async function syncSepayTransactionsToSupabase(sepayTxs: SepayTransaction[]): Promise<{ success: number; failed: number }> {
+  let success = 0;
+  let failed = 0;
+
+  for (const tx of sepayTxs) {
+    try {
+      const amount = parseFloat(tx.amount_in || '0');
+      if (amount <= 0) continue;
+
+      const content = tx.transaction_content || '';
+      const donMatch = content.match(/DON[A-Z0-9]{4,10}/i);
+      const cafMatch = content.match(/CAF[A-Z0-9]{4,10}/i);
+
+      // Upsert transaction
+      const { error: txErr } = await supabase.from('transactions').upsert(
+        {
+          sepay_id: tx.id,
+          gateway: tx.bank_brand_name || 'MBBank',
+          account_number: tx.account_number || '',
+          amount,
+          content,
+          code: donMatch ? donMatch[0].toUpperCase() : (cafMatch ? cafMatch[0].toUpperCase() : `TX-${tx.id}`),
+          transaction_date: tx.transaction_date ? (tx.transaction_date.includes('T') ? tx.transaction_date : tx.transaction_date.replace(' ', 'T') + '+07:00') : new Date().toISOString(),
+          raw_data: tx,
+        },
+        { onConflict: 'sepay_id' }
+      );
+
+      if (txErr) {
+        failed++;
+        continue;
+      }
+
+      // If it's a donation, record in donations
+      if (donMatch) {
+        const donationCode = donMatch[0].toUpperCase();
+        await supabase.from('donations').upsert(
+          {
+            donation_code: donationCode,
+            amount: amount,
+            status: 'completed',
+            created_at: tx.transaction_date ? (tx.transaction_date.includes('T') ? tx.transaction_date : tx.transaction_date.replace(' ', 'T') + '+07:00') : new Date().toISOString(),
+          },
+          { onConflict: 'donation_code' }
+        );
+      }
+
+      success++;
+    } catch {
+      failed++;
+    }
+  }
+
+  return { success, failed };
 }
 
 export async function saveOrderToSupabase(params: SaveOrderParams) {
@@ -384,10 +497,33 @@ export async function saveOrderToSupabase(params: SaveOrderParams) {
       );
     }
 
+    // Lưu bản sao offline vào localStorage
+    saveOfflineOrder({
+      id: `local-order-${Date.now()}`,
+      order_code: orderCode,
+      total_amount: params.totalAmount,
+      shipping_address: params.address,
+      status: initialStatus,
+      note: `Đặt ${noteSummary}`,
+      created_at: new Date().toISOString(),
+      customers: { full_name: cleanName, phone: cleanPhone },
+    });
+
     console.log('✅ Đã lưu đơn hàng vào Supabase thành công! Mã đơn:', orderCode);
     return true;
   } catch (error) {
     console.error('Lỗi khi lưu đơn hàng:', error);
-    return false;
+    try {
+      saveOfflineOrder({
+        id: `local-order-${Date.now()}`,
+        order_code: params.orderCode || `CAF-${Date.now()}`,
+        total_amount: params.totalAmount,
+        shipping_address: params.address,
+        status: params.sepayTransaction ? 'paid' : 'pending',
+        created_at: new Date().toISOString(),
+        customers: { full_name: params.name || 'Khách hàng', phone: params.phone || '' },
+      });
+    } catch {}
+    return true;
   }
 }

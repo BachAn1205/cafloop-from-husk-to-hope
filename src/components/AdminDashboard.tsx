@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   X,
@@ -13,10 +13,24 @@ import {
   ShieldCheck,
   CheckCircle,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Database,
+  ArrowDownLeft,
+  ArrowUpRight,
+  Sparkles,
+  Info,
 } from 'lucide-react';
 import { supabase } from '../utils/supabase';
-import { getSepayTransactions, type SepayTransaction } from '../utils/sepay';
+import {
+  getSepayTransactions,
+  extractDonationsFromSepay,
+  type SepayTransaction,
+} from '../utils/sepay';
+import {
+  getLocalDonations,
+  getLocalOrders,
+  syncSepayTransactionsToSupabase,
+} from '../utils/supabaseDonation';
 
 interface AdminDashboardProps {
   isOpen: boolean;
@@ -70,6 +84,14 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Status states
+  const [dbStatus, setDbStatus] = useState<'connected' | 'error' | 'checking'>('checking');
+  const [dbErrorMessage, setDbErrorMessage] = useState('');
+  const [sepayStatus, setSepayStatus] = useState<'connected' | 'error' | 'checking'>('checking');
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncResultMsg, setSyncResultMsg] = useState('');
+  const [txTypeFilter, setTxTypeFilter] = useState<'in' | 'all'>('in');
+
   // Data states
   const [donations, setDonations] = useState<DonationRecord[]>([]);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
@@ -94,37 +116,90 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
     sessionStorage.removeItem('cafloop_admin_authed');
   };
 
-  // Fetch all dashboard data from Supabase & SePay
+  // Fetch all dashboard data from Supabase & SePay độc lập
   const fetchAllData = useCallback(async () => {
     setLoading(true);
+    setSyncResultMsg('');
     try {
-      // 1. Fetch Donations
-      const { data: donationsData } = await supabase
-        .from('donations')
-        .select('*, customers(full_name, phone)')
-        .order('created_at', { ascending: false });
+      // 1. Chạy song song độc lập: Lỗi ở Supabase KHÔNG làm crash việc lấy giao dịch SePay!
+      const [donationsRes, ordersRes, customersRes, sepayRes] = await Promise.allSettled([
+        supabase.from('donations').select('*, customers(full_name, phone)').order('created_at', { ascending: false }),
+        supabase.from('orders').select('*, customers(full_name, phone)').order('created_at', { ascending: false }),
+        supabase.from('customers').select('*').order('created_at', { ascending: false }),
+        getSepayTransactions({ limit: 100, transferType: 'all' }),
+      ]);
 
-      if (donationsData) setDonations(donationsData as DonationRecord[]);
+      // Xử lý dữ liệu SePay Live
+      let fetchedSepayTxs: SepayTransaction[] = [];
+      if (sepayRes.status === 'fulfilled' && Array.isArray(sepayRes.value) && sepayRes.value.length > 0) {
+        fetchedSepayTxs = sepayRes.value;
+        setSepayTxs(fetchedSepayTxs);
+        setSepayStatus('connected');
+      } else {
+        setSepayStatus(sepayRes.status === 'fulfilled' ? 'connected' : 'error');
+      }
 
-      // 2. Fetch Orders
-      const { data: ordersData } = await supabase
-        .from('orders')
-        .select('*, customers(full_name, phone)')
-        .order('created_at', { ascending: false });
+      // Xử lý dữ liệu Supabase
+      let fetchedDonations: DonationRecord[] = [];
+      let fetchedOrders: OrderRecord[] = [];
+      let fetchedCustomers: CustomerRecord[] = [];
+      let isDbOk = true;
+      let dbErr = '';
 
-      if (ordersData) setOrders(ordersData as OrderRecord[]);
+      if (donationsRes.status === 'fulfilled') {
+        if (donationsRes.value.error) {
+          isDbOk = false;
+          dbErr = donationsRes.value.error.message;
+        } else if (donationsRes.value.data) {
+          fetchedDonations = donationsRes.value.data as DonationRecord[];
+        }
+      } else {
+        isDbOk = false;
+        dbErr = donationsRes.reason?.message || 'Không thể kết nối máy chủ Supabase';
+      }
 
-      // 3. Fetch Customers
-      const { data: customersData } = await supabase
-        .from('customers')
-        .select('*')
-        .order('created_at', { ascending: false });
+      if (ordersRes.status === 'fulfilled' && !ordersRes.value.error && ordersRes.value.data) {
+        fetchedOrders = ordersRes.value.data as OrderRecord[];
+      }
+      if (customersRes.status === 'fulfilled' && !customersRes.value.error && customersRes.value.data) {
+        fetchedCustomers = customersRes.value.data as CustomerRecord[];
+      }
 
-      if (customersData) setCustomers(customersData as CustomerRecord[]);
+      setDbStatus(isDbOk ? 'connected' : 'error');
+      if (dbErr) setDbErrorMessage(dbErr);
 
-      // 4. Fetch SePay Live Transactions
-      const txs = await getSepayTransactions({ limit: 30, transferType: 'in' });
-      setSepayTxs(txs);
+      // 3. Fallback thông minh:
+      // Nếu Supabase rỗng hoặc gặp lỗi kết nối, tự động trích xuất các đơn quyên góp thực tế từ SePay Live + LocalStorage
+      const localDonations = getLocalDonations();
+      const localOrders = getLocalOrders();
+
+      if (fetchedDonations.length === 0) {
+        // Tự động suy ra quyên góp từ 10 giao dịch SePay (khớp DON...)
+        const derived = extractDonationsFromSepay(fetchedSepayTxs);
+        const merged = [...derived];
+        for (const loc of localDonations) {
+          if (!merged.some((m) => m.donation_code === loc.donation_code)) {
+            merged.push(loc);
+          }
+        }
+        setDonations(merged);
+      } else {
+        const merged = [...fetchedDonations];
+        for (const loc of localDonations) {
+          if (!merged.some((m) => m.donation_code === loc.donation_code)) {
+            merged.push(loc);
+          }
+        }
+        setDonations(merged);
+      }
+
+      if (fetchedOrders.length === 0 && localOrders.length > 0) {
+        setOrders(localOrders);
+      } else {
+        setOrders(fetchedOrders);
+      }
+
+      setCustomers(fetchedCustomers);
     } catch (err) {
       console.error('Lỗi khi tải dữ liệu Admin:', err);
     } finally {
@@ -138,6 +213,39 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
     }
   }, [isOpen, isAuthenticated, fetchAllData]);
 
+  // Đồng bộ giao dịch SePay vào Database khi người dùng bấm nút
+  const handleSyncSepay = async () => {
+    if (isSyncing || sepayTxs.length === 0) return;
+    setIsSyncing(true);
+    setSyncResultMsg('');
+    try {
+      const res = await syncSepayTransactionsToSupabase(sepayTxs);
+      setSyncResultMsg(`✅ Đã đồng bộ ${res.success} giao dịch vào Database! (${res.failed} lỗi)`);
+      fetchAllData();
+    } catch (e: any) {
+      setSyncResultMsg(`⚠️ Lỗi đồng bộ: ${e.message}`);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // Filter SePay transactions
+  const filteredSepayTxs = useMemo(() => {
+    let list = sepayTxs;
+    if (txTypeFilter === 'in') {
+      list = list.filter((t) => parseFloat(t.amount_in || '0') > 0);
+    }
+    if (!searchTerm.trim()) return list;
+    const term = searchTerm.toLowerCase();
+    return list.filter(
+      (t) =>
+        t.id.toString().includes(term) ||
+        (t.transaction_content || '').toLowerCase().includes(term) ||
+        (t.account_number || '').includes(term) ||
+        (t.code || '').toLowerCase().includes(term)
+    );
+  }, [sepayTxs, txTypeFilter, searchTerm]);
+
   if (!isOpen) return null;
 
   // Calculating stats
@@ -145,6 +253,9 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
   const totalOrderAmount = orders.reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
   const totalDonors = donations.length;
   const totalOrders = orders.length;
+
+  // Giao dịch tiền vào thực tế trên SePay
+  const sepayInCount = sepayTxs.filter((t) => parseFloat(t.amount_in || '0') > 0).length;
 
   return (
     <AnimatePresence>
@@ -266,6 +377,72 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                 </div>
               </div>
 
+              {/* Status Bar */}
+              <div className="px-4 md:px-6 py-2 bg-[#E3EDD3]/50 border-b border-[#335C33]/15 flex flex-wrap items-center justify-between text-xs gap-2">
+                <div className="flex flex-wrap items-center gap-4">
+                  {/* SePay Status */}
+                  <div className="flex items-center gap-1.5 font-medium">
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        sepayStatus === 'connected' ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'
+                      }`}
+                    />
+                    <span className="text-[#335C33]">
+                      SePay Live:{' '}
+                      <strong className="text-emerald-800">
+                        MB 0972582580 ({sepayInCount} GD tiền vào)
+                      </strong>
+                    </span>
+                  </div>
+
+                  {/* Supabase Status */}
+                  <div className="flex items-center gap-1.5 font-medium">
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        dbStatus === 'connected' ? 'bg-emerald-500' : 'bg-amber-500'
+                      }`}
+                    />
+                    <span className="text-[#335C33]">
+                      Supabase DB:{' '}
+                      <strong className={dbStatus === 'connected' ? 'text-emerald-800' : 'text-amber-800'}>
+                        {dbStatus === 'connected'
+                          ? 'Đã kết nối'
+                          : 'Đang offline / Tạm ngưng (Dùng dữ liệu SePay Live)'}
+                      </strong>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Sync Action */}
+                <div className="flex items-center gap-2">
+                  {syncResultMsg && (
+                    <span className="text-[11px] font-semibold text-[#335C33]">{syncResultMsg}</span>
+                  )}
+                  {sepayTxs.length > 0 && dbStatus === 'connected' && (
+                    <button
+                      onClick={handleSyncSepay}
+                      disabled={isSyncing}
+                      className="px-2.5 py-1 rounded-lg bg-[#335C33] hover:bg-[#284828] text-white text-[11px] font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      {isSyncing ? 'Đang đồng bộ...' : 'Đồng bộ SePay vào DB'}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Informative Alert when Supabase is not connected */}
+              {dbStatus === 'error' && (
+                <div className="px-4 md:px-6 py-2.5 bg-amber-50/90 border-b border-amber-200 text-amber-900 text-xs flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>
+                      <strong>Lưu ý:</strong> Database Supabase chưa phản hồi ({dbErrorMessage || 'Domain không hợp lệ hoặc dự án Supabase đang bị tạm ngưng trên gói Free'}). Hệ thống đang tự động <strong>hiển thị trực tiếp dữ liệu Live từ SePay</strong>!
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {/* Navigation Tabs & Search */}
               <div className="px-4 md:px-6 pt-3 bg-[#E3EDD3]/40 border-b border-[#335C33]/15 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-2">
@@ -273,7 +450,7 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                     { id: 'overview', label: 'Tổng Quan', icon: TrendingUp },
                     { id: 'donations', label: `Quyên Góp (${donations.length})`, icon: Heart },
                     { id: 'orders', label: `Đơn Trà (${orders.length})`, icon: Coffee },
-                    { id: 'transactions', label: `Ngân Hàng SePay (${sepayTxs.length})`, icon: CreditCard },
+                    { id: 'transactions', label: `Ngân Hàng SePay (${sepayInCount})`, icon: CreditCard },
                     { id: 'customers', label: `Khách Hàng (${customers.length})`, icon: Users },
                   ].map((tab) => {
                     const Icon = tab.icon;
@@ -315,6 +492,7 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                   <div className="space-y-6">
                     {/* Summary Cards Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {/* Tổng tiền quyên góp */}
                       <div className="p-4 md:p-5 rounded-2xl bg-white border border-[#335C33]/15 shadow-sm">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-semibold text-[#335C33]/70">Tổng Tiền Quyên Góp</span>
@@ -325,9 +503,12 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                         <p className="text-xl md:text-2xl font-bold text-[#8C5A35] font-mono">
                           {totalDonationAmount.toLocaleString('vi-VN')} đ
                         </p>
-                        <span className="text-[11px] text-[#2C2E2B]/60 mt-1 block">Từ {totalDonors} lượt ủng hộ</span>
+                        <span className="text-[11px] text-[#2C2E2B]/60 mt-1 block">
+                          Từ {totalDonors} lượt ủng hộ {dbStatus === 'error' ? '(Nguồn SePay)' : ''}
+                        </span>
                       </div>
 
+                      {/* Doanh thu đơn trà */}
                       <div className="p-4 md:p-5 rounded-2xl bg-white border border-[#335C33]/15 shadow-sm">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-semibold text-[#335C33]/70">Doanh Thu Đơn Trà</span>
@@ -338,9 +519,12 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                         <p className="text-xl md:text-2xl font-bold text-[#335C33] font-mono">
                           {totalOrderAmount.toLocaleString('vi-VN')} đ
                         </p>
-                        <span className="text-[11px] text-[#2C2E2B]/60 mt-1 block">Từ {totalOrders} đơn đặt hàng</span>
+                        <span className="text-[11px] text-[#2C2E2B]/60 mt-1 block">
+                          Từ {totalOrders} đơn đặt hàng
+                        </span>
                       </div>
 
+                      {/* Tổng khách hàng */}
                       <div className="p-4 md:p-5 rounded-2xl bg-white border border-[#335C33]/15 shadow-sm">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-semibold text-[#335C33]/70">Tổng Khách Hàng</span>
@@ -349,11 +533,14 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                           </div>
                         </div>
                         <p className="text-xl md:text-2xl font-bold text-[#2C2E2B] font-mono">
-                          {customers.length}
+                          {customers.length > 0 ? customers.length : totalDonors}
                         </p>
-                        <span className="text-[11px] text-[#2C2E2B]/60 mt-1 block">Đã lưu trong Supabase DB</span>
+                        <span className="text-[11px] text-[#2C2E2B]/60 mt-1 block">
+                          {customers.length > 0 ? 'Đã lưu trong Supabase DB' : 'Người ủng hộ qua SePay'}
+                        </span>
                       </div>
 
+                      {/* Giao dịch SePay Live */}
                       <div className="p-4 md:p-5 rounded-2xl bg-white border border-[#335C33]/15 shadow-sm">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-semibold text-[#335C33]/70">Giao Dịch SePay Live</span>
@@ -362,7 +549,7 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                           </div>
                         </div>
                         <p className="text-xl md:text-2xl font-bold text-emerald-800 font-mono">
-                          {sepayTxs.length}
+                          {sepayInCount}
                         </p>
                         <span className="text-[11px] text-[#2C2E2B]/60 mt-1 block">MB Bank 0972582580</span>
                       </div>
@@ -380,20 +567,33 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                             onClick={() => setActiveTab('donations')}
                             className="text-xs font-semibold text-[#8C5A35] hover:text-[#335C33] cursor-pointer"
                           >
-                            Xem tất cả →
+                            Xem tất cả ({donations.length}) →
                           </button>
                         </div>
                         <div className="space-y-2.5">
                           {donations.slice(0, 5).map((d) => (
-                            <div key={d.id} className="p-3 rounded-xl bg-[#F6F6EE] flex items-center justify-between border border-[#335C33]/10 text-xs">
+                            <div
+                              key={d.id}
+                              className="p-3 rounded-xl bg-[#F6F6EE] flex items-center justify-between border border-[#335C33]/10 text-xs"
+                            >
                               <div>
-                                <p className="font-bold text-[#335C33]">{d.customers?.full_name || 'Nhà Hảo Tâm'}</p>
-                                <p className="text-[11px] text-[#2C2E2B]/60">{d.customers?.phone || 'Chưa có SĐT'} • {new Date(d.created_at).toLocaleDateString('vi-VN')}</p>
+                                <p className="font-bold text-[#335C33]">
+                                  {d.customers?.full_name || 'Nhà Hảo Tâm'}
+                                </p>
+                                <p className="text-[11px] text-[#2C2E2B]/60 font-mono">
+                                  {d.donation_code} • {new Date(d.created_at).toLocaleDateString('vi-VN')}
+                                </p>
                               </div>
-                              <span className="font-mono font-bold text-[#8C5A35]">+{(Number(d.amount) || 0).toLocaleString('vi-VN')} đ</span>
+                              <span className="font-mono font-bold text-[#8C5A35]">
+                                +{(Number(d.amount) || 0).toLocaleString('vi-VN')} đ
+                              </span>
                             </div>
                           ))}
-                          {donations.length === 0 && <p className="text-xs text-[#2C2E2B]/50 text-center py-4">Chưa có lượt quyên góp nào.</p>}
+                          {donations.length === 0 && (
+                            <p className="text-xs text-[#2C2E2B]/50 text-center py-4">
+                              Chưa có lượt quyên góp nào.
+                            </p>
+                          )}
                         </div>
                       </div>
 
@@ -407,20 +607,33 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                             onClick={() => setActiveTab('orders')}
                             className="text-xs font-semibold text-[#335C33] hover:text-[#284828] cursor-pointer"
                           >
-                            Xem tất cả →
+                            Xem tất cả ({orders.length}) →
                           </button>
                         </div>
                         <div className="space-y-2.5">
                           {orders.slice(0, 5).map((o) => (
-                            <div key={o.id} className="p-3 rounded-xl bg-[#F6F6EE] flex items-center justify-between border border-[#335C33]/10 text-xs">
+                            <div
+                              key={o.id}
+                              className="p-3 rounded-xl bg-[#F6F6EE] flex items-center justify-between border border-[#335C33]/10 text-xs"
+                            >
                               <div>
-                                <p className="font-bold text-[#335C33]">{o.customers?.full_name || 'Khách hàng'}</p>
-                                <p className="text-[11px] text-[#2C2E2B]/60">{o.order_code} • {o.customers?.phone || ''}</p>
+                                <p className="font-bold text-[#335C33]">
+                                  {o.customers?.full_name || 'Khách hàng'}
+                                </p>
+                                <p className="text-[11px] text-[#2C2E2B]/60 font-mono">
+                                  {o.order_code} • {o.customers?.phone || ''}
+                                </p>
                               </div>
-                              <span className="font-mono font-bold text-[#335C33]">{(Number(o.total_amount) || 0).toLocaleString('vi-VN')} đ</span>
+                              <span className="font-mono font-bold text-[#335C33]">
+                                {(Number(o.total_amount) || 0).toLocaleString('vi-VN')} đ
+                              </span>
                             </div>
                           ))}
-                          {orders.length === 0 && <p className="text-xs text-[#2C2E2B]/50 text-center py-4">Chưa có đơn hàng nào.</p>}
+                          {orders.length === 0 && (
+                            <p className="text-xs text-[#2C2E2B]/50 text-center py-4">
+                              Chưa có đơn hàng nào.
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -435,7 +648,7 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                         <tr className="border-b border-[#335C33]/15 text-[#335C33]/70 bg-[#F6F6EE]/60">
                           <th className="pb-3 pt-1 px-2 font-semibold">Mã Quyên Góp</th>
                           <th className="pb-3 pt-1 px-2 font-semibold">Nhà Hảo Tâm</th>
-                          <th className="pb-3 pt-1 px-2 font-semibold">Số Điện Thoại</th>
+                          <th className="pb-3 pt-1 px-2 font-semibold">Nguồn / SĐT</th>
                           <th className="pb-3 pt-1 px-2 font-semibold text-right">Số Tiền (VNĐ)</th>
                           <th className="pb-3 pt-1 px-2 font-semibold text-center">Trạng Thái</th>
                           <th className="pb-3 pt-1 px-2 font-semibold text-right">Thời Gian</th>
@@ -453,15 +666,21 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                           })
                           .map((d) => (
                             <tr key={d.id} className="hover:bg-[#F4F7F0] transition-colors">
-                              <td className="py-3 px-2 font-mono font-semibold text-[#335C33]">{d.donation_code}</td>
-                              <td className="py-3 px-2 font-bold text-[#2C2E2B]">{d.customers?.full_name || 'Khô danh'}</td>
-                              <td className="py-3 px-2 font-mono text-[#2C2E2B]/80">{d.customers?.phone || '—'}</td>
+                              <td className="py-3 px-2 font-mono font-semibold text-[#8C5A35]">
+                                {d.donation_code}
+                              </td>
+                              <td className="py-3 px-2 font-bold text-[#2C2E2B]">
+                                {d.customers?.full_name || 'Nhà Hảo Tâm'}
+                              </td>
+                              <td className="py-3 px-2 font-mono text-[#2C2E2B]/80">
+                                {d.customers?.phone || 'MB Bank 0972582580'}
+                              </td>
                               <td className="py-3 px-2 font-mono font-bold text-right text-[#8C5A35]">
                                 +{(Number(d.amount) || 0).toLocaleString('vi-VN')} đ
                               </td>
                               <td className="py-3 px-2 text-center">
                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                  <CheckCircle className="w-3 h-3" /> Đã nhận
+                                  <CheckCircle className="w-3 h-3" /> Thành công
                                 </span>
                               </td>
                               <td className="py-3 px-2 text-right text-[#2C2E2B]/60 font-mono">
@@ -469,6 +688,13 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                               </td>
                             </tr>
                           ))}
+                        {donations.length === 0 && (
+                          <tr>
+                            <td colSpan={6} className="text-center py-8 text-[#2C2E2B]/50">
+                              Chưa có dữ liệu quyên góp.
+                            </td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -500,11 +726,19 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                           })
                           .map((o) => (
                             <tr key={o.id} className="hover:bg-[#F4F7F0] transition-colors">
-                              <td className="py-3 px-2 font-mono font-semibold text-[#335C33]">{o.order_code}</td>
-                              <td className="py-3 px-2 font-bold text-[#2C2E2B]">{o.customers?.full_name || 'Khách hàng'}</td>
+                              <td className="py-3 px-2 font-mono font-semibold text-[#335C33]">
+                                {o.order_code}
+                              </td>
+                              <td className="py-3 px-2 font-bold text-[#2C2E2B]">
+                                {o.customers?.full_name || 'Khách hàng'}
+                              </td>
                               <td className="py-3 px-2 text-[#2C2E2B]/80">
-                                <span className="font-mono block text-[#335C33] font-semibold">{o.customers?.phone || '—'}</span>
-                                <span className="text-[11px] text-[#2C2E2B]/60 truncate max-w-xs block">{o.shipping_address}</span>
+                                <span className="font-mono block text-[#335C33] font-semibold">
+                                  {o.customers?.phone || '—'}
+                                </span>
+                                <span className="text-[11px] text-[#2C2E2B]/60 truncate max-w-xs block">
+                                  {o.shipping_address}
+                                </span>
                               </td>
                               <td className="py-3 px-2 font-mono font-bold text-right text-[#335C33]">
                                 {(Number(o.total_amount) || 0).toLocaleString('vi-VN')} đ
@@ -519,6 +753,13 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                               </td>
                             </tr>
                           ))}
+                        {orders.length === 0 && (
+                          <tr>
+                            <td colSpan={6} className="text-center py-8 text-[#2C2E2B]/50">
+                              Chưa có đơn hàng nào.
+                            </td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -526,45 +767,112 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
 
                 {/* TAB 4: SEPAY TRANSACTIONS */}
                 {activeTab === 'transactions' && (
-                  <div className="bg-white rounded-2xl p-4 md:p-5 border border-[#335C33]/15 shadow-sm overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead>
-                        <tr className="border-b border-[#335C33]/15 text-[#335C33]/70 bg-[#F6F6EE]/60">
-                          <th className="pb-3 pt-1 px-2 font-semibold">SePay ID</th>
-                          <th className="pb-3 pt-1 px-2 font-semibold">Ngân Hàng / Số TK</th>
-                          <th className="pb-3 pt-1 px-2 font-semibold">Nội Dung Chuyển Khoản</th>
-                          <th className="pb-3 pt-1 px-2 font-semibold text-right">Số Tiền Vào</th>
-                          <th className="pb-3 pt-1 px-2 font-semibold text-right">Thời Gian Thực</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[#335C33]/10">
-                        {sepayTxs
-                          .filter((t) => {
-                            const term = searchTerm.toLowerCase();
+                  <div className="space-y-4">
+                    {/* Filter and stats banner */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-[#335C33]/15 text-xs shadow-xs">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setTxTypeFilter('in')}
+                          className={`px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer ${
+                            txTypeFilter === 'in'
+                              ? 'bg-emerald-700 text-white'
+                              : 'bg-[#F6F6EE] text-[#335C33] hover:bg-[#E3EDD3]'
+                          }`}
+                        >
+                          Chỉ Tiền Vào ({sepayInCount})
+                        </button>
+                        <button
+                          onClick={() => setTxTypeFilter('all')}
+                          className={`px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer ${
+                            txTypeFilter === 'all'
+                              ? 'bg-[#335C33] text-white'
+                              : 'bg-[#F6F6EE] text-[#335C33] hover:bg-[#E3EDD3]'
+                          }`}
+                        >
+                          Tất Cả ({sepayTxs.length})
+                        </button>
+                      </div>
+
+                      <div className="text-[11px] text-[#2C2E2B]/70">
+                        Đang kết nối SePay Gateway: <strong>MBBank (0972582580 & 2666627122005)</strong>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-2xl p-4 md:p-5 border border-[#335C33]/15 shadow-sm overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead>
+                          <tr className="border-b border-[#335C33]/15 text-[#335C33]/70 bg-[#F6F6EE]/60">
+                            <th className="pb-3 pt-1 px-2 font-semibold">SePay ID</th>
+                            <th className="pb-3 pt-1 px-2 font-semibold">Phân Loại</th>
+                            <th className="pb-3 pt-1 px-2 font-semibold">Ngân Hàng / Số TK</th>
+                            <th className="pb-3 pt-1 px-2 font-semibold">Nội Dung Chuyển Khoản</th>
+                            <th className="pb-3 pt-1 px-2 font-semibold text-right">Số Tiền (VNĐ)</th>
+                            <th className="pb-3 pt-1 px-2 font-semibold text-right">Thời Gian Thực</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#335C33]/10">
+                          {filteredSepayTxs.map((tx) => {
+                            const isIncoming = parseFloat(tx.amount_in || '0') > 0;
+                            const amount = isIncoming
+                              ? parseFloat(tx.amount_in || '0')
+                              : parseFloat(tx.amount_out || '0');
+                            const content = tx.transaction_content || '';
+                            const isDonation = /DON[A-Z0-9]{4,10}/i.test(content);
+                            const isOrder = /CAF[A-Z0-9]{4,10}/i.test(content);
+
                             return (
-                              t.id.toString().includes(term) ||
-                              t.transaction_content.toLowerCase().includes(term)
+                              <tr key={tx.id} className="hover:bg-[#F4F7F0] transition-colors">
+                                <td className="py-3 px-2 font-mono font-semibold text-[#335C33]">
+                                  {tx.id}
+                                </td>
+                                <td className="py-3 px-2">
+                                  {isDonation ? (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#8C5A35]/15 text-[#8C5A35] border border-[#8C5A35]/30">
+                                      <Heart className="w-2.5 h-2.5" /> Quyên góp
+                                    </span>
+                                  ) : isOrder ? (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#335C33]/15 text-[#335C33] border border-[#335C33]/30">
+                                      <Coffee className="w-2.5 h-2.5" /> Đơn hàng
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-700">
+                                      Khác
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="py-3 px-2 font-bold text-[#2C2E2B]">
+                                  {tx.bank_brand_name} •{' '}
+                                  <span className="font-mono font-normal text-[#2C2E2B]/80">
+                                    {tx.account_number}
+                                  </span>
+                                </td>
+                                <td className="py-3 px-2 text-[#2C2E2B] font-mono text-[11px] max-w-sm break-words">
+                                  {tx.transaction_content}
+                                </td>
+                                <td
+                                  className={`py-3 px-2 font-mono font-bold text-right ${
+                                    isIncoming ? 'text-emerald-700' : 'text-red-600'
+                                  }`}
+                                >
+                                  {isIncoming ? '+' : '-'}
+                                  {amount.toLocaleString('vi-VN')} đ
+                                </td>
+                                <td className="py-3 px-2 text-right text-[#2C2E2B]/60 font-mono">
+                                  {tx.transaction_date}
+                                </td>
+                              </tr>
                             );
-                          })
-                          .map((tx) => (
-                            <tr key={tx.id} className="hover:bg-[#F4F7F0] transition-colors">
-                              <td className="py-3 px-2 font-mono font-semibold text-[#335C33]">{tx.id}</td>
-                              <td className="py-3 px-2 font-bold text-[#2C2E2B]">
-                                {tx.bank_brand_name} • <span className="font-mono font-normal text-[#2C2E2B]/80">{tx.account_number}</span>
-                              </td>
-                              <td className="py-3 px-2 text-[#2C2E2B] font-mono text-[11px] max-w-sm break-words">
-                                {tx.transaction_content}
-                              </td>
-                              <td className="py-3 px-2 font-mono font-bold text-right text-emerald-700">
-                                +{parseFloat(tx.amount_in || '0').toLocaleString('vi-VN')} đ
-                              </td>
-                              <td className="py-3 px-2 text-right text-[#2C2E2B]/60 font-mono">
-                                {tx.transaction_date}
+                          })}
+                          {filteredSepayTxs.length === 0 && (
+                            <tr>
+                              <td colSpan={6} className="text-center py-8 text-[#2C2E2B]/50">
+                                Không tìm thấy giao dịch SePay nào.
                               </td>
                             </tr>
-                          ))}
-                      </tbody>
-                    </table>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 )}
 
@@ -599,6 +907,15 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                               </td>
                             </tr>
                           ))}
+                        {customers.length === 0 && (
+                          <tr>
+                            <td colSpan={4} className="text-center py-8 text-[#2C2E2B]/50">
+                              {dbStatus === 'error'
+                                ? 'Chưa kết nối được Supabase Database để tải danh sách khách hàng.'
+                                : 'Chưa có thông tin khách hàng nào được lưu.'}
+                            </td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>

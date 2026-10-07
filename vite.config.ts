@@ -7,8 +7,7 @@ function sepayBackendPlugin(sepayApiKey: string): Plugin {
   return {
     name: 'sepay-backend-plugin',
     configureServer(server) {
-      // 1. Secure Server-to-Server Proxy for Transaction Fetching (Hides API Key from Frontend)
-      server.middlewares.use('/api/sepay/transactions/list', async (req, res) => {
+      const handleSepayList = async (req: any, res: any) => {
         if (req.method !== 'GET') {
           res.statusCode = 405;
           res.end(JSON.stringify({ error: 'Method not allowed' }));
@@ -24,7 +23,12 @@ function sepayBackendPlugin(sepayApiKey: string): Plugin {
         }
 
         try {
-          const query = req.url ? req.url.split('?')[1] || '' : '';
+          let query = req.url ? req.url.split('?')[1] || '' : '';
+          if (!query) {
+            query = 'limit=100';
+          } else if (query === 'limit=10' || query.startsWith('limit=10&') || query.includes('&limit=10')) {
+            query = query.replace(/limit=10(?![0-9])/, 'limit=30');
+          }
           const targetUrl = `https://my.sepay.vn/userapi/transactions/list${query ? `?${query}` : ''}`;
           
           const response = await fetch(targetUrl, {
@@ -43,7 +47,9 @@ function sepayBackendPlugin(sepayApiKey: string): Plugin {
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify({ error: err.message || 'Internal proxy error' }));
         }
-      });
+      };
+
+      server.middlewares.use('/api/sepay/transactions/list', handleSepayList);
 
       // 2. Secure Webhook Receiver (Validates Authorization Header & Anti-Spoofing)
       server.middlewares.use('/api/sepay/webhook', async (req, res) => {
@@ -82,6 +88,29 @@ function sepayBackendPlugin(sepayApiKey: string): Plugin {
             res.end(JSON.stringify({ error: 'Invalid JSON payload' }));
           }
         });
+      });
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use('/api/sepay/transactions/list', async (req, res) => {
+        const apiKey = sepayApiKey || process.env.SEPAY_API_KEY || '';
+        let query = req.url ? req.url.split('?')[1] || '' : '';
+        if (!query) query = 'limit=100';
+        try {
+          const targetUrl = `https://my.sepay.vn/userapi/transactions/list${query ? `?${query}` : ''}`;
+          const response = await fetch(targetUrl, {
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          const data = await response.text();
+          res.statusCode = response.status;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(data);
+        } catch (err: any) {
+          res.statusCode = 500;
+          res.end(JSON.stringify({ error: err.message }));
+        }
       });
     },
   };

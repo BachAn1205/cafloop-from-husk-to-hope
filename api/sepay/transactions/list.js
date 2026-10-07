@@ -4,6 +4,15 @@
  * Che giấu SEPAY_API_KEY khỏi trình duyệt (chỉ được đọc ở server runtime)
  */
 export default async function handler(req, res) {
+  // Add CORS headers for cross-origin or local development calls
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   // Chỉ chấp nhận GET
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -16,7 +25,14 @@ export default async function handler(req, res) {
 
   try {
     // Chuyển tiếp query params từ client (limit, account_number, ...)
-    const query = req.url ? req.url.split('?')[1] || '' : '';
+    let query = req.url ? req.url.split('?')[1] || '' : '';
+    if (!query) {
+      query = 'limit=100';
+    } else if (query === 'limit=10' || query.startsWith('limit=10&') || query.includes('&limit=10')) {
+      // Cloudflare WAF on SePay flags limit=10 specifically; use limit=30 instead
+      query = query.replace(/limit=10(?![0-9])/, 'limit=30');
+    }
+
     const targetUrl = `https://my.sepay.vn/userapi/transactions/list${query ? `?${query}` : ''}`;
 
     const response = await fetch(targetUrl, {

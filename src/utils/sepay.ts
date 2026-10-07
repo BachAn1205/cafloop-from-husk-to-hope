@@ -50,6 +50,7 @@ export function generatePaymentCode(type: 'ORDER' | 'DONATE'): string {
 
 /**
  * Lấy danh sách giao dịch từ SePay qua Proxy bảo mật (Không để lộ API Key ở Frontend)
+ * Tích hợp fallback thông minh nếu proxy nội bộ gặp trục trặc mạng
  */
 export async function getSepayTransactions(params?: {
   limit?: number;
@@ -57,17 +58,41 @@ export async function getSepayTransactions(params?: {
   accountNumber?: string;
 }): Promise<SepayTransaction[]> {
   try {
+    const limit = params?.limit ?? 100;
     const queryParams = new URLSearchParams();
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    queryParams.append('limit', limit.toString());
     if (params?.accountNumber) queryParams.append('account_number', params.accountNumber);
 
     const url = `${SEPAY_API_ENDPOINT}?${queryParams.toString()}`;
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    let response: Response;
+
+    try {
+      response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      // Nếu local proxy 404/500, fallback sang endpoint Vercel production
+      if (!response.ok && typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+        const fallbackUrl = `https://cafloop-from-husk-to-hope.vercel.app/api/sepay/transactions/list?${queryParams.toString()}`;
+        console.warn(`Local proxy returned ${response.status}, thử fallback sang Vercel: ${fallbackUrl}`);
+        const fallbackRes = await fetch(fallbackUrl);
+        if (fallbackRes.ok) {
+          response = fallbackRes;
+        }
+      }
+    } catch (fetchErr) {
+      // Network failure on local proxy -> thử qua Vercel proxy
+      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+        const fallbackUrl = `https://cafloop-from-husk-to-hope.vercel.app/api/sepay/transactions/list?${queryParams.toString()}`;
+        console.warn('Local proxy fetch failed, thử fallback sang Vercel:', fallbackUrl);
+        response = await fetch(fallbackUrl);
+      } else {
+        throw fetchErr;
+      }
+    }
 
     if (!response.ok) {
       console.warn(`SePay Secure Proxy returned status: ${response.status}`);
@@ -89,6 +114,56 @@ export async function getSepayTransactions(params?: {
     console.error('Lỗi khi tải lịch sử giao dịch SePay từ proxy:', error);
     return [];
   }
+}
+
+export interface DerivedDonation {
+  id: string;
+  donation_code: string;
+  amount: number;
+  status: string;
+  created_at: string;
+  customers: {
+    full_name: string;
+    phone: string;
+  };
+  raw_tx?: SepayTransaction;
+}
+
+/**
+ * Trích xuất danh sách quyên góp thực tế từ các giao dịch SePay (khớp mã DON...)
+ */
+export function extractDonationsFromSepay(transactions: SepayTransaction[]): DerivedDonation[] {
+  const result: DerivedDonation[] = [];
+
+  for (const tx of transactions) {
+    const amountIn = parseFloat(tx.amount_in || '0');
+    if (amountIn <= 0) continue;
+
+    const content = tx.transaction_content || '';
+    const match = content.match(/DON[A-Z0-9]{4,10}/i);
+    const donationCode = match ? match[0].toUpperCase() : (tx.code ? tx.code.toUpperCase() : `DON-TX${tx.id}`);
+
+    // Chuẩn hóa thời gian giao dịch
+    let dateStr = tx.transaction_date;
+    if (dateStr && !dateStr.includes('T')) {
+      dateStr = dateStr.replace(' ', 'T') + '+07:00';
+    }
+
+    result.push({
+      id: `sepay-don-${tx.id}`,
+      donation_code: donationCode,
+      amount: amountIn,
+      status: 'completed',
+      created_at: dateStr || new Date().toISOString(),
+      customers: {
+        full_name: `Nhà Hảo Tâm (${tx.bank_brand_name || 'MB'})`,
+        phone: tx.account_number || 'MB Bank',
+      },
+      raw_tx: tx,
+    });
+  }
+
+  return result;
 }
 
 /**
