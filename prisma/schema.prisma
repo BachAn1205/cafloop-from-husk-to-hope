@@ -81,3 +81,14 @@ model transactions {
   raw_data         Json?
   created_at       DateTime? @default(now()) @db.Timestamptz(6)
 }
+
+/// Lượt truy cập web (mỗi phiên = 1, dùng cho thẻ QR trên ESG + Admin dashboard).
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model qr_visits {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  path       String   @default("/")
+  referrer   String?
+
+  @@index([created_at(sort: Desc)], map: "qr_visits_created_at_idx")
+}

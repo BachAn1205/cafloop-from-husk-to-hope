@@ -97,6 +97,7 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [customers, setCustomers] = useState<CustomerRecord[]>([]);
   const [sepayTxs, setSepayTxs] = useState<SepayTransaction[]>([]);
+  const [qrVisitCount, setQrVisitCount] = useState(0);
 
   // Authenticate PIN
   const handlePinSubmit = (e: React.FormEvent) => {
@@ -122,11 +123,12 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
     setSyncResultMsg('');
     try {
       // 1. Chạy song song độc lập: Lỗi ở Supabase KHÔNG làm crash việc lấy giao dịch SePay!
-      const [donationsRes, ordersRes, customersRes, sepayRes] = await Promise.allSettled([
+      const [donationsRes, ordersRes, customersRes, sepayRes, visitsRes] = await Promise.allSettled([
         supabase.from('donations').select('*, customers(full_name, phone)').order('created_at', { ascending: false }),
         supabase.from('orders').select('*, customers(full_name, phone)').order('created_at', { ascending: false }),
         supabase.from('customers').select('*').order('created_at', { ascending: false }),
-        getSepayTransactions({ limit: 100, transferType: 'all' }),
+        getSepayTransactions({ limit: 100, transactionType: 'all' }),
+        supabase.from('qr_visits').select('*', { count: 'exact', head: true }),
       ]);
 
       // Xử lý dữ liệu SePay Live
@@ -163,6 +165,12 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
       }
       if (customersRes.status === 'fulfilled' && !customersRes.value.error && customersRes.value.data) {
         fetchedCustomers = customersRes.value.data as CustomerRecord[];
+      }
+
+      if (visitsRes.status === 'fulfilled' && !visitsRes.value.error) {
+        setQrVisitCount(visitsRes.value.count ?? 0);
+      } else {
+        setQrVisitCount(0);
       }
 
       setDbStatus(isDbOk ? 'connected' : 'error');
@@ -491,7 +499,7 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                 {activeTab === 'overview' && (
                   <div className="space-y-6">
                     {/* Summary Cards Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                       {/* Tổng tiền quyên góp */}
                       <div className="p-4 md:p-5 rounded-2xl bg-white border border-[#335C33]/15 shadow-sm">
                         <div className="flex items-center justify-between mb-2">
@@ -537,6 +545,22 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                         </p>
                         <span className="text-[11px] text-[#2C2E2B]/60 mt-1 block">
                           {customers.length > 0 ? 'Đã lưu trong Supabase DB' : 'Người ủng hộ qua SePay'}
+                        </span>
+                      </div>
+
+                      {/* Lượt truy cập QR / Web */}
+                      <div className="p-4 md:p-5 rounded-2xl bg-white border border-[#335C33]/15 shadow-sm">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-semibold text-[#335C33]/70">Lượt Truy Cập QR</span>
+                          <div className="p-2 rounded-lg bg-[#8C5A35]/15 text-[#8C5A35]">
+                            <TrendingUp className="w-4 h-4" />
+                          </div>
+                        </div>
+                        <p className="text-xl md:text-2xl font-bold text-[#8C5A35] font-mono">
+                          {qrVisitCount.toLocaleString('vi-VN')}
+                        </p>
+                        <span className="text-[11px] text-[#2C2E2B]/60 mt-1 block">
+                          Tổng phiên truy cập cafloop.com
                         </span>
                       </div>
 

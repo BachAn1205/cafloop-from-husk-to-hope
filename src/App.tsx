@@ -13,6 +13,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { Share2, Coffee, Volume2, VolumeX } from 'lucide-react';
 import { trungAudio } from './utils/audio';
 import { useLanguage } from './utils/LanguageContext';
+import { recordSiteVisit } from './utils/visitorTracker';
 
 export default function App() {
   const [isOrderOpen, setIsOrderOpen] = useState(false);
@@ -23,6 +24,9 @@ export default function App() {
   const { t, language } = useLanguage();
 
   useEffect(() => {
+    // Mỗi phiên truy cập website = 1 lượt (lưu Supabase qr_visits)
+    void recordSiteVisit();
+
     // Secret URL route check (#admin or ?admin=true)
     if (window.location.hash === '#admin' || window.location.search.includes('admin=true')) {
       setIsAdminOpen(true);

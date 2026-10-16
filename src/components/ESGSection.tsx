@@ -3,16 +3,23 @@ import { motion } from 'motion/react';
 import { Recycle, Clock, QrCode, Users, TrendingUp, Sparkles, Sun, Sprout } from 'lucide-react';
 import { AnimatedCounter } from './AnimatedCounter';
 import { useLanguage } from '../utils/LanguageContext';
-import { getQRScanCount } from '../utils/visitorTracker';
+import { recordSiteVisit } from '../utils/visitorTracker';
 
 const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
 export function ESGSection() {
   const { t, language } = useLanguage();
-  const [scanCount, setScanCount] = useState(1284);
+  const [scanCount, setScanCount] = useState(0);
 
   useEffect(() => {
-    setScanCount(getQRScanCount());
+    let cancelled = false;
+    // recordSiteVisit đã chống trùng theo session; trả về tổng từ DB
+    recordSiteVisit().then((count) => {
+      if (!cancelled) setScanCount(count);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
