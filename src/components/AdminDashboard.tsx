@@ -299,7 +299,7 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
                       setPinInput(e.target.value);
                       setPinError(false);
                     }}
-                    placeholder="Nhập mã PIN (Mặc định: 2026)"
+                    placeholder="Nhập mã PIN"
                     className={`w-full text-center text-lg font-mono tracking-widest px-4 py-3 rounded-xl bg-white text-[#335C33] border-2 ${
                       pinError ? 'border-red-500 text-red-600' : 'border-[#335C33]/25 focus:border-[#335C33]'
                     } focus:outline-none transition-all shadow-xs`}
