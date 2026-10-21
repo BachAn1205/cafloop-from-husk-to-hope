@@ -1,15 +1,6 @@
 import { supabase } from './supabase';
 import type { SepayTransaction } from './sepay';
-
-// Import product images
-import teaZip50g from '../../assets/image/tea_50g.jpg';
-import teaZip100g from '../../assets/image/teaZip_100g.jpg';
-import teaCtn50g from '../../assets/image/teaCtn_50g.jpg';
-import teaCtn100g from '../../assets/image/teaCtn_100g.jpg';
-import bag from '../../assets/image/bag.jpg';
-import tuithom from '../../assets/image/tuithom.jpg';
-import combo130k from '../../assets/image/combo130k.jpg';
-import combo250k from '../../assets/image/combo250k.PNG';
+import { PRODUCT_IMAGES } from './productImages';
 
 export interface ProductItem {
   id?: string;
@@ -28,7 +19,7 @@ export const PRODUCTS_LIST: ProductItem[] = [
     price: 60000,
     unit: 'túi',
     description: 'Vị trái cây nhẹ, ít caffeine.',
-    image: teaZip50g,
+    image: PRODUCT_IMAGES.zip50g,
   },
   {
     sku: 'CASCARA-ZIP-100G',
@@ -36,7 +27,7 @@ export const PRODUCTS_LIST: ProductItem[] = [
     price: 80000,
     unit: 'túi',
     description: 'Vị trái cây nhẹ, ít caffeine.',
-    image: teaZip100g,
+    image: PRODUCT_IMAGES.zip100g,
   },
   {
     sku: 'CASCARA-JAR-50G',
@@ -44,7 +35,7 @@ export const PRODUCTS_LIST: ProductItem[] = [
     price: 60000,
     unit: 'hũ',
     description: 'Vị trái cây nhẹ, ít caffeine.',
-    image: teaCtn50g,
+    image: PRODUCT_IMAGES.jar50g,
   },
   {
     sku: 'CASCARA-JAR-100G',
@@ -52,7 +43,7 @@ export const PRODUCTS_LIST: ProductItem[] = [
     price: 80000,
     unit: 'hũ',
     description: 'Vị trái cây nhẹ, ít caffeine.',
-    image: teaCtn100g,
+    image: PRODUCT_IMAGES.jar100g,
   },
   {
     sku: 'GIFT-BROCADE',
@@ -60,7 +51,7 @@ export const PRODUCTS_LIST: ProductItem[] = [
     price: 150000,
     unit: 'túi',
     description: 'Handmade - Tiện dùng, bền - Phong cách văn hóa đậm bản sắc.',
-    image: bag,
+    image: PRODUCT_IMAGES.brocade,
   },
   {
     sku: 'GIFT-SCENT',
@@ -68,7 +59,7 @@ export const PRODUCTS_LIST: ProductItem[] = [
     price: 50000,
     unit: 'túi',
     description: 'Hương tự nhiên - Khử mùi hiệu quả - Dùng decor, tủ quần áo, xe hơi.',
-    image: tuithom,
+    image: PRODUCT_IMAGES.scent,
   },
   {
     sku: 'COMBO-130K',
@@ -76,7 +67,7 @@ export const PRODUCTS_LIST: ProductItem[] = [
     price: 130000,
     unit: 'combo',
     description: 'Gồm: Hũ trà vỏ cà phê + Túi thơm cà phê.',
-    image: combo130k,
+    image: PRODUCT_IMAGES.combo130k,
   },
   {
     sku: 'COMBO-250K',
@@ -84,19 +75,19 @@ export const PRODUCTS_LIST: ProductItem[] = [
     price: 250000,
     unit: 'combo',
     description: 'Gồm: Hũ trà vỏ cà phê + Túi thơm cà phê + Túi thổ cẩm.',
-    image: combo250k,
+    image: PRODUCT_IMAGES.combo250k,
   }
 ];
 
 const IMAGE_MAP: Record<string, string> = {
-  'CASCARA-ZIP-50G': teaZip50g,
-  'CASCARA-ZIP-100G': teaZip100g,
-  'CASCARA-JAR-50G': teaCtn50g,
-  'CASCARA-JAR-100G': teaCtn100g,
-  'GIFT-BROCADE': bag,
-  'GIFT-SCENT': tuithom,
-  'COMBO-130K': combo130k,
-  'COMBO-250K': combo250k,
+  'CASCARA-ZIP-50G': PRODUCT_IMAGES.zip50g,
+  'CASCARA-ZIP-100G': PRODUCT_IMAGES.zip100g,
+  'CASCARA-JAR-50G': PRODUCT_IMAGES.jar50g,
+  'CASCARA-JAR-100G': PRODUCT_IMAGES.jar100g,
+  'GIFT-BROCADE': PRODUCT_IMAGES.brocade,
+  'GIFT-SCENT': PRODUCT_IMAGES.scent,
+  'COMBO-130K': PRODUCT_IMAGES.combo130k,
+  'COMBO-250K': PRODUCT_IMAGES.combo250k,
 };
 
 export async function seedProductsToSupabase() {
@@ -142,7 +133,7 @@ export async function fetchProductsFromSupabase(): Promise<ProductItem[]> {
       price: Number(item.price),
       unit: item.unit || 'sản phẩm',
       description: item.description || '',
-      image: IMAGE_MAP[item.sku] || teaZip50g,
+      image: IMAGE_MAP[item.sku] || PRODUCT_IMAGES.zip50g,
     }));
   } catch (err) {
     console.error('Lỗi khi fetch sản phẩm:', err);

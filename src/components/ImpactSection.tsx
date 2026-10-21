@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { motion, useInView } from 'motion/react';
-import { Bike, Tv, MapPin, CheckCircle2, Sparkles, Award, CalendarCheck } from 'lucide-react';
+import { Bike, Tv, MapPin, CheckCircle2, Sparkles, Award, CalendarCheck, Shield, HeartHandshake } from 'lucide-react';
 import YouTube from 'react-youtube';
 import { AnimatedCounter } from './AnimatedCounter';
 import { useLanguage } from '../utils/LanguageContext';
@@ -8,9 +8,64 @@ import { trungAudio } from '../utils/audio';
 
 const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
+function FundProgressCard({
+  percent,
+  title,
+  delay,
+  children,
+}: {
+  percent: number;
+  title: string;
+  delay: number;
+  children: ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-40px' });
+  const { t } = useLanguage();
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-30px' }}
+      transition={{ duration: 0.5, delay, ease: EASE_NATURAL }}
+      className="bg-[#F6F6EE] border-2 border-[#335C33]/20 rounded-2xl md:rounded-3xl p-5 md:p-6 shadow-md"
+    >
+      <div className="mb-4 md:mb-5">
+        <span className="text-[11px] md:text-xs font-bold uppercase tracking-wider text-[#8C5A35] flex items-center gap-1.5 mb-2">
+          <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#8C5A35]" />
+          {t('impactFundProgress')}
+        </span>
+        <h3 className="text-base md:text-lg font-bold text-[#335C33] leading-snug">{title}</h3>
+      </div>
+
+      <div className="relative w-full h-5 md:h-6 bg-[#E3EDD3] rounded-full overflow-hidden mb-3 md:mb-4 shadow-inner">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: isInView ? `${percent}%` : '0%' }}
+          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+          className="h-full bg-gradient-to-r from-[#335C33] to-[#4A7F4A] rounded-full relative overflow-hidden"
+        >
+          <div className="absolute inset-0 w-[200%] bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+        </motion.div>
+      </div>
+
+      <div className="flex items-center text-xs md:text-sm font-semibold mb-4">
+        <span className="text-[#335C33] flex items-center gap-1.5">
+          <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-[#335C33]" />
+          <span className="font-bold text-sm md:text-base">
+            {t('impactProgressLabel')} {isInView ? <AnimatedCounter to={percent} duration={1.5} /> : 0}%
+          </span>
+        </span>
+      </div>
+
+      {children}
+    </motion.div>
+  );
+}
+
 export function ImpactSection() {
-  const progressRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(progressRef, { once: true, margin: '-40px' });
   const { t } = useLanguage();
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
@@ -99,98 +154,71 @@ export function ImpactSection() {
               </p>
             </motion.div>
 
-            {/* PROGRESS BAR CARD */}
-            <motion.div
-              id="progress-container"
-              ref={progressRef}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-30px' }}
-              transition={{ duration: 0.5, delay: 0.18, ease: EASE_NATURAL }}
-              className="bg-[#F6F6EE] border-2 border-[#335C33]/20 rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-md"
-            >
-              {/* Target Title */}
-              <div className="mb-5 md:mb-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] md:text-xs font-bold uppercase tracking-wider text-[#8C5A35] flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#8C5A35]" />
-                    {t('impactFundProgress')}
-                  </span>
-                  <span className="text-xs md:text-sm font-bold text-[#335C33] bg-[#E3EDD3] px-3 py-1 rounded-full">
-                    {t('impactPhase')}
-                  </span>
-                </div>
-                <h3 id="target-label" className="text-base md:text-lg lg:text-xl font-bold text-[#335C33] leading-snug">
-                  {t('impactTargetTitle')}
-                </h3>
-              </div>
-
-              {/* Progress Bar — uses palette color */}
-              <div className="relative w-full h-5 md:h-6 bg-[#E3EDD3] rounded-full overflow-hidden mb-3 md:mb-4 shadow-inner">
-                <motion.div
-                  id="progress-bar-fill"
-                  initial={{ width: 0 }}
-                  animate={{ width: isInView ? '100%' : '0%' }}
-                  transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                  className="h-full bg-gradient-to-r from-[#335C33] to-[#4A7F4A] rounded-full relative overflow-hidden"
-                >
-                  {/* Shimmer effect inside progress bar */}
-                  <div className="absolute inset-0 w-[200%] bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                </motion.div>
-              </div>
-
-              {/* Text Below Progress Bar */}
-              <div className="flex items-center justify-between text-xs md:text-sm font-semibold mb-5">
-                <span className="text-[#335C33] flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-[#335C33]" />
-                  <span id="progress-percentage-label" className="font-bold text-sm md:text-base">
-                    {t('impactCompleted')} {isInView ? <AnimatedCounter to={100} duration={1.5} /> : 0}%
-                  </span>
-                </span>
-                <span className="text-[#8C5A35]">
-                  {t('impactRemaining')}
-                </span>
-              </div>
-
-              {/* Breakdown items */}
-              <div className="grid grid-cols-2 gap-3 md:gap-5 pt-4 md:pt-5 border-t border-[#335C33]/15">
-                <div className="flex items-center gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60 hover:bg-[#E3EDD3] transition-colors duration-300">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#335C33] flex items-center justify-center flex-shrink-0 shadow-xs">
-                    <Bike className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
+            <div id="progress-container" className="flex flex-col gap-4 md:gap-5">
+              <FundProgressCard percent={100} title={t('impactTargetTitle')} delay={0.12}>
+                <div className="grid grid-cols-2 gap-3 md:gap-4">
+                  <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#335C33] flex items-center justify-center flex-shrink-0">
+                      <Bike className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactBikesTitle')}</p>
+                      <p className="text-xs md:text-sm text-[#8C5A35] mt-0.5">{t('impactBikesDesc')}</p>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-xs md:text-sm font-bold text-[#335C33] truncate">{t('impactBikesTitle')}</p>
-                    <p className="text-[10px] md:text-xs text-[#8C5A35] mt-0.5">{t('impactBikesDesc')}</p>
+                  <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#8C5A35] flex items-center justify-center flex-shrink-0">
+                      <Tv className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactTVsTitle')}</p>
+                      <p className="text-xs md:text-sm text-[#8C5A35] mt-0.5">{t('impactTVsDesc')}</p>
+                    </div>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60 hover:bg-[#E3EDD3] transition-colors duration-300">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#8C5A35] flex items-center justify-center flex-shrink-0 shadow-xs">
-                    <Tv className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
+                <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#E3EDD3]/45 p-3 rounded-xl md:rounded-2xl border border-[#335C33]/10">
+                  <div className="flex items-center gap-2 text-xs md:text-sm text-[#335C33] font-bold">
+                    <div className="w-6 h-6 md:w-7 md:h-7 rounded-lg bg-[#335C33] text-[#E3EDD3] flex items-center justify-center shrink-0">
+                      <CalendarCheck className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    </div>
+                    <span>{t('impactCompletionTitle')}</span>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-xs md:text-sm font-bold text-[#335C33] truncate">{t('impactTVsTitle')}</p>
-                    <p className="text-[10px] md:text-xs text-[#8C5A35] mt-0.5">{t('impactTVsDesc')}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Completion Timeline Banner */}
-              <div className="mt-4 md:mt-5 pt-3.5 border-t border-[#335C33]/15 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#E3EDD3]/45 p-3 sm:p-3.5 rounded-xl md:rounded-2xl border border-[#335C33]/10">
-                <div className="flex items-center gap-2 text-xs md:text-sm text-[#335C33] font-bold">
-                  <div className="w-6 h-6 md:w-7 md:h-7 rounded-lg bg-[#335C33] text-[#E3EDD3] flex items-center justify-center shrink-0 shadow-2xs">
-                    <CalendarCheck className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                  </div>
-                  <span>{t('impactCompletionTitle')}</span>
-                </div>
-                <div className="flex items-center gap-1.5 self-start sm:self-auto">
-                  <span className="text-xs md:text-sm font-extrabold text-[#335C33] bg-white px-2.5 sm:px-3 py-1 rounded-lg border border-[#335C33]/15 shadow-2xs">
+                  <span className="text-xs md:text-sm font-extrabold text-[#335C33] bg-white px-2.5 sm:px-3 py-1 rounded-lg border border-[#335C33]/15">
                     {t('impactCompletionValue')}
                   </span>
                 </div>
-              </div>
+              </FundProgressCard>
 
-            </motion.div>
+              <FundProgressCard percent={75} title={t('impactHoaSenFrameTitle')} delay={0.18}>
+                <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#335C33] flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactHoaSenTitle')}</p>
+                    <p className="text-xs md:text-sm text-[#8C5A35] mt-0.5">{t('impactHoaSenDesc')}</p>
+                  </div>
+                </div>
+              </FundProgressCard>
+
+              <FundProgressCard percent={70} title={t('impactHighlandFrameTitle')} delay={0.24}>
+                <div className="flex items-start gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#8C5A35] flex items-center justify-center flex-shrink-0">
+                    <HeartHandshake className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
+                  </div>
+                  <div className="min-w-0 space-y-1.5">
+                    <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactHighlandFundTitle')}</p>
+                    <p className="text-xs md:text-sm font-semibold text-[#335C33]/80">{t('impactHighlandFundSubtitle')}</p>
+                    <p className="text-xs md:text-sm text-[#8C5A35] leading-relaxed">{t('impactHighlandFundDesc')}</p>
+                    <ul className="text-xs md:text-sm text-[#2C2E2B]/80 leading-relaxed space-y-1 list-disc pl-3.5">
+                      <li>{t('impactHighlandFundGoal1')}</li>
+                      <li>{t('impactHighlandFundGoal2')}</li>
+                      <li>{t('impactHighlandFundGoal3')}</li>
+                    </ul>
+                  </div>
+                </div>
+              </FundProgressCard>
+            </div>
 
             {/* Mission note */}
             <motion.div

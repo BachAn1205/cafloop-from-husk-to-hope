@@ -33,6 +33,7 @@ type TranslationKeys =
   | 'esgCardQRDesc'
   | 'esgCardHouseholdsTitle'
   | 'esgCardHouseholdsDesc'
+  | 'esgSource'
   | 'esgCycleTitle'
   | 'esgCycleZeroWaste'
   | 'esgCycleStep1Title'
@@ -51,15 +52,27 @@ type TranslationKeys =
   | 'impactFundProgress'
   | 'impactPhase'
   | 'impactTargetTitle'
+  | 'impactHoaSenFrameTitle'
+  | 'impactHighlandFrameTitle'
+  | 'impactProgressLabel'
   | 'impactCompleted'
   | 'impactRemaining'
   | 'impactBikesTitle'
   | 'impactBikesDesc'
   | 'impactTVsTitle'
   | 'impactTVsDesc'
+  | 'impactHoaSenTitle'
+  | 'impactHoaSenDesc'
+  | 'impactHighlandFundTitle'
+  | 'impactHighlandFundSubtitle'
+  | 'impactHighlandFundDesc'
+  | 'impactHighlandFundGoal1'
+  | 'impactHighlandFundGoal2'
+  | 'impactHighlandFundGoal3'
   | 'impactCompletionTitle'
   | 'impactCompletionValue'
   | 'impactTransparency'
+  | 'heritageCode'
   | 'storyBadge'
   | 'storyTitle'
   | 'storySub'
@@ -192,19 +205,20 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     heroScrollDown: 'Tác động xanh',
     esgBadge: 'Dữ Liệu Tuần Hoàn',
     esgTitle: 'Tác Động Xanh',
-    esgSubtitle: 'Mỗi ly trà là một vòng tuần hoàn được khép lại.',
-    esgCardHuskTitle: 'Vỏ cà phê tái chế',
-    esgCardHuskDesc: 'Thu gom từ 12 nông hộ Tây Nguyên',
-    esgCardCO2Title: 'CO2 giảm tải',
-    esgCardCO2Desc: 'Ngăn chặn khí mê-tan phân hủy hở',
-    esgCardByProductTitle: 'Khối lượng phụ phẩm tái sử dụng',
-    esgCardByProductDesc: 'Thu gom và tái chế vỏ cà phê chín mọng thành trà & túi thơm.',
+    esgSubtitle: 'Từ phụ phẩm đến giá trị bền vững',
+    esgCardHuskTitle: 'Biên lợi nhuận gộp',
+    esgCardHuskDesc: 'Tỷ suất lợi nhuận gộp tích lũy hai giai đoạn',
+    esgCardCO2Title: 'CO₂e giảm thải',
+    esgCardCO2Desc: 'CO₂e ước tính theo mô hình kịch bản của báo cáo',
+    esgCardByProductTitle: 'Phụ phẩm được tái sử dụng',
+    esgCardByProductDesc: 'Tổng khối lượng qua hai giai đoạn',
     esgCardLaborTitle: 'Giờ công lao động cộng đồng',
-    esgCardLaborDesc: 'Ước tính TB 2 giờ dệt & hoàn thiện/túi thổ cẩm thủ công.',
-    esgCardQRTitle: 'Lượt quét mã QR truy cập web',
-    esgCardQRDesc: 'Lượt quan tâm và đồng hành cùng chiến dịch kinh tế tuần hoàn.',
-    esgCardHouseholdsTitle: 'Hộ dân hỗ trợ trực tiếp',
-    esgCardHouseholdsDesc: 'Nông hộ và các nghệ nhân Ê Đê đồng hành tạo sinh kế.',
+    esgCardLaborDesc: 'Thời gian tình nguyện hỗ trợ chuẩn bị vật liệu và đóng gói sản phẩm',
+    esgCardQRTitle: 'Lượt quét mã QR "The Heritage Code"',
+    esgCardQRDesc: 'Đạt 101,8% mục tiêu đề ra',
+    esgCardHouseholdsTitle: 'Nhóm nhà cung cấp địa phương',
+    esgCardHouseholdsDesc: 'Nhóm nhà cung cấp địa phương được ghi nhận',
+    esgSource: 'Nguồn: Báo cáo tác động CAFLOOP. Giai đoạn 1 và Giai đoạn 2.',
     esgCycleTitle: 'Vòng Lặp Tuần Hoàn CAFLOOP',
     esgCycleZeroWaste: '100% Zero-Waste',
     esgCycleStep1Title: '1. Thu hoạch',
@@ -222,17 +236,30 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     impactQuote: '“Toàn bộ lợi nhuận từ phiên bản giới hạn sẽ được chuyển hóa thành phương tiện đến trường và tri thức.”',
     impactFundProgress: 'Tiến Độ Gây Quỹ Hiện Tại',
     impactPhase: 'Giai đoạn 1',
-    impactTargetTitle: 'Mục tiêu: 77 xe đạp & 02 TV (Trường TH Nguyễn Thị Minh Khai)',
+    impactTargetTitle: 'Đối tác với Ea War Project: trao tặng 77 xe đạp và 2 TV cho trường TH NTMK',
+    impactHoaSenFrameTitle: 'Đối tác với Liên minh Cầu Hoa Sen: trao tặng 500 vòng phản quang cho các em nhỏ ở Đắk Lắk',
+    impactHighlandFrameTitle: 'Quỹ Highland Girl\'s Fund',
+    impactProgressLabel: 'Tiến độ',
     impactCompleted: 'Đã hoàn thành',
     impactRemaining: 'Đạt 100% mục tiêu giai đoạn 1',
     impactBikesTitle: '77 / 77 Xe Đạp',
-    impactBikesDesc: 'Đã sẵn sàng bàn giao',
+    impactBikesDesc: 'Hợp tác cùng Dự án Ea War',
     impactTVsTitle: '02 / 02 TV',
-    impactTVsDesc: 'Cho phòng học số',
+    impactTVsDesc: 'Hợp tác cùng Dự án Ea War',
+    impactHoaSenTitle: 'Liên minh Cầu Hoa Sen',
+    impactHoaSenDesc: '500 vòng phản quang trao tặng',
+    impactHighlandFundTitle: "Highland Girl's Fund",
+    impactHighlandFundSubtitle: 'Góc nhỏ, ước mơ lớn',
+    impactHighlandFundDesc:
+      'Sáng kiến do CAFLOOP sáng lập, đồng hành cùng trẻ em gái tại Buôn Đrăng Phốk, Đắk Lắk qua giáo dục, tri thức và cơ hội phát triển.',
+    impactHighlandFundGoal1: 'Xây góc đọc sách cộng đồng — khích lệ tò mò và niềm yêu thích học tập.',
+    impactHighlandFundGoal2: 'Chia sẻ kiến thức tuổi dậy thì, sức khỏe, ranh giới cá nhân và kỹ năng tự bảo vệ.',
+    impactHighlandFundGoal3: 'Trao sách vở, dụng cụ học tập theo nhu cầu thực tế của các em.',
     impactCompletionTitle: 'Thời gian hoàn thành:',
     impactCompletionValue: '30/04/2026 (Hoàn tất 100% trước hạn)',
     impactTransparency: 'Minh bạch 100% tài chính và tiến độ trao quà trực tiếp tại điểm trường',
-    storyBadge: 'Hương Vị Đại Ngàn',
+    heritageCode: 'The Heritage Code',
+    storyBadge: 'Chiến dịch "The Heritage Code"',
     storyTitle: 'Trà Cascara CAFLOOP',
     storySub: 'Mỗi giọt trà ngọt thanh mang theo niềm hy vọng đến trường',
     storyCardBadge: 'Phiên Bản Gây Quỹ Giới Hạn',
@@ -363,19 +390,20 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     heroScrollDown: 'Green Impact',
     esgBadge: 'Circular Data',
     esgTitle: 'Green Impact',
-    esgSubtitle: 'Every cup of tea closes a circular loop.',
-    esgCardHuskTitle: 'Recycled Coffee Husk',
-    esgCardHuskDesc: 'Collected from 12 highland farming families',
-    esgCardCO2Title: 'CO2 Offset',
-    esgCardCO2Desc: 'Preventing methane emissions from open decay',
-    esgCardByProductTitle: 'Upcycled By-products Weight',
-    esgCardByProductDesc: 'Coffee cherry husks upcycled into premium tea & scent sachets.',
-    esgCardLaborTitle: 'Community Labor Hours',
-    esgCardLaborDesc: 'Estimated avg 2 hours of weaving & finishing per handmade brocade bag.',
-    esgCardQRTitle: 'QR Scans & Web Visits',
-    esgCardQRDesc: 'Visitors exploring and engaging with our circular economy mission.',
-    esgCardHouseholdsTitle: 'Households Supported',
-    esgCardHouseholdsDesc: 'Local farmers and Ê Đê weaving artisans supported with sustainable income.',
+    esgSubtitle: 'From by-products to lasting value',
+    esgCardHuskTitle: 'Gross profit margin',
+    esgCardHuskDesc: 'Cumulative gross margin across both phases',
+    esgCardCO2Title: 'CO₂e reduced',
+    esgCardCO2Desc: 'Estimated CO₂e using the report scenario model',
+    esgCardByProductTitle: 'Upcycled by-products',
+    esgCardByProductDesc: 'Total volume across both phases',
+    esgCardLaborTitle: 'Community labor hours',
+    esgCardLaborDesc: 'Volunteer time preparing materials and packing products',
+    esgCardQRTitle: 'QR scans of "The Heritage Code"',
+    esgCardQRDesc: '101.8% of the set target',
+    esgCardHouseholdsTitle: 'Local supplier groups',
+    esgCardHouseholdsDesc: 'Local supplier groups recorded',
+    esgSource: 'Source: CAFLOOP impact report. Phase 1 and Phase 2.',
     esgCycleTitle: 'CAFLOOP Circular Loop',
     esgCycleZeroWaste: '100% Zero-Waste',
     esgCycleStep1Title: '1. Harvest',
@@ -393,17 +421,30 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     impactQuote: '“All profits from this limited edition will be transformed into school transport and digital knowledge.”',
     impactFundProgress: 'Current Fundraising Progress',
     impactPhase: 'Phase 1',
-    impactTargetTitle: 'Target: 77 bicycles & 2 TVs (Nguyen Thi Minh Khai Primary School)',
+    impactTargetTitle: 'Partner with the Ea War Project: 77 bicycles and 2 TVs for Nguyen Thi Minh Khai Primary School',
+    impactHoaSenFrameTitle: 'Partner with the Hoa Sen Bridge Alliance: 500 reflective rings for children in Dak Lak',
+    impactHighlandFrameTitle: "Highland Girl's Fund",
+    impactProgressLabel: 'Progress',
     impactCompleted: 'Completed',
     impactRemaining: '100% goal achieved for Phase 1',
     impactBikesTitle: '77 / 77 Bicycles',
-    impactBikesDesc: 'Ready for delivery',
+    impactBikesDesc: 'Partner with the Ea War Project',
     impactTVsTitle: '02 / 02 TVs',
-    impactTVsDesc: 'For digital classrooms',
+    impactTVsDesc: 'Partner with the Ea War Project',
+    impactHoaSenTitle: 'Hoa Sen Bridge Alliance',
+    impactHoaSenDesc: '500 reflective rings donated',
+    impactHighlandFundTitle: "Highland Girl's Fund",
+    impactHighlandFundSubtitle: 'A small corner, big dreams',
+    impactHighlandFundDesc:
+      'A CAFLOOP initiative supporting girls in Buon Drang Phok, Dak Lak through education, knowledge, and lasting opportunities.',
+    impactHighlandFundGoal1: 'Build a community reading corner — sparking curiosity and a love of learning.',
+    impactHighlandFundGoal2: 'Age-appropriate sessions on puberty, health, personal boundaries, and self-protection.',
+    impactHighlandFundGoal3: 'Provide books, school supplies, and practical support based on real local needs.',
     impactCompletionTitle: 'Completion Timeline:',
     impactCompletionValue: 'Apr 30, 2026 (100% achieved ahead of schedule)',
     impactTransparency: '100% transparent finance and direct delivery progress at the school site',
-    storyBadge: 'Mountain Flavor',
+    heritageCode: 'The Heritage Code',
+    storyBadge: 'The Heritage Code Campaign',
     storyTitle: 'CAFLOOP Cascara Tea',
     storySub: 'Every sweet drop of tea carries hope to school',
     storyCardBadge: 'Limited Fundraising Edition',

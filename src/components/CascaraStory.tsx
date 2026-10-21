@@ -2,9 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Coffee, Heart, Check, ShieldCheck, Flame, Droplets, ChevronLeft, ChevronRight, Leaf } from 'lucide-react';
 import { useLanguage } from '../utils/LanguageContext';
-import traImg from '../../assets/image/tra.jpg';
-import tuithomImg from '../../assets/image/tuithom1.jpg';
-import bagImg from '../../assets/image/bag1.jpg';
+import { PRODUCT_IMAGES } from '../utils/productImages';
 
 const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
@@ -27,7 +25,7 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
   const products = [
     {
       id: 1,
-      image: traImg,
+      image: PRODUCT_IMAGES.zip100g,
       badge: t('storyCardBadge'),
       title: t('storyCardTitle'),
       desc: t('storyCardDesc'),
@@ -40,7 +38,7 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
     },
     {
       id: 2,
-      image: tuithomImg,
+      image: PRODUCT_IMAGES.scent,
       badge: t('storyProd2Badge'),
       title: t('storyProd2Title'),
       desc: t('storyProd2Desc'),
@@ -53,7 +51,7 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
     },
     {
       id: 3,
-      image: bagImg,
+      image: PRODUCT_IMAGES.brocade,
       badge: t('storyProd3Badge'),
       title: t('storyProd3Title'),
       desc: t('storyProd3Desc'),
@@ -222,7 +220,7 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
 
             {/* Carousel Controls & CTA inside product card */}
             <div className="mt-6 md:mt-8 flex items-center gap-2 md:gap-3 relative z-10">
-              <button 
+              <button
                 onClick={prevProduct}
                 className="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-[#E3EDD3] text-[#335C33] flex items-center justify-center hover:bg-[#D5E3C0] transition-colors shrink-0"
               >
@@ -239,8 +237,8 @@ export function CascaraStory({ onOpenOrder }: CascaraStoryProps) {
                 <Heart className="w-4 h-4 md:w-5 md:h-5 text-[#E3EDD3] fill-[#E3EDD3] shrink-0" />
                 <span className="truncate">{activeProduct.priceText}</span>
               </motion.button>
-              
-              <button 
+
+              <button
                 onClick={nextProduct}
                 className="w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-[#E3EDD3] text-[#335C33] flex items-center justify-center hover:bg-[#D5E3C0] transition-colors shrink-0"
               >

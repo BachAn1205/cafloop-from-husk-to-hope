@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Recycle, Clock, QrCode, Users, TrendingUp, Sparkles, Sun, Sprout } from 'lucide-react';
 import { AnimatedCounter } from './AnimatedCounter';
@@ -9,13 +9,12 @@ const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
 export function ESGSection() {
   const { t, language } = useLanguage();
-  const [scanCount, setScanCount] = useState(0);
+  const [qrVisitCount, setQrVisitCount] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    // recordSiteVisit đã chống trùng theo session; trả về tổng từ DB
     recordSiteVisit().then((count) => {
-      if (!cancelled) setScanCount(count);
+      if (!cancelled) setQrVisitCount(count);
     });
     return () => {
       cancelled = true;
@@ -72,7 +71,7 @@ export function ESGSection() {
             <div className="relative z-10 mt-2">
               <div className="flex items-baseline gap-1.5">
                 <span className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#335C33] tracking-tight font-serif">
-                  ≈ 7,22
+                  {language === 'vi' ? '51,12' : '51.12'}
                 </span>
                 <span className="text-base md:text-lg font-bold text-[#8C5A35]">kg</span>
               </div>
@@ -97,7 +96,7 @@ export function ESGSection() {
             <div>
               <div className="mb-4">
                 <div className="w-11 h-11 rounded-xl bg-[#335C33] text-[#F6F6EE] flex items-center justify-center shadow-xs">
-                  <Sprout className="w-5 h-5 text-[#E3EDD3]" />
+                  <TrendingUp className="w-5 h-5 text-[#E3EDD3]" />
                 </div>
               </div>
 
@@ -109,9 +108,9 @@ export function ESGSection() {
             <div className="relative z-10 mt-2">
               <div className="flex items-baseline gap-1.5">
                 <span className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#335C33] tracking-tight font-serif">
-                  <AnimatedCounter to={500} duration={2.0} />
+                  {language === 'vi' ? '23,74' : '23.74'}
+                  <span className="text-base md:text-lg font-bold text-[#8C5A35]">%</span>
                 </span>
-                <span className="text-base md:text-lg font-bold text-[#8C5A35]">kg</span>
               </div>
               <p className="text-[11px] md:text-xs text-[#2C2E2B]/75 mt-2 leading-relaxed">
                 {t('esgCardHuskDesc')}
@@ -146,7 +145,7 @@ export function ESGSection() {
             <div className="relative z-10 mt-2">
               <div className="flex items-baseline gap-1.5">
                 <span className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#335C33] tracking-tight font-serif">
-                  <AnimatedCounter to={1200} duration={2.2} />
+                  {language === 'vi' ? '88,17' : '88.17'}
                 </span>
                 <span className="text-base md:text-lg font-bold text-[#8C5A35]">kg</span>
               </div>
@@ -183,10 +182,10 @@ export function ESGSection() {
             <div className="relative z-10 mt-2">
               <div className="flex items-baseline gap-1.5">
                 <span className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#335C33] tracking-tight font-serif">
-                  ≈ 44
+                  ≈ <AnimatedCounter to={20} duration={1.6} />
                 </span>
                 <span className="text-sm md:text-base font-bold text-[#8C5A35]">
-                  {language === 'vi' ? 'giờ công' : 'hours'}
+                  {language === 'vi' ? 'giờ' : 'hours'}
                 </span>
               </div>
               <p className="text-[11px] md:text-xs text-[#2C2E2B]/75 mt-2 leading-relaxed">
@@ -222,10 +221,14 @@ export function ESGSection() {
             <div className="relative z-10 mt-2">
               <div className="flex items-baseline gap-1.5">
                 <span className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#335C33] tracking-tight font-serif">
-                  <AnimatedCounter to={scanCount} duration={2.0} />
+                  {qrVisitCount === null ? (
+                    '0'
+                  ) : (
+                    <AnimatedCounter to={qrVisitCount} duration={2.0} />
+                  )}
                 </span>
                 <span className="text-sm md:text-base font-bold text-[#8C5A35]">
-                  {language === 'vi' ? 'lượt' : 'scans'}
+                  {language === 'vi' ? 'lượt' : 'visits'}
                 </span>
               </div>
               <p className="text-[11px] md:text-xs text-[#2C2E2B]/75 mt-2 leading-relaxed">
@@ -261,10 +264,7 @@ export function ESGSection() {
             <div className="relative z-10 mt-2">
               <div className="flex items-baseline gap-1.5">
                 <span className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#335C33] tracking-tight font-serif">
-                  <AnimatedCounter to={12} duration={1.5} />
-                </span>
-                <span className="text-sm md:text-base font-bold text-[#8C5A35]">
-                  {language === 'vi' ? 'hộ dân' : 'households'}
+                  <AnimatedCounter to={4} duration={1.2} />
                 </span>
               </div>
               <p className="text-[11px] md:text-xs text-[#2C2E2B]/75 mt-2 leading-relaxed">
@@ -274,6 +274,10 @@ export function ESGSection() {
           </motion.div>
 
         </div>
+
+        <p className="text-[11px] md:text-xs text-[#2C2E2B]/60 mb-8 md:mb-12">
+          {t('esgSource')}
+        </p>
 
         {/* Circular Economy Flow Section (3 Steps) */}
         <motion.div

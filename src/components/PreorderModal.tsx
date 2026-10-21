@@ -505,9 +505,14 @@ export function PreorderModal({ isOpen, onClose }: PreorderModalProps) {
                   <Sparkles className="text-[#8C5A35]" />
                   <span>{t('modalFundraiseYear')}</span>
                 </div>
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#335C33] font-serif mb-1">
-                  {language === 'vi' ? 'Đặt Hàng Sản Phẩm Tuần Hoàn' : 'Order Circular Products'}
-                </h3>
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-1">
+                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#335C33] font-serif">
+                    {language === 'vi' ? 'Đặt Hàng Sản Phẩm Tuần Hoàn' : 'Order Circular Products'}
+                  </h3>
+                  <span className="text-xs md:text-sm font-semibold tracking-wide text-[#8C5A35]">
+                    {t('heritageCode')}
+                  </span>
+                </div>
                 <p className="text-xs md:text-sm text-[#8C5A35] mb-5">
                   {language === 'vi'
                     ? 'Chọn sản phẩm, số lượng và địa chỉ để ủng hộ dự án CAFLOOP'
