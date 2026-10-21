@@ -81,9 +81,9 @@ export function ESGSection() {
             </div>
           </motion.div>
 
-          {/* Card 2: Vỏ cà phê tái chế (500kg) */}
+          {/* Card 2: Lượt quét mã QR */}
           <motion.div
-            id="card-esg-recycled-husk"
+            id="card-esg-qr-scans"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-30px' }}
@@ -95,25 +95,31 @@ export function ESGSection() {
 
             <div>
               <div className="mb-4">
-                <div className="w-11 h-11 rounded-xl bg-[#335C33] text-[#F6F6EE] flex items-center justify-center shadow-xs">
-                  <TrendingUp className="w-5 h-5 text-[#E3EDD3]" />
+                <div className="w-11 h-11 rounded-xl bg-[#8C5A35] text-[#F6F6EE] flex items-center justify-center shadow-xs">
+                  <QrCode className="w-5 h-5 text-[#E3EDD3]" />
                 </div>
               </div>
 
               <p className="text-xs md:text-sm font-bold text-[#335C33] leading-snug mb-2">
-                {t('esgCardHuskTitle')}
+                {t('esgCardQRTitle')}
               </p>
             </div>
 
             <div className="relative z-10 mt-2">
               <div className="flex items-baseline gap-1.5">
                 <span className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#335C33] tracking-tight font-serif">
-                  {language === 'vi' ? '23,74' : '23.74'}
-                  <span className="text-base md:text-lg font-bold text-[#8C5A35]">%</span>
+                  {qrVisitCount === null ? (
+                    '0'
+                  ) : (
+                    <AnimatedCounter to={qrVisitCount} duration={2.0} />
+                  )}
+                </span>
+                <span className="text-sm md:text-base font-bold text-[#8C5A35]">
+                  {language === 'vi' ? 'lượt' : 'visits'}
                 </span>
               </div>
               <p className="text-[11px] md:text-xs text-[#2C2E2B]/75 mt-2 leading-relaxed">
-                {t('esgCardHuskDesc')}
+                {t('esgCardQRDesc')}
               </p>
             </div>
           </motion.div>
@@ -194,9 +200,9 @@ export function ESGSection() {
             </div>
           </motion.div>
 
-          {/* Card 5: Lượt quét mã QR truy cập trang web - Nền icon màu nâu */}
+          {/* Card 5: Biên lợi nhuận gộp */}
           <motion.div
-            id="card-esg-qr-scans"
+            id="card-esg-recycled-husk"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-30px' }}
@@ -204,35 +210,29 @@ export function ESGSection() {
             whileHover={{ y: -4 }}
             className="bg-[#E3EDD3] rounded-2xl md:rounded-3xl p-5 md:p-6 shadow-xs border border-[#335C33]/15 flex flex-col justify-between transition-[box-shadow,transform] duration-300 hover:shadow-lg relative overflow-hidden group cursor-default"
           >
-            <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-[#8C5A35]/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform duration-500" />
-            
+            <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-[#335C33]/5 rounded-full pointer-events-none group-hover:scale-125 transition-transform duration-500" />
+
             <div>
               <div className="mb-4">
-                <div className="w-11 h-11 rounded-xl bg-[#8C5A35] text-[#F6F6EE] flex items-center justify-center shadow-xs">
-                  <QrCode className="w-5 h-5 text-[#E3EDD3]" />
+                <div className="w-11 h-11 rounded-xl bg-[#335C33] text-[#F6F6EE] flex items-center justify-center shadow-xs">
+                  <TrendingUp className="w-5 h-5 text-[#E3EDD3]" />
                 </div>
               </div>
 
               <p className="text-xs md:text-sm font-bold text-[#335C33] leading-snug mb-2">
-                {t('esgCardQRTitle')}
+                {t('esgCardHuskTitle')}
               </p>
             </div>
 
             <div className="relative z-10 mt-2">
               <div className="flex items-baseline gap-1.5">
                 <span className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-[#335C33] tracking-tight font-serif">
-                  {qrVisitCount === null ? (
-                    '0'
-                  ) : (
-                    <AnimatedCounter to={qrVisitCount} duration={2.0} />
-                  )}
-                </span>
-                <span className="text-sm md:text-base font-bold text-[#8C5A35]">
-                  {language === 'vi' ? 'lượt' : 'visits'}
+                  {language === 'vi' ? '23,74' : '23.74'}
+                  <span className="text-base md:text-lg font-bold text-[#8C5A35]">%</span>
                 </span>
               </div>
               <p className="text-[11px] md:text-xs text-[#2C2E2B]/75 mt-2 leading-relaxed">
-                {t('esgCardQRDesc')}
+                {t('esgCardHuskDesc')}
               </p>
             </div>
           </motion.div>

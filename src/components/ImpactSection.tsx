@@ -1,6 +1,6 @@
 import { useRef, useState, type ReactNode } from 'react';
 import { motion, useInView } from 'motion/react';
-import { Bike, Tv, MapPin, CheckCircle2, Sparkles, Award, CalendarCheck, Shield, HeartHandshake } from 'lucide-react';
+import { Bike, Tv, MapPin, CheckCircle2, Sparkles, Award, CalendarCheck, Shield, HeartHandshake, Bean } from 'lucide-react';
 import YouTube from 'react-youtube';
 import { AnimatedCounter } from './AnimatedCounter';
 import { useLanguage } from '../utils/LanguageContext';
@@ -12,11 +12,13 @@ function FundProgressCard({
   percent,
   title,
   delay,
+  className = '',
   children,
 }: {
   percent: number;
   title: string;
   delay: number;
+  className?: string;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -30,7 +32,7 @@ function FundProgressCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-30px' }}
       transition={{ duration: 0.5, delay, ease: EASE_NATURAL }}
-      className="bg-[#F6F6EE] border-2 border-[#335C33]/20 rounded-2xl md:rounded-3xl p-5 md:p-6 shadow-md"
+      className={`bg-[#F6F6EE] border-2 border-[#335C33]/20 rounded-2xl md:rounded-3xl p-5 md:p-6 shadow-md ${className}`}
     >
       <div className="mb-4 md:mb-5">
         <span className="text-[11px] md:text-xs font-bold uppercase tracking-wider text-[#8C5A35] flex items-center gap-1.5 mb-2">
@@ -102,8 +104,23 @@ export function ImpactSection() {
           </div>
         </motion.div>
 
-        {/* Desktop Split Screen Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-30px' }}
+          transition={{ duration: 0.5, delay: 0.12, ease: EASE_NATURAL }}
+          className="bg-[#E3EDD3]/90 rounded-2xl md:rounded-3xl p-5 md:p-8 border border-[#335C33]/15 shadow-sm relative overflow-hidden mb-8 lg:mb-12"
+        >
+          <div className="absolute -top-4 -left-2 text-[80px] leading-none text-[#335C33]/10 font-serif pointer-events-none">
+            "
+          </div>
+          <p id="impact-copy-text" className="text-base md:text-lg lg:text-xl text-[#335C33] font-medium leading-relaxed text-center relative z-10 italic">
+            {t('impactQuote')}
+          </p>
+        </motion.div>
+
+        {/* Video spans the first two partner cards; Highland fund sits below them */}
+        <div id="progress-container" className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-4 md:gap-y-5 items-stretch">
           
           {/* Left Column: Heartwarming Video */}
           <motion.div
@@ -111,7 +128,7 @@ export function ImpactSection() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: '-30px' }}
             transition={{ duration: 0.6, delay: 0.08, ease: EASE_NATURAL }}
-            className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-lg border-2 border-[#E3EDD3] aspect-[4/3] lg:aspect-square w-full group bg-black"
+            className="relative rounded-2xl md:rounded-3xl overflow-hidden shadow-lg border-2 border-[#E3EDD3] aspect-[4/3] lg:aspect-auto lg:row-span-2 lg:row-start-1 lg:h-full w-full min-h-0 group bg-black"
           >
             <YouTube
               videoId="ZK2En3NWqTY"
@@ -134,27 +151,6 @@ export function ImpactSection() {
             />
           </motion.div>
 
-          {/* Right Column: Copy & Progress */}
-          <div className="flex flex-col gap-6 md:gap-8">
-            
-            {/* Core Social Impact Copy */}
-            <motion.div
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-30px' }}
-              transition={{ duration: 0.5, delay: 0.12, ease: EASE_NATURAL }}
-              className="bg-[#E3EDD3]/90 rounded-2xl md:rounded-3xl p-5 md:p-8 border border-[#335C33]/15 shadow-sm relative overflow-hidden"
-            >
-              {/* Decorative quote mark */}
-              <div className="absolute -top-4 -left-2 text-[80px] leading-none text-[#335C33]/10 font-serif pointer-events-none">
-                "
-              </div>
-              <p id="impact-copy-text" className="text-base md:text-lg lg:text-xl text-[#335C33] font-medium leading-relaxed md:leading-relaxed text-center relative z-10 italic">
-                {t('impactQuote')}
-              </p>
-            </motion.div>
-
-            <div id="progress-container" className="flex flex-col gap-4 md:gap-5">
               <FundProgressCard percent={100} title={t('impactTargetTitle')} delay={0.12}>
                 <div className="grid grid-cols-2 gap-3 md:gap-4">
                   <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
@@ -201,7 +197,7 @@ export function ImpactSection() {
                 </div>
               </FundProgressCard>
 
-              <FundProgressCard percent={70} title={t('impactHighlandFrameTitle')} delay={0.24}>
+              <FundProgressCard percent={70} title={t('impactHighlandFrameTitle')} delay={0.24} className="lg:col-span-2">
                 <div className="flex items-start gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
                   <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#8C5A35] flex items-center justify-center flex-shrink-0">
                     <HeartHandshake className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
@@ -210,15 +206,17 @@ export function ImpactSection() {
                     <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactHighlandFundTitle')}</p>
                     <p className="text-xs md:text-sm font-semibold text-[#335C33]/80">{t('impactHighlandFundSubtitle')}</p>
                     <p className="text-xs md:text-sm text-[#8C5A35] leading-relaxed">{t('impactHighlandFundDesc')}</p>
-                    <ul className="text-xs md:text-sm text-[#2C2E2B]/80 leading-relaxed space-y-1 list-disc pl-3.5">
-                      <li>{t('impactHighlandFundGoal1')}</li>
-                      <li>{t('impactHighlandFundGoal2')}</li>
-                      <li>{t('impactHighlandFundGoal3')}</li>
+                    <ul className="space-y-2 pt-1">
+                      {[t('impactHighlandFundGoal1'), t('impactHighlandFundGoal2'), t('impactHighlandFundGoal3')].map((goal) => (
+                        <li key={goal} className="flex items-start gap-2.5 text-xs md:text-sm text-[#2C2E2B]/85 leading-relaxed">
+                          <Bean className="w-4 h-4 md:w-[18px] md:h-[18px] mt-0.5 shrink-0 text-[#8C5A35]" strokeWidth={2.25} />
+                          <span>{goal}</span>
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 </div>
               </FundProgressCard>
-            </div>
 
             {/* Mission note */}
             <motion.div
@@ -226,13 +224,12 @@ export function ImpactSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-30px' }}
               transition={{ duration: 0.4, delay: 0.25, ease: EASE_NATURAL }}
-              className="flex items-center justify-center lg:justify-start gap-2 text-xs md:text-sm text-[#8C5A35]"
+              className="lg:col-span-2 flex items-center justify-center lg:justify-start gap-2 text-xs md:text-sm text-[#8C5A35]"
             >
               <Award className="w-4 h-4 md:w-5 md:h-5 text-[#335C33]" />
               <span>{t('impactTransparency')}</span>
             </motion.div>
 
-          </div>
         </div>
 
       </div>
