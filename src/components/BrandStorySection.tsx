@@ -18,7 +18,7 @@ import founderImg from '../../assets/image/founder.png';
 const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
 export function BrandStorySection() {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const [isFounderModalOpen, setIsFounderModalOpen] = useState(false);
 
   const coreValues = [
@@ -127,11 +127,6 @@ export function BrandStorySection() {
                 {t('visionDesc')}
               </p>
             </div>
-
-            <div className="pt-6 mt-4 border-t border-[#335C33]/10 flex items-center gap-2 text-xs font-semibold text-[#335C33]">
-              <span className="w-2 h-2 rounded-full bg-[#335C33] animate-pulse" />
-              <span>{language === 'vi' ? 'Tác động tuần hoàn dài hạn' : 'Long-term Circular Impact'}</span>
-            </div>
           </motion.div>
 
           {/* Sứ Mệnh (Mission Card) */}
@@ -157,11 +152,6 @@ export function BrandStorySection() {
               <p className="text-[#E3EDD3]/90 text-sm sm:text-base leading-relaxed">
                 {t('missionDesc')}
               </p>
-            </div>
-
-            <div className="pt-6 mt-4 border-t border-white/10 flex items-center gap-2 text-xs font-semibold text-[#E3EDD3] relative z-10">
-              <span className="w-2 h-2 rounded-full bg-[#E3EDD3] animate-pulse" />
-              <span>{language === 'vi' ? 'Từ nông dân đến thế hệ trẻ' : 'Connecting Farmers to the Youth'}</span>
             </div>
           </motion.div>
         </div>

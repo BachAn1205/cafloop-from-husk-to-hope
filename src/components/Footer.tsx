@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Leaf, Heart, School, ArrowUp } from 'lucide-react';
+import { Leaf, Heart, ArrowUp } from 'lucide-react';
 import { useLanguage } from '../utils/LanguageContext';
 
 const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
@@ -57,15 +57,9 @@ export function Footer({ onOpenAdmin }: FooterProps) {
               <span className="text-[10px] md:text-xs text-[#8C5A35] font-semibold">• From Husk to Hope</span>
             </div>
 
-            <p className="text-xs md:text-sm text-[#2C2E2B]/75 leading-relaxed md:leading-relaxed mb-4">
+            <p className="text-xs md:text-sm text-[#2C2E2B]/75 leading-relaxed md:leading-relaxed">
               {t('footerDesc')}
             </p>
-
-            {/* School beneficiary badge */}
-            <div className="inline-flex items-center gap-2 bg-[#F6F6EE] border border-[#335C33]/15 px-3.5 md:px-4 py-2 md:py-2.5 rounded-xl text-xs md:text-sm text-[#335C33] font-medium shadow-xs">
-              <School className="w-4 h-4 md:w-5 md:h-5 text-[#8C5A35] flex-shrink-0" />
-              <span>{t('footerPartner')}</span>
-            </div>
           </div>
 
           {/* Right Column: Actions */}

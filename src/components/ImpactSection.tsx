@@ -31,6 +31,7 @@ function FundProgressCard({
   delay,
   className = '',
   place,
+  description,
   children,
 }: {
   percent: number;
@@ -38,6 +39,7 @@ function FundProgressCard({
   delay: number;
   className?: string;
   place?: string;
+  description?: string;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -67,7 +69,12 @@ function FundProgressCard({
           <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#8C5A35]" />
           {t('impactFundProgress')}
         </span>
-        <h3 className="text-base md:text-lg font-bold text-[#335C33] leading-snug">{title}</h3>
+        {title ? (
+          <h3 className="text-base md:text-lg font-bold text-[#335C33] leading-snug">{title}</h3>
+        ) : null}
+        {description ? (
+          <p className="mt-1.5 text-xs md:text-sm text-[#8C5A35] font-medium leading-relaxed">{description}</p>
+        ) : null}
       </div>
 
       <div className="relative w-full h-5 md:h-6 bg-[#E3EDD3] rounded-full overflow-hidden mb-3 md:mb-4 shadow-inner">
@@ -131,11 +138,11 @@ export function ImpactSection() {
           <h2 id="impact-section-title" className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#335C33] font-serif tracking-tight">
             {t('impactTitle')}
           </h2>
-          <div className="section-subtitle mt-2.5 max-w-3xl mx-auto">
-            <span>
-              <Award className="inline-block w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 align-[-0.15em] text-[#8C5A35]" />
+          <div className="mt-2.5 w-full">
+            <p className="whitespace-nowrap text-center font-medium leading-none text-[#8C5A35] [font-family:var(--font-body)] text-[clamp(0.3rem,calc((100vw-3.5rem)/58),1.125rem)]">
+              <Award className="inline-block w-[1em] h-[1em] mr-[0.35em] align-[-0.12em] text-[#8C5A35]" />
               {t('impactSchool')}
-            </span>
+            </p>
           </div>
         </motion.div>
 
@@ -224,8 +231,7 @@ export function ImpactSection() {
                     <Shield className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactHoaSenTitle')}</p>
-                    <p className="text-xs md:text-sm text-[#8C5A35] mt-0.5">{t('impactHoaSenDesc')}</p>
+                    <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactHoaSenDesc')}</p>
                   </div>
                 </div>
               </FundProgressCard>
@@ -233,6 +239,7 @@ export function ImpactSection() {
               <FundProgressCard
                 percent={70}
                 title={`${t('impactHighlandFrameTitle')} - ${t('impactHighlandFundSubtitle')}`}
+                description={t('impactHighlandFundDesc')}
                 place={t('impactHighlandPlace')}
                 delay={0.24}
                 className="lg:col-span-2"
@@ -241,17 +248,14 @@ export function ImpactSection() {
                   <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#8C5A35] flex items-center justify-center flex-shrink-0">
                     <HeartHandshake className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactHighlandFundDesc')}</p>
-                    <ul className="mt-0.5 space-y-1">
-                      {[t('impactHighlandFundGoal1'), t('impactHighlandFundGoal2'), t('impactHighlandFundGoal3')].map((goal) => (
-                        <li key={goal} className="flex items-start gap-2 text-xs md:text-sm text-[#8C5A35]">
-                          <CoffeeBeanIcon className="w-4 h-4 md:w-[18px] md:h-[18px] mt-0.5 shrink-0 text-[#8C5A35]" />
-                          <span>{goal}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  <ul className="min-w-0 space-y-1.5">
+                    {[t('impactHighlandFundGoal1'), t('impactHighlandFundGoal2'), t('impactHighlandFundGoal3')].map((goal) => (
+                      <li key={goal} className="flex items-start gap-2 text-xs md:text-sm font-bold text-[#335C33]">
+                        <CoffeeBeanIcon className="w-4 h-4 md:w-[18px] md:h-[18px] mt-0.5 shrink-0 text-[#8C5A35]" />
+                        <span>{goal}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </FundProgressCard>
 

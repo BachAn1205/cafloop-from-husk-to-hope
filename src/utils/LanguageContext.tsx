@@ -60,7 +60,6 @@ type TranslationKeys =
   | 'impactRemaining'
   | 'impactBikesTitle'
   | 'impactTVsTitle'
-  | 'impactHoaSenTitle'
   | 'impactHoaSenDesc'
   | 'impactHoaSenPlace'
   | 'impactHighlandPlace'
@@ -137,7 +136,6 @@ type TranslationKeys =
   | 'modalFreeship'
   | 'modalBtnConfirm'
   | 'footerDesc'
-  | 'footerPartner'
   | 'footerToTop'
   | 'footerCopyright'
   | 'footerSlogan'
@@ -235,7 +233,7 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     impactQuote: '“Toàn bộ lợi nhuận từ phiên bản giới hạn sẽ được chuyển hóa thành phương tiện đến trường và tri thức.”',
     impactFundProgress: 'Tiến Độ Gây Quỹ Hiện Tại',
     impactPhase: 'Giai đoạn 1',
-    impactTargetTitle: 'Đối tác với Ea War Project',
+    impactTargetTitle: 'Đối tác với Ea Wer Project',
     impactEaWarPlace: 'Trường Tiểu học Nguyễn Thị Minh Khai',
     impactHoaSenFrameTitle: 'Đối tác với Liên minh Cầu Hoa Sen',
     impactHighlandFrameTitle: 'Quỹ Highland Girl\'s Fund',
@@ -244,13 +242,11 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     impactRemaining: 'Đạt 100% mục tiêu giai đoạn 1',
     impactBikesTitle: '77 / 77 Xe Đạp',
     impactTVsTitle: '02 / 02 TV',
-    impactHoaSenTitle: 'Liên minh Cầu Hoa Sen',
     impactHoaSenDesc: '500 vòng phản quang trao tặng',
     impactHoaSenPlace: 'Tỉnh Đắk Lắk',
     impactHighlandPlace: 'Buôn Đrăng Phốk, Đắk Lắk',
     impactHighlandFundSubtitle: 'Góc nhỏ, ước mơ lớn',
-    impactHighlandFundDesc:
-      'Sáng kiến do CAFLOOP sáng lập, đồng hành cùng trẻ em gái tại Buôn Đrăng Phốk, Đắk Lắk qua giáo dục, tri thức và cơ hội phát triển.',
+    impactHighlandFundDesc: 'Sáng kiến do CAFLOOP sáng lập, đồng hành cùng trẻ em gái qua giáo dục, tri thức và cơ hội phát triển.',
     impactHighlandFundGoal1: 'Xây góc đọc sách cộng đồng — khích lệ tò mò và niềm yêu thích học tập.',
     impactHighlandFundGoal2: 'Chia sẻ kiến thức tuổi dậy thì, sức khỏe, ranh giới cá nhân và kỹ năng tự bảo vệ.',
     impactHighlandFundGoal3: 'Trao sách vở, dụng cụ học tập theo nhu cầu thực tế của các em.',
@@ -330,7 +326,6 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     donateQRSub: 'Mở ứng dụng ngân hàng hoặc ví điện tử (MoMo, VNPay...) để quét mã.',
     donateBtnDone: 'Tôi đã chuyển khoản thành công',
     footerDesc: 'Dự án kinh tế tuần hoàn tái chế vỏ quả cà phê chín mọng thành trà Cascara thượng hạng, gây quỹ học bổng và trang thiết bị cho các điểm trường vùng cao Tây Nguyên.',
-    footerPartner: 'Đối tác thụ hưởng: Trường TH Nguyễn Thị Minh Khai',
     footerToTop: 'Lên đầu trang',
     footerCopyright: '© 2026 CAFLOOP - Dự Án Kinh Tế Tuần Hoàn & Quỹ Giáo Dục Vùng Cao',
     footerSlogan: 'Vì một tương lai xanh và ngời sáng tri thức',
@@ -419,7 +414,7 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     impactQuote: '“All profits from this limited edition will be transformed into school transport and digital knowledge.”',
     impactFundProgress: 'Current Fundraising Progress',
     impactPhase: 'Phase 1',
-    impactTargetTitle: 'Partner with the Ea War Project',
+    impactTargetTitle: 'Partner with the Ea Wer Project',
     impactEaWarPlace: 'Nguyen Thi Minh Khai Primary School',
     impactHoaSenFrameTitle: 'Partner with the Hoa Sen Bridge Alliance',
     impactHighlandFrameTitle: "Highland Girl's Fund",
@@ -428,13 +423,11 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     impactRemaining: '100% goal achieved for Phase 1',
     impactBikesTitle: '77 / 77 Bicycles',
     impactTVsTitle: '02 / 02 TVs',
-    impactHoaSenTitle: 'Hoa Sen Bridge Alliance',
     impactHoaSenDesc: '500 reflective rings donated',
     impactHoaSenPlace: 'Dak Lak Province',
     impactHighlandPlace: 'Buon Drang Phok, Dak Lak',
-    impactHighlandFundSubtitle: 'A small corner, big dreams',
-    impactHighlandFundDesc:
-      'A CAFLOOP initiative supporting girls in Buon Drang Phok, Dak Lak through education, knowledge, and lasting opportunities.',
+    impactHighlandFundSubtitle: 'A small corner, a big dream',
+    impactHighlandFundDesc: 'An initiative founded by CAFLOOP, accompanying girls through education, knowledge, and opportunities to grow.',
     impactHighlandFundGoal1: 'Build a community reading corner — sparking curiosity and a love of learning.',
     impactHighlandFundGoal2: 'Age-appropriate sessions on puberty, health, personal boundaries, and self-protection.',
     impactHighlandFundGoal3: 'Provide books, school supplies, and practical support based on real local needs.',
@@ -514,7 +507,6 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     donateQRSub: 'Open your banking app or e-wallet to scan this QR code.',
     donateBtnDone: 'I have successfully transferred',
     footerDesc: 'A circular economy project upcycling coffee cherry husks into premium Cascara tea, funding scholarships and digital equipment for highland primary schools in the Central Highlands.',
-    footerPartner: 'Beneficiary Partner: Nguyen Thi Minh Khai Primary School',
     footerToTop: 'Back to top',
     footerCopyright: '© 2026 CAFLOOP - Circular Economy & Highland Education Fund',
     footerSlogan: 'For a green future and bright minds',
