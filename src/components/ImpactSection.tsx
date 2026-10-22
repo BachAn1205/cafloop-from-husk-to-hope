@@ -144,12 +144,12 @@ export function ImpactSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
           transition={{ duration: 0.5, delay: 0.12, ease: EASE_NATURAL }}
-          className="bg-[#E3EDD3]/90 rounded-2xl md:rounded-3xl p-5 md:p-8 border border-[#335C33]/15 shadow-sm relative overflow-hidden mb-8 lg:mb-12"
+          className="@container bg-[#E3EDD3]/90 rounded-2xl md:rounded-3xl p-5 md:p-8 border border-[#335C33]/15 shadow-sm relative overflow-hidden mb-8 lg:mb-12"
         >
           <div className="absolute -top-4 -left-2 text-[80px] leading-none text-[#335C33]/10 font-serif pointer-events-none">
             "
           </div>
-          <p id="impact-copy-text" className="text-base md:text-lg lg:text-xl text-[#335C33] font-medium leading-relaxed text-center relative z-10 italic">
+          <p id="impact-copy-text" className="sm:whitespace-nowrap text-[clamp(0.6875rem,1.65cqi,1.25rem)] text-[#335C33] font-medium text-center relative z-10 italic">
             {t('impactQuote')}
           </p>
         </motion.div>
