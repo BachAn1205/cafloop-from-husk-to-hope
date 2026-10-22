@@ -1,6 +1,6 @@
 import { useRef, useState, type ReactNode } from 'react';
 import { motion, useInView } from 'motion/react';
-import { Bike, Tv, MapPin, CheckCircle2, Sparkles, Award, CalendarCheck, Shield, HeartHandshake, Bean } from 'lucide-react';
+import { Bike, Tv, CheckCircle2, Sparkles, Award, CalendarCheck, Shield, HeartHandshake, MapPin } from 'lucide-react';
 import YouTube from 'react-youtube';
 import { AnimatedCounter } from './AnimatedCounter';
 import { useLanguage } from '../utils/LanguageContext';
@@ -8,22 +8,50 @@ import { trungAudio } from '../utils/audio';
 
 const EASE_NATURAL = [0.25, 0.46, 0.45, 0.94] as const;
 
+function CoffeeBeanIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <g transform="rotate(-28 12 12)">
+        <ellipse cx="12" cy="12" rx="5.1" ry="8.35" fill="currentColor" />
+        <path
+          d="M12 4.6c1.35 2.15 1.35 4.35 0 6.5s-1.35 4.35 0 6.3"
+          fill="none"
+          stroke="#F6F6EE"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+      </g>
+    </svg>
+  );
+}
+
 function FundProgressCard({
   percent,
   title,
   delay,
   className = '',
+  place,
   children,
 }: {
   percent: number;
   title: string;
   delay: number;
   className?: string;
+  place?: string;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-40px' });
   const { t } = useLanguage();
+
+  const progressLabel = (
+    <span className="text-[#335C33] flex items-center gap-1.5 shrink-0">
+      <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-[#335C33]" />
+      <span className="font-bold text-sm md:text-base">
+        {t('impactProgressLabel')} {isInView ? <AnimatedCounter to={percent} duration={1.5} /> : 0}%
+      </span>
+    </span>
+  );
 
   return (
     <motion.div
@@ -53,14 +81,19 @@ function FundProgressCard({
         </motion.div>
       </div>
 
-      <div className="flex items-center text-xs md:text-sm font-semibold mb-4">
-        <span className="text-[#335C33] flex items-center gap-1.5">
-          <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-[#335C33]" />
-          <span className="font-bold text-sm md:text-base">
-            {t('impactProgressLabel')} {isInView ? <AnimatedCounter to={percent} duration={1.5} /> : 0}%
+      {place ? (
+        <div className="flex items-center justify-between gap-3 text-xs md:text-sm font-semibold mb-4">
+          <span className="text-[#335C33] flex items-center gap-1.5 min-w-0">
+            <MapPin className="w-4 h-4 md:w-5 md:h-5 text-[#335C33] shrink-0" />
+            <span className="font-bold text-sm md:text-base">{place}</span>
           </span>
-        </span>
-      </div>
+          {progressLabel}
+        </div>
+      ) : (
+        <div className="flex items-center text-xs md:text-sm font-semibold mb-4">
+          {progressLabel}
+        </div>
+      )}
 
       {children}
     </motion.div>
@@ -98,9 +131,11 @@ export function ImpactSection() {
           <h2 id="impact-section-title" className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#335C33] font-serif tracking-tight">
             {t('impactTitle')}
           </h2>
-          <div className="section-subtitle mt-2.5 flex items-center justify-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#8C5A35]" />
-            <span>{t('impactSchool')}</span>
+          <div className="section-subtitle mt-2.5 max-w-3xl mx-auto">
+            <span>
+              <Award className="inline-block w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5 align-[-0.15em] text-[#8C5A35]" />
+              {t('impactSchool')}
+            </span>
           </div>
         </motion.div>
 
@@ -151,7 +186,7 @@ export function ImpactSection() {
             />
           </motion.div>
 
-              <FundProgressCard percent={100} title={t('impactTargetTitle')} delay={0.12}>
+              <FundProgressCard percent={100} title={t('impactTargetTitle')} place={t('impactEaWarPlace')} delay={0.12}>
                 <div className="grid grid-cols-2 gap-3 md:gap-4">
                   <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
                     <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#335C33] flex items-center justify-center flex-shrink-0">
@@ -159,7 +194,6 @@ export function ImpactSection() {
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactBikesTitle')}</p>
-                      <p className="text-xs md:text-sm text-[#8C5A35] mt-0.5">{t('impactBikesDesc')}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
@@ -168,24 +202,23 @@ export function ImpactSection() {
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactTVsTitle')}</p>
-                      <p className="text-xs md:text-sm text-[#8C5A35] mt-0.5">{t('impactTVsDesc')}</p>
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-[#E3EDD3]/45 p-3 rounded-xl md:rounded-2xl border border-[#335C33]/10">
-                  <div className="flex items-center gap-2 text-xs md:text-sm text-[#335C33] font-bold">
-                    <div className="w-6 h-6 md:w-7 md:h-7 rounded-lg bg-[#335C33] text-[#E3EDD3] flex items-center justify-center shrink-0">
-                      <CalendarCheck className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <div className="mt-4 flex flex-row items-center flex-nowrap gap-2 bg-[#E3EDD3]/45 p-3 rounded-xl md:rounded-2xl border border-[#335C33]/10">
+                  <div className="flex items-center gap-2 min-w-0 text-xs text-[#335C33] font-bold">
+                    <div className="w-6 h-6 rounded-lg bg-[#335C33] text-[#E3EDD3] flex items-center justify-center shrink-0">
+                      <CalendarCheck className="w-3.5 h-3.5" />
                     </div>
-                    <span>{t('impactCompletionTitle')}</span>
+                    <span className="whitespace-nowrap">{t('impactCompletionTitle')}</span>
                   </div>
-                  <span className="text-xs md:text-sm font-extrabold text-[#335C33] bg-white px-2.5 sm:px-3 py-1 rounded-lg border border-[#335C33]/15">
+                  <span className="text-xs font-extrabold text-[#335C33] bg-white px-2.5 py-1 rounded-lg border border-[#335C33]/15 whitespace-nowrap">
                     {t('impactCompletionValue')}
                   </span>
                 </div>
               </FundProgressCard>
 
-              <FundProgressCard percent={75} title={t('impactHoaSenFrameTitle')} delay={0.18}>
+              <FundProgressCard percent={75} title={t('impactHoaSenFrameTitle')} place={t('impactHoaSenPlace')} delay={0.18}>
                 <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
                   <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#335C33] flex items-center justify-center flex-shrink-0">
                     <Shield className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
@@ -197,19 +230,23 @@ export function ImpactSection() {
                 </div>
               </FundProgressCard>
 
-              <FundProgressCard percent={70} title={t('impactHighlandFrameTitle')} delay={0.24} className="lg:col-span-2">
+              <FundProgressCard
+                percent={70}
+                title={`${t('impactHighlandFrameTitle')} - ${t('impactHighlandFundSubtitle')}`}
+                place={t('impactHighlandPlace')}
+                delay={0.24}
+                className="lg:col-span-2"
+              >
                 <div className="flex items-start gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
                   <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#8C5A35] flex items-center justify-center flex-shrink-0">
                     <HeartHandshake className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
                   </div>
-                  <div className="min-w-0 space-y-1.5">
-                    <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactHighlandFundTitle')}</p>
-                    <p className="text-xs md:text-sm font-semibold text-[#335C33]/80">{t('impactHighlandFundSubtitle')}</p>
-                    <p className="text-xs md:text-sm text-[#8C5A35] leading-relaxed">{t('impactHighlandFundDesc')}</p>
-                    <ul className="space-y-2 pt-1">
+                  <div className="min-w-0">
+                    <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactHighlandFundDesc')}</p>
+                    <ul className="mt-0.5 space-y-1">
                       {[t('impactHighlandFundGoal1'), t('impactHighlandFundGoal2'), t('impactHighlandFundGoal3')].map((goal) => (
-                        <li key={goal} className="flex items-start gap-2.5 text-xs md:text-sm text-[#2C2E2B]/85 leading-relaxed">
-                          <Bean className="w-4 h-4 md:w-[18px] md:h-[18px] mt-0.5 shrink-0 text-[#8C5A35]" strokeWidth={2.25} />
+                        <li key={goal} className="flex items-start gap-2 text-xs md:text-sm text-[#8C5A35]">
+                          <CoffeeBeanIcon className="w-4 h-4 md:w-[18px] md:h-[18px] mt-0.5 shrink-0 text-[#8C5A35]" />
                           <span>{goal}</span>
                         </li>
                       ))}
@@ -217,18 +254,6 @@ export function ImpactSection() {
                   </div>
                 </div>
               </FundProgressCard>
-
-            {/* Mission note */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-30px' }}
-              transition={{ duration: 0.4, delay: 0.25, ease: EASE_NATURAL }}
-              className="lg:col-span-2 flex items-center justify-center lg:justify-start gap-2 text-xs md:text-sm text-[#8C5A35]"
-            >
-              <Award className="w-4 h-4 md:w-5 md:h-5 text-[#335C33]" />
-              <span>{t('impactTransparency')}</span>
-            </motion.div>
 
         </div>
 

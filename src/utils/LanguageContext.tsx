@@ -52,18 +52,18 @@ type TranslationKeys =
   | 'impactFundProgress'
   | 'impactPhase'
   | 'impactTargetTitle'
+  | 'impactEaWarPlace'
   | 'impactHoaSenFrameTitle'
   | 'impactHighlandFrameTitle'
   | 'impactProgressLabel'
   | 'impactCompleted'
   | 'impactRemaining'
   | 'impactBikesTitle'
-  | 'impactBikesDesc'
   | 'impactTVsTitle'
-  | 'impactTVsDesc'
   | 'impactHoaSenTitle'
   | 'impactHoaSenDesc'
-  | 'impactHighlandFundTitle'
+  | 'impactHoaSenPlace'
+  | 'impactHighlandPlace'
   | 'impactHighlandFundSubtitle'
   | 'impactHighlandFundDesc'
   | 'impactHighlandFundGoal1'
@@ -71,7 +71,6 @@ type TranslationKeys =
   | 'impactHighlandFundGoal3'
   | 'impactCompletionTitle'
   | 'impactCompletionValue'
-  | 'impactTransparency'
   | 'heritageCode'
   | 'storyBadge'
   | 'storyTitle'
@@ -229,26 +228,26 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     esgCycleStep3Desc: 'Xe đạp & TV',
     impactBadge: 'Tác Động Xã Hội',
     impactTitle: 'Hành Trình Gieo Mầm',
-    impactSchool: 'Trường Tiểu học Nguyễn Thị Minh Khai • Tây Nguyên',
+    impactSchool: 'Minh bạch 100% tài chính và tiến độ trao quà trực tiếp tại các điểm trường và các cơ quan địa phương',
     impactImgBadgeTitle: 'Điểm Trường Vùng Cao',
     impactImgBadgeDesc: 'Vượt 8-12km đồi dốc mỗi ngày',
     impactImgBadgeSeason: 'Mùa Tựu Trường',
     impactQuote: '“Toàn bộ lợi nhuận từ phiên bản giới hạn sẽ được chuyển hóa thành phương tiện đến trường và tri thức.”',
     impactFundProgress: 'Tiến Độ Gây Quỹ Hiện Tại',
     impactPhase: 'Giai đoạn 1',
-    impactTargetTitle: 'Đối tác với Ea War Project: trao tặng 77 xe đạp và 2 TV cho trường TH NTMK',
-    impactHoaSenFrameTitle: 'Đối tác với Liên minh Cầu Hoa Sen: trao tặng 500 vòng phản quang cho các em nhỏ ở Đắk Lắk',
+    impactTargetTitle: 'Đối tác với Ea War Project',
+    impactEaWarPlace: 'Trường Tiểu học Nguyễn Thị Minh Khai',
+    impactHoaSenFrameTitle: 'Đối tác với Liên minh Cầu Hoa Sen',
     impactHighlandFrameTitle: 'Quỹ Highland Girl\'s Fund',
     impactProgressLabel: 'Tiến độ',
     impactCompleted: 'Đã hoàn thành',
     impactRemaining: 'Đạt 100% mục tiêu giai đoạn 1',
     impactBikesTitle: '77 / 77 Xe Đạp',
-    impactBikesDesc: 'Hợp tác cùng Dự án Ea War',
     impactTVsTitle: '02 / 02 TV',
-    impactTVsDesc: 'Hợp tác cùng Dự án Ea War',
     impactHoaSenTitle: 'Liên minh Cầu Hoa Sen',
     impactHoaSenDesc: '500 vòng phản quang trao tặng',
-    impactHighlandFundTitle: "Highland Girl's Fund",
+    impactHoaSenPlace: 'Tỉnh Đắk Lắk',
+    impactHighlandPlace: 'Buôn Đrăng Phốk, Đắk Lắk',
     impactHighlandFundSubtitle: 'Góc nhỏ, ước mơ lớn',
     impactHighlandFundDesc:
       'Sáng kiến do CAFLOOP sáng lập, đồng hành cùng trẻ em gái tại Buôn Đrăng Phốk, Đắk Lắk qua giáo dục, tri thức và cơ hội phát triển.',
@@ -257,7 +256,6 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     impactHighlandFundGoal3: 'Trao sách vở, dụng cụ học tập theo nhu cầu thực tế của các em.',
     impactCompletionTitle: 'Thời gian hoàn thành:',
     impactCompletionValue: '30/04/2026 (Hoàn tất 100% trước hạn)',
-    impactTransparency: 'Minh bạch 100% tài chính và tiến độ trao quà trực tiếp tại điểm trường',
     heritageCode: 'The Heritage Code',
     storyBadge: 'Chiến dịch "The Heritage Code"',
     storyTitle: 'Trà Cascara CAFLOOP',
@@ -414,26 +412,26 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     esgCycleStep3Desc: 'Bikes & TVs',
     impactBadge: 'Social Impact',
     impactTitle: 'Journey of Hope',
-    impactSchool: 'Nguyen Thi Minh Khai Primary School • Central Highlands',
+    impactSchool: '100% transparency in finances and direct gift delivery at school sites and local authorities',
     impactImgBadgeTitle: 'Highland School Site',
     impactImgBadgeDesc: 'Traveling 8-12km hilly roads daily',
     impactImgBadgeSeason: 'Back-to-school',
     impactQuote: '“All profits from this limited edition will be transformed into school transport and digital knowledge.”',
     impactFundProgress: 'Current Fundraising Progress',
     impactPhase: 'Phase 1',
-    impactTargetTitle: 'Partner with the Ea War Project: 77 bicycles and 2 TVs for Nguyen Thi Minh Khai Primary School',
-    impactHoaSenFrameTitle: 'Partner with the Hoa Sen Bridge Alliance: 500 reflective rings for children in Dak Lak',
+    impactTargetTitle: 'Partner with the Ea War Project',
+    impactEaWarPlace: 'Nguyen Thi Minh Khai Primary School',
+    impactHoaSenFrameTitle: 'Partner with the Hoa Sen Bridge Alliance',
     impactHighlandFrameTitle: "Highland Girl's Fund",
     impactProgressLabel: 'Progress',
     impactCompleted: 'Completed',
     impactRemaining: '100% goal achieved for Phase 1',
     impactBikesTitle: '77 / 77 Bicycles',
-    impactBikesDesc: 'Partner with the Ea War Project',
     impactTVsTitle: '02 / 02 TVs',
-    impactTVsDesc: 'Partner with the Ea War Project',
     impactHoaSenTitle: 'Hoa Sen Bridge Alliance',
     impactHoaSenDesc: '500 reflective rings donated',
-    impactHighlandFundTitle: "Highland Girl's Fund",
+    impactHoaSenPlace: 'Dak Lak Province',
+    impactHighlandPlace: 'Buon Drang Phok, Dak Lak',
     impactHighlandFundSubtitle: 'A small corner, big dreams',
     impactHighlandFundDesc:
       'A CAFLOOP initiative supporting girls in Buon Drang Phok, Dak Lak through education, knowledge, and lasting opportunities.',
@@ -442,7 +440,6 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     impactHighlandFundGoal3: 'Provide books, school supplies, and practical support based on real local needs.',
     impactCompletionTitle: 'Completion Timeline:',
     impactCompletionValue: 'Apr 30, 2026 (100% achieved ahead of schedule)',
-    impactTransparency: '100% transparent finance and direct delivery progress at the school site',
     heritageCode: 'The Heritage Code',
     storyBadge: 'The Heritage Code Campaign',
     storyTitle: 'CAFLOOP Cascara Tea',
