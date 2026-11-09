@@ -127,7 +127,7 @@ export function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
         supabase.from('donations').select('*, customers(full_name, phone)').order('created_at', { ascending: false }),
         supabase.from('orders').select('*, customers(full_name, phone)').order('created_at', { ascending: false }),
         supabase.from('customers').select('*').order('created_at', { ascending: false }),
-        getSepayTransactions({ limit: 100, transactionType: 'all' }),
+        getSepayTransactions({ limit: 100, transferType: 'all' }),
         supabase.from('qr_visits').select('*', { count: 'exact', head: true }),
       ]);
 

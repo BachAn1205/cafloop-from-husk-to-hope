@@ -68,6 +68,8 @@ type TranslationKeys =
   | 'impactHighlandFundGoal1'
   | 'impactHighlandFundGoal2'
   | 'impactHighlandFundGoal3'
+  | 'impactHighlandNoteTitle'
+  | 'impactHighlandNoteValue'
   | 'impactCompletionTitle'
   | 'impactCompletionValue'
   | 'heritageCode'
@@ -250,6 +252,8 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     impactHighlandFundGoal1: 'Xây góc đọc sách cộng đồng — khích lệ tò mò và niềm yêu thích học tập.',
     impactHighlandFundGoal2: 'Chia sẻ kiến thức tuổi dậy thì, sức khỏe, ranh giới cá nhân và kỹ năng tự bảo vệ.',
     impactHighlandFundGoal3: 'Trao sách vở, dụng cụ học tập theo nhu cầu thực tế của các em.',
+    impactHighlandNoteTitle: 'Ghi chú:',
+    impactHighlandNoteValue: 'Vẫn tiếp tục duy trì quỹ',
     impactCompletionTitle: 'Thời gian hoàn thành:',
     impactCompletionValue: '30/04/2026 (Hoàn tất 100% trước hạn)',
     heritageCode: 'The Heritage Code',
@@ -431,6 +435,8 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     impactHighlandFundGoal1: 'Build a community reading corner — sparking curiosity and a love of learning.',
     impactHighlandFundGoal2: 'Age-appropriate sessions on puberty, health, personal boundaries, and self-protection.',
     impactHighlandFundGoal3: 'Provide books, school supplies, and practical support based on real local needs.',
+    impactHighlandNoteTitle: 'Note:',
+    impactHighlandNoteValue: 'The fund continues to be actively maintained',
     impactCompletionTitle: 'Completion Timeline:',
     impactCompletionValue: 'Apr 30, 2026 (100% achieved ahead of schedule)',
     heritageCode: 'The Heritage Code',
