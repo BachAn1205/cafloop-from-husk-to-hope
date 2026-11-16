@@ -163,7 +163,7 @@ export function ImpactSection() {
 
         {/* Video spans the first two partner cards; Highland fund sits below them */}
         <div id="progress-container" className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-4 md:gap-y-5 items-stretch">
-          
+
           {/* Left Column: Heartwarming Video */}
           <motion.div
             initial={{ opacity: 0, scale: 0.98 }}
@@ -193,58 +193,78 @@ export function ImpactSection() {
             />
           </motion.div>
 
-              <FundProgressCard percent={100} title={t('impactTargetTitle')} place={t('impactEaWarPlace')} delay={0.12}>
-                <div className="grid grid-cols-2 gap-3 md:gap-4">
-                  <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#335C33] flex items-center justify-center flex-shrink-0">
-                      <Bike className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactBikesTitle')}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#8C5A35] flex items-center justify-center flex-shrink-0">
-                      <Tv className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactTVsTitle')}</p>
-                    </div>
-                  </div>
+          <FundProgressCard percent={100} title={t('impactTargetTitle')} place={t('impactEaWarPlace')} delay={0.12}>
+            <div className="grid grid-cols-2 gap-3 md:gap-4">
+              <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#335C33] flex items-center justify-center flex-shrink-0">
+                  <Bike className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
                 </div>
-                <div className="mt-4 flex flex-row items-center flex-nowrap gap-2 bg-[#E3EDD3]/45 p-3 rounded-xl md:rounded-2xl border border-[#335C33]/10">
-                  <div className="flex items-center gap-2 min-w-0 text-xs text-[#335C33] font-bold">
-                    <div className="w-6 h-6 rounded-lg bg-[#335C33] text-[#E3EDD3] flex items-center justify-center shrink-0">
-                      <CalendarCheck className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="whitespace-nowrap">{t('impactCompletionTitle')}</span>
-                  </div>
-                  <span className="text-xs font-extrabold text-[#335C33] bg-white px-2.5 py-1 rounded-lg border border-[#335C33]/15 whitespace-nowrap">
-                    {t('impactCompletionValue')}
-                  </span>
+                <div className="min-w-0">
+                  <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactBikesTitle')}</p>
                 </div>
-              </FundProgressCard>
+              </div>
+              <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#8C5A35] flex items-center justify-center flex-shrink-0">
+                  <Tv className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactTVsTitle')}</p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-row items-center flex-nowrap gap-2 bg-[#E3EDD3]/45 p-3 rounded-xl md:rounded-2xl border border-[#335C33]/10">
+              <div className="flex items-center gap-2 min-w-0 text-xs text-[#335C33] font-bold">
+                <div className="w-6 h-6 rounded-lg bg-[#335C33] text-[#E3EDD3] flex items-center justify-center shrink-0">
+                  <CalendarCheck className="w-3.5 h-3.5" />
+                </div>
+                <span className="whitespace-nowrap">{t('impactCompletionTitle')}</span>
+              </div>
+              <span className="text-xs font-extrabold text-[#335C33] bg-white px-2.5 py-1 rounded-lg border border-[#335C33]/15 whitespace-nowrap">
+                {t('impactCompletionValue')}
+              </span>
+            </div>
+          </FundProgressCard>
 
-              <FundProgressCard percent={100} title={t('impactHoaSenFrameTitle')} place={t('impactHoaSenPlace')} delay={0.18}>
-                <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#335C33] flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactHoaSenDesc')}</p>
-                  </div>
+          <FundProgressCard percent={100} title={t('impactHoaSenFrameTitle')} place={t('impactHoaSenPlace')} delay={0.18}>
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#335C33] flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
                 </div>
-              </FundProgressCard>
+                <div className="min-w-0">
+                  <p className="text-xs md:text-sm font-bold text-[#335C33]">{t('impactHoaSenDesc')}</p>
+                </div>
+              </div>
+              <div className="p-3 md:p-3.5 rounded-xl md:rounded-2xl bg-[#E3EDD3]/45 border border-[#335C33]/10">
+                <p className="text-xs md:text-sm leading-relaxed text-[#335C33] font-medium">
+                  {t('impactHoaSenSubDesc')}
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-row items-center flex-nowrap gap-2 bg-[#E3EDD3]/45 p-3 rounded-xl md:rounded-2xl border border-[#335C33]/10">
+              <div className="flex items-center gap-2 min-w-0 text-xs text-[#335C33] font-bold">
+                <div className="w-6 h-6 rounded-lg bg-[#335C33] text-[#E3EDD3] flex items-center justify-center shrink-0">
+                  <CalendarCheck className="w-3.5 h-3.5" />
+                </div>
+                <span className="whitespace-nowrap">{t('impactCompletionTitle')}</span>
+              </div>
+              <span className="text-xs font-extrabold text-[#335C33] bg-white px-2.5 py-1 rounded-lg border border-[#335C33]/15 whitespace-nowrap">
+                {t('impactHoaSenCompletionValue')}
+              </span>
+            </div>
+          </FundProgressCard>
 
-              <FundProgressCard
-                percent={70}
-                title={`${t('impactHighlandFrameTitle')} - ${t('impactHighlandFundSubtitle')}`}
-                description={t('impactHighlandFundDesc')}
-                place={t('impactHighlandPlace')}
-                delay={0.24}
-                className="lg:col-span-2"
-              >
-                <div className="flex items-start gap-3 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60">
+          <FundProgressCard
+            percent={100}
+            title={`${t('impactHighlandFrameTitle')} - ${t('impactHighlandFundSubtitle')}`}
+            description={t('impactHighlandFundDesc')}
+            place={t('impactHighlandPlace')}
+            delay={0.24}
+            className="lg:col-span-2"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-4 md:gap-6 items-center">
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-start gap-3 p-3 md:p-3.5 rounded-xl md:rounded-2xl bg-[#E3EDD3]/60 w-fit">
                   <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#8C5A35] flex items-center justify-center flex-shrink-0">
                     <HeartHandshake className="w-5 h-5 md:w-6 md:h-6 text-[#E3EDD3]" />
                   </div>
@@ -257,7 +277,7 @@ export function ImpactSection() {
                     ))}
                   </ul>
                 </div>
-                <div className="mt-4 flex flex-row items-center flex-nowrap gap-2 bg-[#E3EDD3]/45 p-3 rounded-xl md:rounded-2xl border border-[#335C33]/10">
+                <div className="flex flex-row items-center flex-nowrap gap-2 bg-[#E3EDD3]/45 p-2.5 md:p-3 rounded-xl md:rounded-2xl border border-[#335C33]/10 w-fit">
                   <div className="flex items-center gap-2 min-w-0 text-xs text-[#335C33] font-bold">
                     <div className="w-6 h-6 rounded-lg bg-[#8C5A35] text-[#E3EDD3] flex items-center justify-center shrink-0">
                       <Sparkles className="w-3.5 h-3.5" />
@@ -268,11 +288,22 @@ export function ImpactSection() {
                     {t('impactHighlandNoteValue')}
                   </span>
                 </div>
-              </FundProgressCard>
+              </div>
 
-        </div>
+              <div className="relative rounded-xl md:rounded-2xl overflow-hidden border border-[#335C33]/15 shadow-sm bg-[#E3EDD3]/40 h-[140px] md:h-[155px] max-w-[420px] w-full justify-self-center lg:justify-self-end flex items-center">
+                <img
+                  src="/highland-girls-fund.jpg"
+                  alt="Hoạt động Quỹ Highland Girl's Fund tại Buôn Đrăng Phốk"
+                  className="w-full h-full object-cover object-center rounded-xl md:rounded-2xl hover:scale-105 transition-transform duration-500 ease-out"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </FundProgressCard>
 
-      </div>
-    </section>
+        </div >
+
+      </div >
+    </section >
   );
 }

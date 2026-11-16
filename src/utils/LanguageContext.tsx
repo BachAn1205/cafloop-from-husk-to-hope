@@ -61,6 +61,8 @@ type TranslationKeys =
   | 'impactBikesTitle'
   | 'impactTVsTitle'
   | 'impactHoaSenDesc'
+  | 'impactHoaSenSubDesc'
+  | 'impactHoaSenCompletionValue'
   | 'impactHoaSenPlace'
   | 'impactHighlandPlace'
   | 'impactHighlandFundSubtitle'
@@ -225,7 +227,7 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     esgCycleStep2Title: '2. Phơi nắng',
     esgCycleStep2Desc: 'Trà Cascara thơm',
     esgCycleStep3Title: '3. Gây quỹ',
-    esgCycleStep3Desc: 'Xe đạp & TV',
+    esgCycleStep3Desc: 'Hỗ trợ học sinh vùng Tây Nguyên',
     impactBadge: 'Tác Động Xã Hội',
     impactTitle: 'Hành Trình Gieo Mầm',
     impactSchool: 'Minh bạch 100% tài chính và tiến độ trao quà trực tiếp tại các điểm trường và các cơ quan địa phương',
@@ -244,11 +246,13 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     impactRemaining: 'Đạt 100% mục tiêu giai đoạn 1',
     impactBikesTitle: '77 / 77 Xe Đạp',
     impactTVsTitle: '02 / 02 TV',
-    impactHoaSenDesc: '500 vòng phản quang trao tặng',
+    impactHoaSenDesc: 'Trao tặng 500 vòng phản quang',
+    impactHoaSenSubDesc: 'Hợp tác với International Kabataan Union (IKU) và Korea International Youth Alliance (KIYA), phân phát tổng cộng 35.000 vòng phản quang tại ba quốc gia (Việt Nam, Philippines, Hàn Quốc)',
+    impactHoaSenCompletionValue: '02/11/2026 (Hoàn tất)',
     impactHoaSenPlace: 'Tỉnh Đắk Lắk',
     impactHighlandPlace: 'Buôn Đrăng Phốk, Đắk Lắk',
     impactHighlandFundSubtitle: 'Góc nhỏ, ước mơ lớn',
-    impactHighlandFundDesc: 'Sáng kiến do CAFLOOP sáng lập, đồng hành cùng trẻ em gái qua giáo dục, tri thức và cơ hội phát triển.',
+    impactHighlandFundDesc: 'Sáng kiến do CAFLOOP sáng lập, đồng hành cùng trẻ em gái tại Buôn Đrăng Phốk qua giáo dục, tri thức và cơ hội phát triển.',
     impactHighlandFundGoal1: 'Xây góc đọc sách cộng đồng — khích lệ tò mò và niềm yêu thích học tập.',
     impactHighlandFundGoal2: 'Chia sẻ kiến thức tuổi dậy thì, sức khỏe, ranh giới cá nhân và kỹ năng tự bảo vệ.',
     impactHighlandFundGoal3: 'Trao sách vở, dụng cụ học tập theo nhu cầu thực tế của các em.',
@@ -408,7 +412,7 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     esgCycleStep2Title: '2. Sun-dry',
     esgCycleStep2Desc: 'Fragrant Cascara tea',
     esgCycleStep3Title: '3. Fundraising',
-    esgCycleStep3Desc: 'Bikes & TVs',
+    esgCycleStep3Desc: 'Supporting Central Highlands students',
     impactBadge: 'Social Impact',
     impactTitle: 'Journey of Hope',
     impactSchool: '100% transparency in finances and direct gift delivery at school sites and local authorities',
@@ -427,11 +431,13 @@ const translations: Record<Language, Record<TranslationKeys, string>> = {
     impactRemaining: '100% goal achieved for Phase 1',
     impactBikesTitle: '77 / 77 Bicycles',
     impactTVsTitle: '02 / 02 TVs',
-    impactHoaSenDesc: '500 reflective rings donated',
+    impactHoaSenDesc: 'Donated 500 reflective rings',
+    impactHoaSenSubDesc: 'Partnering with International Kabataan Union (IKU) and Korea International Youth Alliance (KIYA), distributing a total of 35,000 reflective rings across three countries (Vietnam, Philippines, South Korea)',
+    impactHoaSenCompletionValue: 'Nov 02, 2026 (Completed)',
     impactHoaSenPlace: 'Dak Lak Province',
     impactHighlandPlace: 'Buon Drang Phok, Dak Lak',
     impactHighlandFundSubtitle: 'A small corner, a big dream',
-    impactHighlandFundDesc: 'An initiative founded by CAFLOOP, accompanying girls through education, knowledge, and opportunities to grow.',
+    impactHighlandFundDesc: 'An initiative founded by CAFLOOP, accompanying girls in Buon Drang Phok through education, knowledge, and opportunities to grow.',
     impactHighlandFundGoal1: 'Build a community reading corner — sparking curiosity and a love of learning.',
     impactHighlandFundGoal2: 'Age-appropriate sessions on puberty, health, personal boundaries, and self-protection.',
     impactHighlandFundGoal3: 'Provide books, school supplies, and practical support based on real local needs.',
